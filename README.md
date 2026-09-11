@@ -1,3 +1,4 @@
-Multimedia Retrieval CBSR
+# Multimedia Retrieval CBSR
 
-Hello
+Database sourced from:
+https://github.com/MaxRee94/ShapeDatabase_INFOMR
