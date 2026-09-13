@@ -1,14 +1,16 @@
 import vedo
 import os
-from typing import List, Any
 from dataclasses import dataclass
+from mesh_types import Box, FaceType
 
 
 @dataclass
 class ShapeAnalysis:
     shape_class: str
-    nfaces: int
-    npoints: int
+    n_faces: int
+    n_points: int
+    bounding_box: Box
+    face_type: FaceType
 
 
 def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
@@ -36,7 +38,32 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     # Create mesh object from file
     mesh = vedo.Mesh(shape_path)
 
-    return ShapeAnalysis(shape_class, mesh.ncells, mesh.npoints)
+    # Get bounding box of mesh
+    bounds_array = mesh.bounds()
+    if bounds_array is None:
+        ValueError(
+            f"Could not retrieve bounding box coords from shape: {shape_path},"
+            + f", bounding cords: {bounds_array}"
+        )
+
+    # Put into more readable class
+    bounding_box = Box(*bounds_array)
+
+    # Retrieve celss for face/cell type
+    cells: list = mesh.cells
+    if cells is None or len(cells) == 0:
+        ValueError(f"Could not retrieve any cells from shape: {shape_path}")
+
+    # Classify cells
+    face_type = FaceType.MIXED
+    if all(len(cell) == 3 for cell in cells):
+        face_type = FaceType.TRIANGLES
+    elif all(len(cell) == 4 for cell in cells):
+        face_type = FaceType.QUADS
+
+    return ShapeAnalysis(
+        shape_class, mesh.ncells, mesh.npoints, bounding_box, face_type
+    )
 
 
 def main():
