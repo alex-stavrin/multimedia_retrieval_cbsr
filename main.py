@@ -10,8 +10,6 @@ def main():
     if not mesh_path.is_file():
         raise FileNotFoundError(f"Mesh file not found : {mesh_path}")
 
-    print("hello?")
-
     models : list[Mesh] = [Mesh(mesh_path)]
 
     model_viewer.run(models)
