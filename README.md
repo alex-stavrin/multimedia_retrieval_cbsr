@@ -23,7 +23,10 @@ https://github.com/MaxRee94/ShapeDatabase_INFOMR
 
 You can download the 3d models locally by doing :  
 ```git pull```  
-```git submodule update --init --recursive```  
+```git submodule update --init --recursive```
+
+## 4. How to run  
+```python main.py```  
 
 ## 4. How to Develop
 
