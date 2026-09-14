@@ -10,9 +10,14 @@ def main():
     if not mesh_path.is_file():
         raise FileNotFoundError(f"Mesh file not found : {mesh_path}")
 
-    models : list[Mesh] = [Mesh(mesh_path)]
+    meshes : list[Mesh] = [Mesh(mesh_path)]
 
-    model_viewer.run(models)
+    # add shading and lighting to meshes
+    for mesh in meshes:
+        mesh.phong()
+        mesh.lighting("plastic")
+
+    model_viewer.run(meshes)
     model_viewer.close()
     
 
