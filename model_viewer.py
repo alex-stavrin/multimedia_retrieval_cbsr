@@ -1,4 +1,4 @@
-from vedo import Plotter, Mesh
+from vedo import Plotter, Mesh, Text2D
 
 # This is a abstraction class to handle model/mesh viewing using the Plotter class of vedo
 class ModelViewer:
@@ -7,7 +7,7 @@ class ModelViewer:
             title=window_title,
             size=window_size,
             bg=background_color
-        )
+        )   
 
         # We have to implement scroll ourself in this viewer mode (mode=8)
         self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
@@ -36,3 +36,12 @@ class ModelViewer:
 
     def close(self) -> None:
         self.viewer.close()
+
+    def add_mesh_name_text(self, mesh_name):
+        mesh_name_text = Text2D(
+            mesh_name,
+            pos="bottom-right",
+            c="white",
+            s=1.2
+        )
+        self.viewer.add(mesh_name_text)
