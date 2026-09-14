@@ -1,6 +1,7 @@
 from model_viewer import ModelViewer
 from vedo import Mesh, Points
 from pathlib import Path
+import sys
 
 
 def main():
@@ -8,7 +9,7 @@ def main():
         "Multimedia Retrieval CBSR", window_size=(1000, 1000), background_color="black"
     )
 
-    mesh_path_name: str = "3d_models/Bicycle/D00033.obj"
+    mesh_path_name: str = sys.argv[1]
     mesh_path: Path = Path(__file__).resolve().parent / mesh_path_name
     if not mesh_path.is_file():
         raise FileNotFoundError(f"Mesh file not found : {mesh_path}")
