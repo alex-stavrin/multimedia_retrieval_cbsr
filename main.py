@@ -15,10 +15,14 @@ def main():
             ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
         )
 
+    # Make the QT Application
     app = QApplication(sys.argv)
+
+    # Add an application icon
     app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
     app.setWindowIcon(QIcon(str(app_icon_path)))
 
+    # Look if the mesh path we were given as command line arguement actually exists
     mesh_path_name: str = sys.argv[1]
     mesh_path: Path = Path(__file__).resolve().parent / mesh_path_name
     if not mesh_path.is_file():
