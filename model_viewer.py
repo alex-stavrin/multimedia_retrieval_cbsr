@@ -8,10 +8,9 @@ from PySide6.QtWidgets import (
     QCheckBox,
 )
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from vedo import Plotter, Mesh, Text2D, Points
+from vedo import Plotter, Mesh, Points
 
 
-# This is a abstraction class to handle model/mesh viewing using the Plotter class of vedo
 class ModelViewer(QMainWindow):
     def __init__(
         self,
@@ -93,26 +92,32 @@ class ModelViewer(QMainWindow):
         self.viewer.render()
 
     def run(self) -> None:
+
         self.show()
         self.vtk_widget.Initialize()
 
         self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
 
     def set_edges_visible(self, visible: bool) -> None:
+
         for mesh in self.meshes:
             mesh.linewidth(1 if visible else 0)
 
         self.viewer.render()
 
     def set_vertices_visible(self, visible: bool) -> None:
+
         for points in self.points:
             points.actor.SetVisibility(visible)
 
         self.viewer.render()
 
     def closeEvent(self, event) -> None:
+
+        # clean up vtk widget
         self.vtk_widget.Disable()
         self.vtk_widget.close()
+
         super().closeEvent(event)
 
     def add_mesh_name_text(self, mesh_name: str) -> None:

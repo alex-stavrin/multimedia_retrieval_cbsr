@@ -1,13 +1,23 @@
 from model_viewer import ModelViewer
 from vedo import Mesh, Points
 from pathlib import Path
+import ctypes
 import sys
 from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon
 
 
 def main():
 
+    # Give the viewer its own Windows taskbar identity.
+    if sys.platform == "win32":
+        ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+            ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+        )
+
     app = QApplication(sys.argv)
+    app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
+    app.setWindowIcon(QIcon(str(app_icon_path)))
 
     mesh_path_name: str = sys.argv[1]
     mesh_path: Path = Path(__file__).resolve().parent / mesh_path_name
