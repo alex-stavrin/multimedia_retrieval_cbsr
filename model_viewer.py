@@ -1,18 +1,84 @@
-from vedo import Plotter, Mesh, Text2D
+from PySide6.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QFrame,
+    QHBoxLayout,
+    QVBoxLayout,
+    QLabel,
+    QCheckBox,
+)
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vedo import Plotter, Mesh, Text2D, Points
 
 
 # This is a abstraction class to handle model/mesh viewing using the Plotter class of vedo
-class ModelViewer:
+class ModelViewer(QMainWindow):
     def __init__(
-        self, window_title: str, window_size: tuple[int, int], background_color: str
+        self,
+        window_title: str,
+        window_size: tuple[int, int],
+        background_color: str,
+        meshes: list[Mesh],
+        points: list[Points],
     ):
-        self.viewer: Plotter = Plotter(
-            title=window_title, size=window_size, bg=background_color
-        )
 
-        # We have to implement scroll ourself in this viewer mode (mode=8)
+        super().__init__()
+
+        self.setWindowTitle(window_title)
+        self.resize(*window_size)
+
+        # pass meshes and points and store them
+        self.meshes = meshes
+        self.points = points
+
+        # this is the main container. It will hold the viewer and sidebar horizontally
+        container = QWidget()
+        self.setCentralWidget(container)
+
+        # this will be the 3d model viewer
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        # this will be the side bar with the controls
+        side_bar = QFrame()
+        side_bar.setFixedWidth(240)
+
+        # this is the vertical box for the controls
+        controls = QVBoxLayout(side_bar)
+        controls.setContentsMargins(16, 16, 16, 16)
+        controls.setSpacing(12)
+
+        # this is the name of the 3d model path
+        self.mesh_name_label = QLabel()
+        self.mesh_name_label.setWordWrap(True)
+        controls.addWidget(self.mesh_name_label)
+
+        self.edges_checkbox = QCheckBox("Show Edges")
+        self.edges_checkbox.setChecked(True)
+        controls.addWidget(self.edges_checkbox)
+
+        self.vertices_checkbox = QCheckBox("Show Vertices")
+        self.vertices_checkbox.setChecked(True)
+        controls.addWidget(self.vertices_checkbox)
+
+        # Add empty space to keep all controls at the top
+        controls.addStretch()
+
+        layout.addWidget(side_bar)
+
+        # VTK is the library for rendering 3d models
+        # Add VTK inside the Qt layout
+        self.vtk_widget = QVTKRenderWindowInteractor(container)
+        layout.addWidget(self.vtk_widget, 1)
+
+        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)
+
         self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
         self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
+
+        self.edges_checkbox.toggled.connect(self.set_edges_visible)
+        self.vertices_checkbox.toggled.connect(self.set_vertices_visible)
 
     def on_scroll(self, interactor, event) -> None:
         factor = 1.15 if event == "MouseWheelForwardEvent" else 1 / 1.15
@@ -26,12 +92,28 @@ class ModelViewer:
         self.viewer.renderer.ResetCameraClippingRange()
         self.viewer.render()
 
-    def run(self, meshes: list[Mesh]) -> None:
-        self.viewer.show(*meshes, axes=8, mode=8, interactive=True)
+    def run(self) -> None:
+        self.show()
+        self.vtk_widget.Initialize()
 
-    def close(self) -> None:
-        self.viewer.close()
+        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
 
-    def add_mesh_name_text(self, mesh_name):
-        mesh_name_text = Text2D(mesh_name, pos="bottom-right", c="white", s=1.2)
-        self.viewer.add(mesh_name_text)
+    def set_edges_visible(self, visible: bool) -> None:
+        for mesh in self.meshes:
+            mesh.linewidth(1 if visible else 0)
+
+        self.viewer.render()
+
+    def set_vertices_visible(self, visible: bool) -> None:
+        for points in self.points:
+            points.actor.SetVisibility(visible)
+
+        self.viewer.render()
+
+    def closeEvent(self, event) -> None:
+        self.vtk_widget.Disable()
+        self.vtk_widget.close()
+        super().closeEvent(event)
+
+    def add_mesh_name_text(self, mesh_name: str) -> None:
+        self.mesh_name_label.setText(mesh_name)

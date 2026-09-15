@@ -2,7 +2,8 @@
 
 ## 1. About
 
-Assignement for Multimedia Retrieval
+Assignement for Multimedia Retrieval  
+Website : https://webspace.science.uu.nl/~telea001/MR/Assignment  
 
 ## 2. Programming Language
 
@@ -38,3 +39,4 @@ So others can install the library too
 ## 5. Libraries
 
 - vedo
+- PySide6

@@ -2,12 +2,12 @@ from model_viewer import ModelViewer
 from vedo import Mesh, Points
 from pathlib import Path
 import sys
+from PySide6.QtWidgets import QApplication
 
 
 def main():
-    model_viewer: ModelViewer = ModelViewer(
-        "Multimedia Retrieval CBSR", window_size=(1000, 1000), background_color="black"
-    )
+
+    app = QApplication(sys.argv)
 
     mesh_path_name: str = sys.argv[1]
     mesh_path: Path = Path(__file__).resolve().parent / mesh_path_name
@@ -30,12 +30,20 @@ def main():
         points: Points = Points(mesh.vertices, r=4, c="magenta")
         vertices.append(points)
 
-    meshes_and_points: list[Mesh | Points] = meshes + vertices
+    model_viewer: ModelViewer = ModelViewer(
+        window_title="Multimedia Retrieval CBSR",
+        window_size=(1000, 1000),
+        background_color="black",
+        meshes=meshes,
+        points=vertices,
+    )
+
     model_viewer.add_mesh_name_text(mesh_path_name)
-    model_viewer.run(meshes_and_points)
-    model_viewer.close()
+    model_viewer.run()
+
+    return app.exec()
 
 
 # checks if the current file is being run directly using "python main.py" and not imported
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
