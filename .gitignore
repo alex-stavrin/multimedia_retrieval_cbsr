@@ -1,3 +1,5 @@
 .venv/
 __pycache__/
 *.py[cod]
+.claude/
+3d_models_normalized/
