@@ -1,3 +1,5 @@
-# Prevents database from being uploaded
-**/ShapeDatabase_INFOMR**
+# Ignore my (david) database download
+ShapeData
+**ShapeData**/**
 
+3d_models

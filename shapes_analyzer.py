@@ -8,6 +8,7 @@ import csv
 
 @dataclass
 class ShapeAnalysis:
+    relative_file_path: str
     shape_class: str
     n_faces: int
     n_points: int
@@ -21,6 +22,7 @@ class ShapeAnalysis:
     ) -> None:
         with open(filename, "w", newline="") as f:
             fieldnames = [
+                "relative_file_path",
                 "shape_class",
                 "n_faces",
                 "n_points",
@@ -39,6 +41,7 @@ class ShapeAnalysis:
             for shape in shapes:
                 writer.writerow(
                     {
+                        "relative_file_path": shape.relative_file_path,
                         "shape_class": shape.shape_class,
                         "n_faces": shape.n_faces,
                         "n_points": shape.n_points,
@@ -103,8 +106,15 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     elif all(len(cell) == 4 for cell in cells):
         face_type = FaceType.QUADS
 
+    relative_path = split_path[-2] + "/" + split_path[-1]
+
     return ShapeAnalysis(
-        shape_class, mesh.ncells, mesh.npoints, bounding_box, face_type
+        relative_path,
+        shape_class,
+        mesh.ncells,
+        mesh.npoints,
+        bounding_box,
+        face_type,
     )
 
 
@@ -132,8 +142,8 @@ def retrieve_all_shape_files(root_dir: str):
 
 
 def analyze_database(root_dir: str, output_path: str):
-    if not isinstance(root_dir, str) or not isinstance(output_path, str):
-        ValueError("File paths must be string")
+    if not isinstance(root_dir, str) or output_path is not str:
+        TypeError("File paths must be string")
 
     if not os.path.exists(root_dir):
         ValueError(f"Root dir does not exist: {root_dir}")
@@ -144,9 +154,30 @@ def analyze_database(root_dir: str, output_path: str):
     all_shape_paths: np.ndarray = retrieve_all_shape_files(root_dir)
 
     all_analyses = []
-    for shape_path in all_shape_paths:
+    n_total_shapes = len(all_shape_paths)
+    last_percentage = 0
+
+    bar_length = 40
+    print("Starting to analyse shapes in database")
+    for i, shape_path in enumerate(all_shape_paths, start=1):
         analysis: ShapeAnalysis = analyze_shape_from_file(shape_path)
         all_analyses.append(analysis)
+
+        percentage_done: float = int(i / n_total_shapes * 100)
+
+        if percentage_done > last_percentage:
+            last_percentage = percentage_done
+
+            filled = int(bar_length * percentage_done / 100)
+            bar = "█" * filled + "-" * (bar_length - filled)
+
+            print(
+                f"\r[{bar}] {percentage_done:3d}% ({i}/{n_total_shapes})",
+                end="",
+                flush=True
+            )
+    # Newline at end
+    print()
 
     ShapeAnalysis.write_analyses_to_csv(all_analyses, output_path)
 
