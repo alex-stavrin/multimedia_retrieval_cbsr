@@ -2,6 +2,7 @@
 - add fps counter?
 - add content browser?
 - allow for multiple models rendering?
+- add smooth and flat shading
 
 # Step 2
 # Step 3

@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QCheckBox,
+    QComboBox,
 )
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vedo import Plotter, Mesh, Points
@@ -53,13 +54,27 @@ class ModelViewer(QMainWindow):
         self.mesh_name_label.setWordWrap(True)
         controls.addWidget(self.mesh_name_label)
 
+        # checkbox to toggle edges
         self.edges_checkbox = QCheckBox("Show Edges")
         self.edges_checkbox.setChecked(True)
         controls.addWidget(self.edges_checkbox)
 
+        # checkbox to toggle vertices
         self.vertices_checkbox = QCheckBox("Show Vertices")
         self.vertices_checkbox.setChecked(True)
         controls.addWidget(self.vertices_checkbox)
+
+        # input dropdown for selecting shading
+        controls.addWidget(QLabel("Shading"))
+        self.shading_dropdown = QComboBox()
+        self.shading_dropdown.addItems(
+            [
+                "Smooth Shading",
+                "Flat Shading",
+            ]
+        )
+        self.shading_dropdown.currentTextChanged.connect(self.on_shading_option_changed)
+        controls.addWidget(self.shading_dropdown)
 
         # Add empty space to keep all controls at the top
         controls.addStretch()
@@ -122,3 +137,11 @@ class ModelViewer(QMainWindow):
 
     def add_mesh_name_text(self, mesh_name: str) -> None:
         self.mesh_name_label.setText(mesh_name)
+
+    def on_shading_option_changed(self, input_selection_text: str) -> None:
+        for mesh in self.meshes:
+            if input_selection_text == "Flat Shading":
+                mesh.flat()
+            elif input_selection_text == "Smooth Shading":
+                mesh.phong()
+        self.viewer.render()

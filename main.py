@@ -33,6 +33,7 @@ def main():
 
     for mesh in meshes:
         # add shading and lighting to meshes
+        mesh.compute_normals(points=True, cells=True)
         mesh.phong()
         mesh.lighting("plastic")
 
