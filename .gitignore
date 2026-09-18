@@ -2,4 +2,11 @@
 ShapeData
 **ShapeData**/**
 
+**__pycache__
+**.venv
+
+# UV ignore
+pyproject.toml
+uv.lock
+
 3d_models

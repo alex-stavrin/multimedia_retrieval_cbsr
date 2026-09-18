@@ -103,8 +103,12 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     face_type = FaceType.MIXED
     if all(len(cell) == 3 for cell in cells):
         face_type = FaceType.TRIANGLES
-    elif all(len(cell) == 4 for cell in cells):
-        face_type = FaceType.QUADS
+
+    if all(len(cell) == 4 for cell in cells):
+        if face_type == FaceType.TRIANGLES:
+            face_type = FaceType.MIXED
+        else:
+            face_type = FaceType.QUADS
 
     relative_path = split_path[-2] + "/" + split_path[-1]
 
@@ -169,12 +173,12 @@ def analyze_database(root_dir: str, output_path: str):
             last_percentage = percentage_done
 
             filled = int(bar_length * percentage_done / 100)
-            bar = "█" * filled + "-" * (bar_length - filled)
+            bar = "#" * filled + "-" * (bar_length - filled)
 
             print(
                 f"\r[{bar}] {percentage_done:3d}% ({i}/{n_total_shapes})",
                 end="",
-                flush=True
+                flush=True,
             )
     # Newline at end
     print()
