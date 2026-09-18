@@ -100,7 +100,7 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
         ValueError(f"Could not retrieve any cells from shape: {shape_path}")
 
     # Classify cells
-    face_type = FaceType.MIXED
+    face_type = FaceType.POLY
     if all(len(cell) == 3 for cell in cells):
         face_type = FaceType.TRIANGLES
 

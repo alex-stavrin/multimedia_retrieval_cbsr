@@ -16,3 +16,4 @@ class FaceType(Enum):
     TRIANGLES = 1
     QUADS = 2
     MIXED = 3
+    POLY = 4
