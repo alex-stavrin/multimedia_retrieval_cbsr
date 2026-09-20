@@ -42,7 +42,7 @@ def main():
         mesh.linecolor("white")
 
         # make vertices of mesh stand out
-        points: Points = Points(mesh.vertices, r=4, c="magenta")
+        points: Points = Points(mesh.vertices, r=5, c="magenta")
         vertices.append(points)
 
     model_viewer: ModelViewer = ModelViewer(
