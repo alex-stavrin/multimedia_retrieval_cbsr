@@ -1,0 +1,147 @@
+from PySide6.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QFrame,
+    QHBoxLayout,
+    QVBoxLayout,
+    QLabel,
+    QCheckBox,
+    QComboBox,
+)
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vedo import Plotter, Mesh, Points
+
+
+class ModelViewer(QMainWindow):
+    def __init__(
+        self,
+        window_title: str,
+        window_size: tuple[int, int],
+        background_color: str,
+        meshes: list[Mesh],
+        points: list[Points],
+    ):
+
+        super().__init__()
+
+        self.setWindowTitle(window_title)
+        self.resize(*window_size)
+
+        # pass meshes and points and store them
+        self.meshes = meshes
+        self.points = points
+
+        # this is the main container. It will hold the viewer and sidebar horizontally
+        container = QWidget()
+        self.setCentralWidget(container)
+
+        # this will be the 3d model viewer
+        layout = QHBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+        # this will be the side bar with the controls
+        side_bar = QFrame()
+        side_bar.setFixedWidth(240)
+
+        # this is the vertical box for the controls
+        controls = QVBoxLayout(side_bar)
+        controls.setContentsMargins(16, 16, 16, 16)
+        controls.setSpacing(12)
+
+        # this is the name of the 3d model path
+        self.mesh_name_label = QLabel()
+        self.mesh_name_label.setWordWrap(True)
+        controls.addWidget(self.mesh_name_label)
+
+        # checkbox to toggle edges
+        self.edges_checkbox = QCheckBox("Show Edges")
+        self.edges_checkbox.setChecked(True)
+        controls.addWidget(self.edges_checkbox)
+
+        # checkbox to toggle vertices
+        self.vertices_checkbox = QCheckBox("Show Vertices")
+        self.vertices_checkbox.setChecked(True)
+        controls.addWidget(self.vertices_checkbox)
+
+        # input dropdown for selecting shading
+        controls.addWidget(QLabel("Shading"))
+        self.shading_dropdown = QComboBox()
+        self.shading_dropdown.addItems(
+            [
+                "Smooth Shading",
+                "Flat Shading",
+            ]
+        )
+        self.shading_dropdown.currentTextChanged.connect(self.on_shading_option_changed)
+        controls.addWidget(self.shading_dropdown)
+
+        # Add empty space to keep all controls at the top
+        controls.addStretch()
+
+        layout.addWidget(side_bar)
+
+        # VTK is the library for rendering 3d models
+        # Add VTK inside the Qt layout
+        self.vtk_widget = QVTKRenderWindowInteractor(container)
+        layout.addWidget(self.vtk_widget, 1)
+
+        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)
+
+        self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
+        self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
+
+        self.edges_checkbox.toggled.connect(self.set_edges_visible)
+        self.vertices_checkbox.toggled.connect(self.set_vertices_visible)
+
+    def on_scroll(self, interactor, event) -> None:
+        factor = 1.15 if event == "MouseWheelForwardEvent" else 1 / 1.15
+        camera = self.viewer.camera
+
+        if camera.GetParallelProjection():
+            camera.SetParallelScale(camera.GetParallelScale() / factor)
+        else:
+            camera.Dolly(factor)
+
+        self.viewer.renderer.ResetCameraClippingRange()
+        self.viewer.render()
+
+    def run(self) -> None:
+
+        self.show()
+        self.vtk_widget.Initialize()
+
+        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
+
+    def set_edges_visible(self, visible: bool) -> None:
+
+        for mesh in self.meshes:
+            mesh.linewidth(1 if visible else 0)
+
+        self.viewer.render()
+
+    def set_vertices_visible(self, visible: bool) -> None:
+
+        for points in self.points:
+            points.actor.SetVisibility(visible)
+
+        self.viewer.render()
+
+    def closeEvent(self, event) -> None:
+
+        # clean up vtk widget
+        self.vtk_widget.Disable()
+        self.vtk_widget.close()
+
+        super().closeEvent(event)
+
+    def add_mesh_name_text(self, mesh_name: str) -> None:
+        self.mesh_name_label.setText(mesh_name)
+
+    def on_shading_option_changed(self, input_selection_text: str) -> None:
+        for mesh in self.meshes:
+            if input_selection_text == "Flat Shading":
+                mesh.flat()
+            elif input_selection_text == "Smooth Shading":
+                mesh.phong()
+        self.viewer.render()

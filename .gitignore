@@ -2,8 +2,6 @@
 ShapeData
 **ShapeData**/**
 
-**__pycache__
-**.venv
 
 **.pdf
 
@@ -12,3 +10,7 @@ pyproject.toml
 uv.lock
 
 3d_models
+
+.venv/
+__pycache__/
+*.py[cod]
