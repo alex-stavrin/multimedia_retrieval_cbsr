@@ -5,6 +5,8 @@ ShapeData
 **__pycache__
 **.venv
 
+**.pdf
+
 # UV ignore
 pyproject.toml
 uv.lock

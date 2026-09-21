@@ -6,6 +6,7 @@ import numpy as np
 import csv
 
 
+
 @dataclass
 class ShapeAnalysis:
     relative_file_path: str
