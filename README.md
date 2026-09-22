@@ -30,17 +30,14 @@ You can download the 3d models locally by doing :
 ```git pull```  
 ```git submodule update --init --recursive```
 
-## 5. How to run  
-```python main.py```  
-
-## 6. How to Develop
+## 5. How to Develop
 
 ### Adding Libraries
 If you add a new library do  
 ```py -m pip freeze > requirements.txt```  
 So others can install the library too
 
-## 7. Libraries
+## 6. Libraries
 
 - vedo
 - PySide6
