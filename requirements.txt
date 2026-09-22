@@ -3,7 +3,6 @@ cycler==0.12.1
 fonttools==4.65.0
 kiwisolver==1.5.1
 matplotlib==3.11.1
--e file:///home/david/Game_and_Media_Technology/Multimedia_Retrieval/Code/multimedia_retrieval_cbsr
 numpy==2.5.3
 packaging==26.3
 pandas==3.0.5
