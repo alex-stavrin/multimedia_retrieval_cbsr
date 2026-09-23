@@ -31,7 +31,8 @@ class ModelViewer(QMainWindow):
         self.meshes = meshes
         self.points = points
 
-        # this is the main container. It will hold the viewer and sidebar horizontally
+        # this is the main container. It will hold the viewer and
+        # sidebar horizontally
         container = QWidget()
         self.setCentralWidget(container)
 
@@ -73,7 +74,9 @@ class ModelViewer(QMainWindow):
                 "Flat Shading",
             ]
         )
-        self.shading_dropdown.currentTextChanged.connect(self.on_shading_option_changed)
+        self.shading_dropdown.currentTextChanged.connect(
+            self.on_shading_option_changed
+        )
         controls.addWidget(self.shading_dropdown)
 
         # Add empty space to keep all controls at the top
@@ -88,8 +91,12 @@ class ModelViewer(QMainWindow):
 
         self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)
 
-        self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
-        self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
+        self.viewer.interactor.AddObserver(
+            "MouseWheelForwardEvent", self.on_scroll
+        )
+        self.viewer.interactor.AddObserver(
+            "MouseWheelBackwardEvent", self.on_scroll
+        )
 
         self.edges_checkbox.toggled.connect(self.set_edges_visible)
         self.vertices_checkbox.toggled.connect(self.set_vertices_visible)
@@ -111,7 +118,9 @@ class ModelViewer(QMainWindow):
         self.show()
         self.vtk_widget.Initialize()
 
-        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
+        self.viewer.show(
+            *self.meshes, *self.points, axes=8, mode=8, interactive=False
+        )
 
     def set_edges_visible(self, visible: bool) -> None:
 

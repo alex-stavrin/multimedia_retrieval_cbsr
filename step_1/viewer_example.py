@@ -6,6 +6,11 @@ import sys
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 
+# Wayland fix
+import os
+
+os.environ["QT_QPA_PLATFORM"] = "xcb"
+
 
 def main():
 
@@ -22,7 +27,8 @@ def main():
     app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
     app.setWindowIcon(QIcon(str(app_icon_path)))
 
-    # Look if the mesh path we were given as command line arguement actually exists
+    # Look if the mesh path we were given as command line arguement
+    # actually exists
     mesh_path_name: str = sys.argv[1]
     mesh_path: Path = Path(__file__).resolve().parent / mesh_path_name
     if not mesh_path.is_file():
@@ -59,6 +65,7 @@ def main():
     return app.exec()
 
 
-# checks if the current file is being run directly using "python main.py" and not imported
+# checks if the current file is being run directly using "python main.py"
+# and not imported
 if __name__ == "__main__":
     sys.exit(main())
