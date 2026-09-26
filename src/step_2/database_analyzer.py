@@ -151,17 +151,17 @@ def plot_histogram(
 
     ax.axvline(
         mean,
-        color="red",
+        color="magenta",
         linestyle="--",
-        linewidth=2,
+        linewidth=4,
         label=f"Mean: {mean:.2f}",
     )
 
     ax.axvline(
         median,
-        color="green",
-        linestyle="--",
-        linewidth=2,
+        color="lime",
+        linestyle="-.",
+        linewidth=4,
         label=f"Median: {median:.2f}",
     )
 
@@ -232,17 +232,17 @@ def plot_combined_histogram(
 
     ax.axvline(
         mean,
-        color="darkred",
+        color="magenta",
         linestyle="--",
-        linewidth=2,
+        linewidth=4,
         label=f"Mean: {mean:.2f}",
     )
 
     ax.axvline(
         median,
-        color="darkgreen",
-        linestyle="--",
-        linewidth=2,
+        color="lime",
+        linestyle="-.",
+        linewidth=4,
         label=f"Median: {median:.2f}",
     )
 
