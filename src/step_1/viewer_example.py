@@ -29,7 +29,7 @@ def main():
         mesh.linecolor("#000000")
 
         # make vertices of mesh stand out
-        points: Points = Points(mesh.vertices, r=5, c="#000000")
+        points: Points = Points(mesh.vertices, r=6, c="#000000")
         vertices.append(points)
 
     app = QApplication(sys.argv)
