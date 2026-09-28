@@ -21,14 +21,15 @@ def main():
         # add shading and lighting to meshes
         mesh.compute_normals(points=True, cells=True)
         mesh.phong()
+        mesh.c("#A0A0A0")
         mesh.lighting("plastic")
 
         # make edges of mesh stand out
         mesh.linewidth(1)
-        mesh.linecolor("white")
+        mesh.linecolor("#000000")
 
         # make vertices of mesh stand out
-        points: Points = Points(mesh.vertices, r=5, c="magenta")
+        points: Points = Points(mesh.vertices, r=5, c="#000000")
         vertices.append(points)
 
     app = QApplication(sys.argv)
@@ -36,7 +37,7 @@ def main():
         qt_app=app,
         window_title="Multimedia Retrieval CBSR",
         window_size=(1000, 1000),
-        background_color="black",
+        background_color="#FFFFFF",
         meshes=meshes,
         points=vertices,
     )
