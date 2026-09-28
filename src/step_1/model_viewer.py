@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (
+    QApplication,
     QMainWindow,
     QWidget,
     QFrame,
@@ -8,13 +9,19 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
 )
+from PySide6.QtGui import QIcon
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vedo import Plotter, Mesh, Points
+import ctypes
+import sys
+import os
+from pathlib import Path
 
 
 class ModelViewer(QMainWindow):
     def __init__(
         self,
+        qt_app: QApplication,
         window_title: str,
         window_size: tuple[int, int],
         background_color: str,
@@ -23,6 +30,21 @@ class ModelViewer(QMainWindow):
     ):
 
         super().__init__()
+
+        # Give the viewer its own Windows taskbar identity.
+        if sys.platform == "win32":
+            ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+                ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+            )
+        else:
+            os.environ["QT_QPA_PLATFORM"] = "xcb"
+
+        # Make the Application
+        self.app = qt_app
+
+        # Add an application icon
+        app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
+        self.app.setWindowIcon(QIcon(str(app_icon_path)))
 
         self.setWindowTitle(window_title)
         self.resize(*window_size)
@@ -74,9 +96,7 @@ class ModelViewer(QMainWindow):
                 "Flat Shading",
             ]
         )
-        self.shading_dropdown.currentTextChanged.connect(
-            self.on_shading_option_changed
-        )
+        self.shading_dropdown.currentTextChanged.connect(self.on_shading_option_changed)
         controls.addWidget(self.shading_dropdown)
 
         # Add empty space to keep all controls at the top
@@ -91,12 +111,8 @@ class ModelViewer(QMainWindow):
 
         self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)
 
-        self.viewer.interactor.AddObserver(
-            "MouseWheelForwardEvent", self.on_scroll
-        )
-        self.viewer.interactor.AddObserver(
-            "MouseWheelBackwardEvent", self.on_scroll
-        )
+        self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
+        self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
 
         self.edges_checkbox.toggled.connect(self.set_edges_visible)
         self.vertices_checkbox.toggled.connect(self.set_vertices_visible)
@@ -112,15 +128,6 @@ class ModelViewer(QMainWindow):
 
         self.viewer.renderer.ResetCameraClippingRange()
         self.viewer.render()
-
-    def run(self) -> None:
-
-        self.show()
-        self.vtk_widget.Initialize()
-
-        self.viewer.show(
-            *self.meshes, *self.points, axes=8, mode=8, interactive=False
-        )
 
     def set_edges_visible(self, visible: bool) -> None:
 
@@ -154,3 +161,11 @@ class ModelViewer(QMainWindow):
             elif input_selection_text == "Smooth Shading":
                 mesh.phong()
         self.viewer.render()
+
+    def exec(self):
+        self.show()
+        self.vtk_widget.Initialize()
+
+        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
+
+        return self.app.exec()
