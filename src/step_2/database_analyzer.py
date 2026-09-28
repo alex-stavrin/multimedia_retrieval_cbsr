@@ -9,27 +9,58 @@ from matplotlib import rc
 FONT = {"weight": "bold", "size": 20}
 FIGURE_SIZE = (21, 7)
 rc("font", **FONT)
-rc("xtick", labelsize=14)
+rc("xtick", labelsize=7)
 
 
 def show_histogram_from_csv(
-    csv_path: str, n_bins: int, column: str = "", save=False
+    csv_path: str,
+    n_bins: int,
+    column: str = "",
+    save=False,
 ) -> None:
     """Load a CSV file and display its distribution and detected outliers."""
     if not csv_path.endswith(".csv"):
         raise ValueError("Input file must end on .csv")
 
     df = pd.read_csv(csv_path)
-
-    fig, axes = plt.subplots(1, 3, figsize=FIGURE_SIZE)
-
-    plot_histogram(
-        df,
-        column,
-        bins=n_bins,
-        ylabel="Number of shapes",
-        ax=axes[0],
+    numeric = (
+        pd.to_numeric(df[column], errors="coerce").notnull().all()
     )
+
+    fig, axes = [], []
+
+    if numeric:
+        fig, axes = plt.subplots(1, 3, figsize=FIGURE_SIZE)
+        plot_histogram(
+            df,
+            column,
+            bins=n_bins,
+            ylabel="Number of shapes",
+            ax=axes[0],
+        )
+    else:
+        fig, axis = plt.subplots(1, 1, figsize=FIGURE_SIZE)
+
+        plot_histogram(
+            df,
+            column,
+            bins=n_bins,
+            ylabel="Number of shapes",
+            ax=axis,
+        )
+
+    # Quit early, do not calculate outliers
+    if not numeric:
+        if save:
+            fig.savefig(
+                fname=f"histogram_plot_{column}.pdf",
+                format="pdf",
+                bbox_inches="tight",
+            )
+        else:
+            plt.show()
+
+        return
 
     iqr_strictness = 1.5
     percentile = 0.05
@@ -128,17 +159,21 @@ def plot_histogram(
     **kwargs,
 ) -> Tuple[Figure, Axes]:
     """
-    Plot a histogram and mark its mean and median.
+    Plot a histogram for numeric data or a class-count bar chart
+    for non-numeric data.
 
-    If an existing Axes object is provided, the histogram is drawn
-    on that axis. Otherwise, a new figure and axis are created.
+    Numeric columns:
+        - Plot a histogram.
+        - Mark mean and median.
+
+    Non-numeric columns:
+        - Plot the number of occurrences per class.
+        - Display every class as an x-tick using a small font.
+        - Do not calculate or plot mean/median.
 
     Returns:
-        The figure and axes containing the histogram.
+        The figure and axes containing the plot.
     """
-
-    mean = df[column].mean()
-    median = df[column].median()
 
     if ax is None:
         fig, ax = plt.subplots(figsize=FIGURE_SIZE)
@@ -147,32 +182,63 @@ def plot_histogram(
 
     kwargs.setdefault("edgecolor", "black")
 
-    ax.hist(df[column], bins=bins, **kwargs)
+    if pd.api.types.is_numeric_dtype(df[column]):
+        # Numeric data: histogram + mean/median
+        mean = df[column].mean()
+        median = df[column].median()
 
-    ax.axvline(
-        mean,
-        color="red",
-        linestyle="--",
-        linewidth=2,
-        label=f"Mean: {mean:.2f}",
-    )
+        ax.hist(df[column].dropna(), bins=bins, **kwargs)
 
-    ax.axvline(
-        median,
-        color="green",
-        linestyle="--",
-        linewidth=2,
-        label=f"Median: {median:.2f}",
-    )
+        ax.axvline(
+            mean,
+            color="magenta",
+            linestyle="--",
+            linewidth=4,
+            label=f"Mean: {mean:.2f}",
+        )
 
-    ax.set_xlabel(column)
-    ax.set_ylabel(ylabel)
-    ax.set_yscale("log")
+        ax.axvline(
+            median,
+            color="lime",
+            linestyle="-.",
+            linewidth=4,
+            label=f"Median: {median:.2f}",
+        )
+
+        ax.set_xlabel(column)
+        ax.set_ylabel(ylabel)
+        ax.set_yscale("log")
+        ax.legend()
+
+    else:
+        # Non-numeric data: count occurrences per class
+        counts = df[column].value_counts(dropna=False)
+
+        # Convert labels to strings for display
+        labels = counts.index.astype(str)
+
+        ax.bar(
+            range(len(counts)),
+            counts.values,
+            **kwargs,
+        )
+
+        # Explicitly display every class
+        ax.set_xticks(range(len(counts)))
+        ax.set_xticklabels(
+            labels,
+            fontsize=12,
+            rotation=45,
+            ha="right",
+        )
+
+        ax.set_xlabel(column)
+        ax.set_ylabel(ylabel or "Count")
+
     if title == "":
         ax.set_title(f"Distribution of {column},\nTotal: {len(df)}")
     else:
         ax.set_title(title + f",\nTotal: {len(df)}")
-    ax.legend()
 
     if save:
         fig.savefig(
@@ -232,17 +298,17 @@ def plot_combined_histogram(
 
     ax.axvline(
         mean,
-        color="darkred",
+        color="magenta",
         linestyle="--",
-        linewidth=2,
+        linewidth=4,
         label=f"Mean: {mean:.2f}",
     )
 
     ax.axvline(
         median,
-        color="darkgreen",
-        linestyle="--",
-        linewidth=2,
+        color="lime",
+        linestyle="-.",
+        linewidth=4,
         label=f"Median: {median:.2f}",
     )
 
@@ -300,10 +366,11 @@ def main():
         action="store_true",
         help="If given, save image to file",
     )
-
     args = parser.parse_args()
 
-    show_histogram_from_csv(args.input, args.bins, args.property, args.save)
+    show_histogram_from_csv(
+        args.input, args.bins, args.property, args.save
+    )
 
 
 if __name__ == "__main__":
