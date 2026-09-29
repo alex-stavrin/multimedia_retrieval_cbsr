@@ -6,6 +6,7 @@ matplotlib==3.11.1
 numpy==2.5.3
 packaging==26.3
 pandas==3.0.5
+PySide6
 pillow==12.3.0
 pygments==2.21.0
 pyparsing==3.3.2
