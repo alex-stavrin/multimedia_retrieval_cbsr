@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from vedo import Plotter, Mesh, Points
+from vedo import Plotter, Mesh, Points, Line
 import ctypes
 import sys
 import os
@@ -52,6 +52,26 @@ class ModelViewer(QMainWindow):
         # pass meshes and points and store them
         self.meshes = meshes
         self.points = points
+
+        self.world_origin = Points([(0, 0, 0)], r=12, c="red").clone2d(size=1)
+        position = self.world_origin.GetPositionCoordinate()
+
+        # Set point to world origin
+        position.SetCoordinateSystemToWorld()
+        position.SetValue(0, 0, 0)
+
+        self.world_origin.ontop()
+
+        line_size = 1000
+        self.world_axes = [
+            Line((-line_size, 0, 0), (line_size, 0, 0), c="red", lw=2),
+            Line((0, -line_size, 0), (0, line_size, 0), c="green", lw=2),
+            Line((0, 0, -line_size), (0, 0, line_size), c="blue", lw=2),
+        ]
+
+        for axis in self.world_axes:
+            axis.use_bounds(False)
+            axis.pickable(False)
 
         # this is the main container. It will hold the viewer and
         # sidebar horizontally
@@ -126,7 +146,6 @@ class ModelViewer(QMainWindow):
         else:
             camera.Dolly(factor)
 
-        self.viewer.renderer.ResetCameraClippingRange()
         self.viewer.render()
 
     def set_edges_visible(self, visible: bool) -> None:
@@ -166,6 +185,25 @@ class ModelViewer(QMainWindow):
         self.show()
         self.vtk_widget.Initialize()
 
-        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
+        self.viewer.show(
+            *self.meshes,
+            *self.points,
+            *self.world_axes,
+            self.world_origin,
+            axes=7,
+            mode=8,
+            interactive=False
+        )
+
+        camera = self.viewer.camera
+
+        camera.ParallelProjectionOff()
+        camera.SetViewAngle(90)
+        camera.SetClippingRange(0.01, 10000)
+
+        style = self.viewer.interactor.GetInteractorStyle()
+        style.AutoAdjustCameraClippingRangeOff()
+
+        self.viewer.render()
 
         return self.app.exec()
