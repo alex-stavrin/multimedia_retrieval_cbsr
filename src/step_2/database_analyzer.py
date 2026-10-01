@@ -1,15 +1,54 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+import numpy as np
 from typing import Tuple
+
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from matplotlib import rc
+from matplotlib.ticker import MaxNLocator, EngFormatter
 
 # Set up global Matplotlib variables
 FONT = {"weight": "bold", "size": 20}
-FIGURE_SIZE = (21, 7)
+FIGURE_SIZE = (25, 7)
+RWIDTH = 0.8
 rc("font", **FONT)
 rc("xtick", labelsize=7)
+
+
+def _set_ticks_to_ax(ax: Axes, target_ticks, min_val, max_val):
+    raw_interval = (max_val - min_val) / target_ticks
+
+    magnitude = 10 ** np.floor(np.log10(raw_interval))
+    normalized = raw_interval / magnitude
+
+    if normalized <= 1:
+        tick_interval = 1 * magnitude
+    elif normalized <= 2:
+        tick_interval = 2 * magnitude
+    elif normalized <= 5:
+        tick_interval = 5 * magnitude
+    else:
+        tick_interval = 10 * magnitude
+
+    # Nice round ticks
+    tick_positions = np.arange(
+        np.ceil(min_val / tick_interval) * tick_interval,
+        max_val,
+        tick_interval,
+    )
+
+    # Always include the maximum
+    tick_positions = np.insert(tick_positions, 0, min_val)
+    tick_positions = np.append(tick_positions, max_val)
+
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels(
+        [f"{x:g}" for x in tick_positions],
+        fontsize=16,
+    )
+
+    return ax
 
 
 def show_histogram_from_csv(
@@ -23,9 +62,7 @@ def show_histogram_from_csv(
         raise ValueError("Input file must end on .csv")
 
     df = pd.read_csv(csv_path)
-    numeric = (
-        pd.to_numeric(df[column], errors="coerce").notnull().all()
-    )
+    numeric = pd.to_numeric(df[column], errors="coerce").notnull().all()
 
     fig, axes = [], []
 
@@ -187,7 +224,7 @@ def plot_histogram(
         mean = df[column].mean()
         median = df[column].median()
 
-        ax.hist(df[column].dropna(), bins=bins, **kwargs)
+        ax.hist(df[column].dropna(), bins=bins, rwidth=RWIDTH, **kwargs)
 
         ax.axvline(
             mean,
@@ -204,6 +241,8 @@ def plot_histogram(
             linewidth=4,
             label=f"Median: {median:.2f}",
         )
+
+        _set_ticks_to_ax(ax, 6, df[column].min(), df[column].max())
 
         ax.set_xlabel(column)
         ax.set_ylabel(ylabel)
@@ -227,9 +266,8 @@ def plot_histogram(
         ax.set_xticks(range(len(counts)))
         ax.set_xticklabels(
             labels,
-            fontsize=12,
-            rotation=45,
-            ha="right",
+            fontsize=19,
+            rotation=90,
         )
 
         ax.set_xlabel(column)
@@ -281,6 +319,7 @@ def plot_combined_histogram(
         alpha=0.5,
         edgecolor="black",
         label=f"Distribution (n={len(values)})",
+        rwidth=RWIDTH,
     )
 
     ax.hist(
@@ -290,6 +329,7 @@ def plot_combined_histogram(
         alpha=0.75,
         edgecolor="black",
         label=f"Outliers (n={len(outlier_values)})",
+        rwidth=RWIDTH,
     )
 
     # Mean and median of the complete distribution
@@ -312,6 +352,8 @@ def plot_combined_histogram(
         label=f"Median: {median:.2f}",
     )
 
+    _set_ticks_to_ax(ax, 6, values.min(), values.max())
+
     ax.set_xlabel(column)
     ax.set_ylabel("Number of shapes")
 
@@ -319,8 +361,9 @@ def plot_combined_histogram(
 
     ax.set_title(
         f"Distribution and Outliers of {column}\n"
-        f"IQR strictness: {iqr_strictness}, "
-        f"percentile: {percentile:.0%}"
+        f"(IQR strictness: {iqr_strictness}, "
+        f"percentile: {percentile:.0%})\n"
+        f"total: {len(values)}"
     )
 
     ax.legend()
@@ -368,9 +411,7 @@ def main():
     )
     args = parser.parse_args()
 
-    show_histogram_from_csv(
-        args.input, args.bins, args.property, args.save
-    )
+    show_histogram_from_csv(args.input, args.bins, args.property, args.save)
 
 
 if __name__ == "__main__":
