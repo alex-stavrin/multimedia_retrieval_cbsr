@@ -14,3 +14,7 @@ uv.lock
 .venv/
 __pycache__/
 *.py[cod]
+
+3d_models_normalized/
+3d_models_reduced/
+3d_models_reduced_normalized/
