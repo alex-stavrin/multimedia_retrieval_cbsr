@@ -47,7 +47,7 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     # Put into more readable class
     bounding_box = Box(*bounds_array)
 
-    # Retrieve celss for face/cell type
+    # Retrieve cells for face/cell type
     cells: list = mesh.cells
     if cells is None or len(cells) == 0:
         ValueError(f"Could not retrieve any cells from shape: {shape_path}")
