@@ -1,7 +1,8 @@
 import vedo
 import os
 from dataclasses import dataclass
-from mesh_types import Box, FaceType
+from src.helper.mesh_types import Box, FaceType
+from src.helper.database_functions import retrieve_all_shape_files
 import numpy as np
 import csv
 
@@ -65,15 +66,17 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
         ValueError(f"File path must be string: {type(shape_path)}")
 
     if not os.path.exists(shape_path):
-        ValueError(f"{shape_path.__qualname__} does not exist: {shape_path}.")
+        ValueError(f"{shape_path} does not exist: {shape_path}.")
 
     if not shape_path.endswith(".obj"):
-        ValueError(f"{shape_path.__qualname__} is of invalid type: {shape_path}.")
+        ValueError(f"{shape_path} is of invalid type: {shape_path}.")
 
     # Get class of object
     split_path = shape_path.split("/")
     if len(split_path) <= 1:
-        ValueError(f"File path does not contain class superfolder: {shape_path}")
+        ValueError(
+            f"File path does not contain class superfolder: {shape_path}"
+        )
     shape_class = shape_path.split("/")[-2]
 
     # Create mesh object from file
@@ -116,27 +119,6 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
         bounding_box,
         face_type,
     )
-
-
-def retrieve_all_shape_files(root_dir: str):
-    resulting_shape_paths = np.array([])
-
-    cwd = os.getcwd() + "/"
-
-    # Go through all directories and files
-    for file_system_info in os.walk(root_dir):
-        # Check if the first file, of the files in a directory, is of type .obj
-        if not file_system_info[2][0].endswith(".obj"):
-            continue
-
-        cur_path = file_system_info[0] + "/"
-
-        for file in file_system_info[2]:
-            # Get absolute directory to avoid issues
-            shape_path = cwd + cur_path + file
-            resulting_shape_paths = np.append(resulting_shape_paths, shape_path)
-
-    return resulting_shape_paths
 
 
 def analyze_database(root_dir: str, output_path: str):
@@ -185,12 +167,16 @@ def main():
     # it as a module
     import argparse
 
-    parser = argparse.ArgumentParser(description="Analyze a 3D shape from an OBJ file.")
+    parser = argparse.ArgumentParser(
+        description="Analyze a 3D shape from an OBJ file."
+    )
 
     parser.add_argument(
         "-i", "--input", type=str, help="Path to the OBJ file to analyze"
     )
-    parser.add_argument("-o", "--output", type=str, help="Where to store CSV output")
+    parser.add_argument(
+        "-o", "--output", type=str, help="Where to store CSV output"
+    )
     parser.add_argument(
         "-s",
         "--single",

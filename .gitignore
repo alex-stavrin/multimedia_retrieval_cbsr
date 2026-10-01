@@ -9,7 +9,7 @@ ShapeData
 pyproject.toml
 uv.lock
 
-3d_models
+3d_models**
 
 .venv/
 __pycache__/

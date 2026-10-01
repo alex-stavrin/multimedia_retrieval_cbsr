@@ -1,7 +1,7 @@
 import vedo
 import os
 from dataclasses import dataclass
-from mesh_types import Box, FaceType
+from src.helper.mesh_types import Box, FaceType
 
 
 @dataclass
@@ -19,15 +19,17 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
         ValueError(f"File path must be string: {type(shape_path)}")
 
     if not os.path.exists(shape_path):
-        ValueError(f"{shape_path.__qualname__} does not exist: {shape_path}.")
+        ValueError(f"Shape file path does not exist: {shape_path}.")
 
     if not shape_path.endswith(".obj"):
-        ValueError(f"{shape_path.__qualname__} is of invalid type: {shape_path}.")
+        ValueError(f"Shape file path is of invalid type: {shape_path}.")
 
     # Get class of object
     split_path = shape_path.split("/")
     if len(split_path) <= 1:
-        ValueError(f"File path does not contain class superfolder: {shape_path}")
+        ValueError(
+            f"File path does not contain class superfolder: {shape_path}"
+        )
     shape_class = shape_path.split("/")[-2]
     print(shape_class)
 
@@ -67,7 +69,9 @@ def main():
     # it as a module
     import argparse
 
-    parser = argparse.ArgumentParser(description="Analyze a 3D shape from an OBJ file.")
+    parser = argparse.ArgumentParser(
+        description="Analyze a 3D shape from an OBJ file."
+    )
 
     parser.add_argument(
         "-i", "--input", type=str, help="Path to the OBJ file to analyze"

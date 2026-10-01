@@ -3,7 +3,7 @@ import trimesh
 import numpy as np
 import os
 import pandas as pd
-from src.step_2.mesh_types import FaceType
+from src.helper.mesh_types import FaceType
 from src.step_2.standardize_wireframe import standardize_wireframe
 import math
 
