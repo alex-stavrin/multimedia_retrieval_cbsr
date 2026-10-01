@@ -25,11 +25,11 @@ def main():
         mesh.lighting("plastic")
 
         # make edges of mesh stand out
-        mesh.linewidth(1)
+        mesh.linewidth(3)
         mesh.linecolor("#000000")
 
         # make vertices of mesh stand out
-        points: Points = Points(mesh.vertices, r=6, c="#000000")
+        points: Points = Points(mesh.vertices, r=10, c="#000000")
         vertices.append(points)
 
     app = QApplication(sys.argv)
