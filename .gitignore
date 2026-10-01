@@ -1,7 +1,20 @@
+# Ignore my (david) database download
+ShapeData
+**ShapeData**/**
+
+
+**.pdf
+
+# UV ignore
+pyproject.toml
+uv.lock
+
+3d_models
+
 .venv/
 __pycache__/
 *.py[cod]
-.claude/
+
 3d_models_normalized/
 3d_models_reduced/
 3d_models_reduced_normalized/

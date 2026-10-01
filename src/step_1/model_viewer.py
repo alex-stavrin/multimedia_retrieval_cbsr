@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import (
+    QApplication,
     QMainWindow,
     QWidget,
     QFrame,
@@ -6,14 +7,21 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QCheckBox,
+    QComboBox,
 )
+from PySide6.QtGui import QIcon
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from vedo import Plotter, Mesh, Points
+import ctypes
+import sys
+import os
+from pathlib import Path
 
 
 class ModelViewer(QMainWindow):
     def __init__(
         self,
+        qt_app: QApplication,
         window_title: str,
         window_size: tuple[int, int],
         background_color: str,
@@ -23,6 +31,21 @@ class ModelViewer(QMainWindow):
 
         super().__init__()
 
+        # Give the viewer its own Windows taskbar identity.
+        if sys.platform == "win32":
+            ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+                ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+            )
+        else:
+            os.environ["QT_QPA_PLATFORM"] = "xcb"
+
+        # Make the Application
+        self.app = qt_app
+
+        # Add an application icon
+        app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
+        self.app.setWindowIcon(QIcon(str(app_icon_path)))
+
         self.setWindowTitle(window_title)
         self.resize(*window_size)
 
@@ -30,7 +53,8 @@ class ModelViewer(QMainWindow):
         self.meshes = meshes
         self.points = points
 
-        # this is the main container. It will hold the viewer and sidebar horizontally
+        # this is the main container. It will hold the viewer and
+        # sidebar horizontally
         container = QWidget()
         self.setCentralWidget(container)
 
@@ -53,13 +77,27 @@ class ModelViewer(QMainWindow):
         self.mesh_name_label.setWordWrap(True)
         controls.addWidget(self.mesh_name_label)
 
+        # checkbox to toggle edges
         self.edges_checkbox = QCheckBox("Show Edges")
         self.edges_checkbox.setChecked(True)
         controls.addWidget(self.edges_checkbox)
 
+        # checkbox to toggle vertices
         self.vertices_checkbox = QCheckBox("Show Vertices")
         self.vertices_checkbox.setChecked(True)
         controls.addWidget(self.vertices_checkbox)
+
+        # input dropdown for selecting shading
+        controls.addWidget(QLabel("Shading"))
+        self.shading_dropdown = QComboBox()
+        self.shading_dropdown.addItems(
+            [
+                "Smooth Shading",
+                "Flat Shading",
+            ]
+        )
+        self.shading_dropdown.currentTextChanged.connect(self.on_shading_option_changed)
+        controls.addWidget(self.shading_dropdown)
 
         # Add empty space to keep all controls at the top
         controls.addStretch()
@@ -91,13 +129,6 @@ class ModelViewer(QMainWindow):
         self.viewer.renderer.ResetCameraClippingRange()
         self.viewer.render()
 
-    def run(self) -> None:
-
-        self.show()
-        self.vtk_widget.Initialize()
-
-        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
-
     def set_edges_visible(self, visible: bool) -> None:
 
         for mesh in self.meshes:
@@ -122,3 +153,19 @@ class ModelViewer(QMainWindow):
 
     def add_mesh_name_text(self, mesh_name: str) -> None:
         self.mesh_name_label.setText(mesh_name)
+
+    def on_shading_option_changed(self, input_selection_text: str) -> None:
+        for mesh in self.meshes:
+            if input_selection_text == "Flat Shading":
+                mesh.flat()
+            elif input_selection_text == "Smooth Shading":
+                mesh.phong()
+        self.viewer.render()
+
+    def exec(self):
+        self.show()
+        self.vtk_widget.Initialize()
+
+        self.viewer.show(*self.meshes, *self.points, axes=8, mode=8, interactive=False)
+
+        return self.app.exec()

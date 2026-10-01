@@ -5,11 +5,15 @@
 Assignement for Multimedia Retrieval  
 Website : https://webspace.science.uu.nl/~telea001/MR/Assignment  
 
-## 2. Programming Language
+## 2. Report
+
+Report : https://www.overleaf.com/project/6aa7ba137686e3f065d4cd14  
+
+## 3. Programming Language
 
 Python 3.14.7
 
-## 3. How to Setup
+## 4. How to Setup
 
 ### Windows
 - Install python
@@ -26,17 +30,14 @@ You can download the 3d models locally by doing :
 ```git pull```  
 ```git submodule update --init --recursive```
 
-## 4. How to run  
-```python main.py```  
-
-## 4. How to Develop
+## 5. How to Develop
 
 ### Adding Libraries
 If you add a new library do  
 ```py -m pip freeze > requirements.txt```  
 So others can install the library too
 
-## 5. Libraries
+## 6. Libraries
 
 - vedo
 - PySide6
