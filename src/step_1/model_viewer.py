@@ -26,7 +26,6 @@ class ModelViewer(QMainWindow):
         window_size: tuple[int, int],
         background_color: str,
         meshes: list[Mesh],
-        points: list[Points],
     ):
 
         super().__init__()
@@ -51,7 +50,22 @@ class ModelViewer(QMainWindow):
 
         # pass meshes and points and store them
         self.meshes = meshes
-        self.points = points
+        self.points = []
+
+        for mesh in self.meshes:
+            # add shading and lighting to meshes
+            mesh.compute_normals(points=True, cells=True)
+            mesh.phong()
+            mesh.c("#A0A0A0")
+            mesh.lighting("plastic")
+
+            # make edges of mesh stand out
+            mesh.linewidth(3)
+            mesh.linecolor("#000000")
+
+            # make vertices of mesh stand out
+            points: Points = Points(mesh.vertices, r=10, c="#000000")
+            self.points.append(points)
 
         self.world_origin = Points([(0, 0, 0)], r=12, c="red").clone2d(size=1)
         position = self.world_origin.GetPositionCoordinate()
