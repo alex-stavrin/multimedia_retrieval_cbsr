@@ -24,8 +24,6 @@ def main():
         meshes=meshes,
     )
 
-    model_viewer.add_mesh_name_text(mesh_path_name)
-
     return model_viewer.exec()
 
 

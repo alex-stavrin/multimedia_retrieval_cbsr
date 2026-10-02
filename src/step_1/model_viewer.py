@@ -106,11 +106,6 @@ class ModelViewer(QMainWindow):
         controls.setContentsMargins(16, 16, 16, 16)
         controls.setSpacing(12)
 
-        # this is the name of the 3d model path
-        self.mesh_name_label = QLabel()
-        self.mesh_name_label.setWordWrap(True)
-        controls.addWidget(self.mesh_name_label)
-
         # checkbox to toggle edges
         self.edges_checkbox = QCheckBox("Show Edges")
         self.edges_checkbox.setChecked(True)
@@ -183,9 +178,6 @@ class ModelViewer(QMainWindow):
         self.vtk_widget.close()
 
         super().closeEvent(event)
-
-    def add_mesh_name_text(self, mesh_name: str) -> None:
-        self.mesh_name_label.setText(mesh_name)
 
     def on_shading_option_changed(self, input_selection_text: str) -> None:
         for mesh in self.meshes:
