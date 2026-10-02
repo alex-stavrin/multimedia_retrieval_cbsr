@@ -190,7 +190,6 @@ class ModelViewer(QMainWindow):
             *self.points,
             *self.world_axes,
             self.world_origin,
-            axes=7,
             mode=8,
             interactive=False
         )
@@ -198,7 +197,9 @@ class ModelViewer(QMainWindow):
         camera = self.viewer.camera
 
         camera.ParallelProjectionOff()
+        # Set fov to 90
         camera.SetViewAngle(90)
+        # Set near plane to 0.01 and far plane to 10.000
         camera.SetClippingRange(0.01, 10000)
 
         style = self.viewer.interactor.GetInteractorStyle()
