@@ -1,9 +1,12 @@
 import vedo
 import os
 from dataclasses import dataclass
-from mesh_types import Box, FaceType
+from src.step_2.mesh_types import Box, FaceType
 import numpy as np
 import csv
+from src.step_1.model_viewer import ModelViewer
+from PySide6.QtWidgets import QApplication
+import sys
 
 
 @dataclass
@@ -190,13 +193,21 @@ def main():
     parser.add_argument(
         "-i", "--input", type=str, help="Path to the OBJ file to analyze"
     )
-    parser.add_argument("-o", "--output", type=str, help="Where to store CSV output")
+    parser.add_argument("-o", "--output", type=str, help="Where to store CSV output.")
     parser.add_argument(
         "-s",
         "--single",
         type=bool,
         default=False,
-        help="Whether the given input is a single file",
+        help="Whether the given input is a single file.",
+    )
+
+    parser.add_argument(
+        "-v",
+        "--visual",
+        type=bool,
+        default=False,
+        help="If we want to visualize the bounding box.",
     )
 
     args = parser.parse_args()
@@ -204,6 +215,40 @@ def main():
     if args.single:
         analysis = analyze_shape_from_file(args.input)
         print(analysis)
+
+        if args.visual:
+            print("Should visualize")
+
+            bounds = analysis.bounding_box
+
+            bounding_box = (
+                vedo.Box(
+                    pos=[
+                        bounds.x_min,
+                        bounds.x_max,
+                        bounds.y_min,
+                        bounds.y_max,
+                        bounds.z_min,
+                        bounds.z_max,
+                    ]
+                )
+                .wireframe()
+                .color("black")
+                .linewidth(2)
+            )
+
+            meshes: list[vedo.Mesh] = [vedo.Mesh(args.input), bounding_box]
+
+            app = QApplication(sys.argv)
+            model_viewer: ModelViewer = ModelViewer(
+                qt_app=app,
+                window_title="Multimedia Retrieval CBSR",
+                window_size=(1000, 1000),
+                background_color="#FFFFFF",
+                meshes=meshes,
+            )
+
+            return model_viewer.exec()
     else:
         analyze_database(args.input, args.output)
 

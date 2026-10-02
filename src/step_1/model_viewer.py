@@ -160,7 +160,7 @@ class ModelViewer(QMainWindow):
     def set_edges_visible(self, visible: bool) -> None:
 
         for mesh in self.meshes:
-            mesh.linewidth(1 if visible else 0)
+            mesh.properties.SetEdgeVisibility(visible)
 
         self.viewer.render()
 
