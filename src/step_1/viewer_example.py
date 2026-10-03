@@ -18,9 +18,6 @@ def main():
     app = QApplication(sys.argv)
     model_viewer: ModelViewer = ModelViewer(
         qt_app=app,
-        window_title="Multimedia Retrieval CBSR",
-        window_size=(1000, 1000),
-        background_color="#FFFFFF",
         meshes=meshes,
     )
 

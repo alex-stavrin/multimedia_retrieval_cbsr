@@ -22,10 +22,10 @@ class ModelViewer(QMainWindow):
     def __init__(
         self,
         qt_app: QApplication,
-        window_title: str,
-        window_size: tuple[int, int],
-        background_color: str,
-        meshes: list[Mesh],
+        window_title: str = "Multimedia Retrieval CBSR",
+        window_size: tuple[int, int] = (1000, 1000),
+        background_color: str = "#FFFFFF",
+        meshes: list[Mesh] = None,
     ):
 
         super().__init__()
