@@ -1,7 +1,6 @@
 import csv
 import os
 import sys
-import numpy as np
 import vedo
 
 from tqdm import tqdm
