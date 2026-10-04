@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from matplotlib import rc
-from matplotlib.ticker import MaxNLocator, EngFormatter
 
 # Set up global Matplotlib variables
 FONT = {"weight": "bold", "size": 20}
