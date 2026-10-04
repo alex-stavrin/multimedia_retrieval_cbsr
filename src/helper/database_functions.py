@@ -3,23 +3,28 @@ import os
 
 
 def retrieve_all_shape_files(root_dir: str):
-    resulting_shape_paths = np.array([])
+    resulting_shape_paths = []
 
-    cwd = os.getcwd() + "/"
+    for dirpath, _, filenames in os.walk(root_dir):
+        obj_files = [f for f in filenames if f.endswith(".obj")]
 
-    # Go through all directories and files
-    for file_system_info in os.walk(root_dir):
-        # Check if the first file, of the files in a directory, is of type .obj
-        if not file_system_info[2][0].endswith(".obj"):
+        if not obj_files:
+            print(f"No .obj files found in directory: {dirpath}")
             continue
 
-        cur_path = file_system_info[0] + "/"
-
-        for file in file_system_info[2]:
-            # Get absolute directory to avoid issues
-            shape_path = cwd + cur_path + file
-            resulting_shape_paths = np.append(
-                resulting_shape_paths, shape_path
+        for file in obj_files:
+            resulting_shape_paths.append(
+                os.path.abspath(os.path.join(dirpath, file))
             )
 
-    return resulting_shape_paths
+    return np.array(resulting_shape_paths)
+
+
+def map_by_relative_path(root_dir: str) -> dict:
+    """Maps 'AquaticAnimal/m51.obj' -> absolute path,
+    for every shape in root_dir."""
+    root_abs = os.path.abspath(root_dir)
+    return {
+        os.path.relpath(path, root_abs): path
+        for path in retrieve_all_shape_files(root_dir)
+    }

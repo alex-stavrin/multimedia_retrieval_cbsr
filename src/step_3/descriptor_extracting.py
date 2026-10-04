@@ -118,7 +118,7 @@ def calculate_compactness(
         )
 
     if shape is None:
-        shape = __prepare_and_check_file_path(file_path)
+        shape: vedo.Mesh = __prepare_and_check_file_path(file_path)
 
     # REMOVE LATER                                  SHOULD BE DONE OVER WHOLE DATABASE
     shape = standardize_wireframe(shape)
