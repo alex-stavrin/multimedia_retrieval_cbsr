@@ -1,7 +1,7 @@
 import pandas
 import vedo
 from typing import Final
-from src.step_2.database_analyzer import find_outliers
+from src.step_2._2.database_analyzer import find_outliers
 from pathlib import Path
 from shutil import copy2
 
@@ -15,6 +15,9 @@ def resample_outliers(
     output_path=Path,
 ) -> None:
     data_frame = pandas.read_csv(input_csv_path)
+
+    subdivided_models: list[str] = []
+    decimated_models: list[str] = []
 
     # Vertex outliers
     vertex_outliers_data_frame = find_outliers(data_frame, "n_points")
@@ -63,6 +66,8 @@ def resample_outliers(
             while mesh.npoints < MIN_VERTEX_COUNT:
                 mesh.subdivide(n=1, method=4)
 
+            subdivided_models.append(str(row.relative_file_path))
+
             if mesh.npoints > MAX_VERTEX_COUNT:
                 mesh.decimate(n=TARGET_VERTEX_COUNT)
 
@@ -80,6 +85,7 @@ def resample_outliers(
             mesh_path = models_path / row.relative_file_path
             mesh = vedo.Mesh(str(mesh_path))
             mesh.decimate(n=TARGET_VERTEX_COUNT)
+            decimated_models.append(str(row.relative_file_path))
             if print_decimating_logs:
                 print(
                     f"Mesh {row.relative_file_path} has now {mesh.npoints} vertices\n"
@@ -90,7 +96,7 @@ def resample_outliers(
         else:
             # just copy the file
             if print_outlier_stats:
-                print("Found outlier that is not in the vertex range.")
+                print("Found outlier that is not in the vertex range.\n")
             final_output_path.parent.mkdir(parents=True, exist_ok=True)
             copy2(mesh_path, final_output_path)
 
@@ -104,6 +110,25 @@ def resample_outliers(
 
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         copy2(source_path, destination_path)
+
+    # Logging
+    log_folder = Path("./") / "logs"
+    log_folder.mkdir(parents=True, exist_ok=True)
+
+    log_path = log_folder / "resampled_outliers.log"
+
+    with open(log_path, "w", encoding="utf-8") as log_file:
+        log_file.write("SUBDIVIDED MODELS\n")
+        log_file.write("=================\n")
+
+        for relative_path in subdivided_models:
+            log_file.write(f"{relative_path}\n")
+
+        log_file.write("\nDECIMATED MODELS\n")
+        log_file.write("================\n")
+
+        for relative_path in decimated_models:
+            log_file.write(f"{relative_path}\n")
 
 
 def main() -> None:
