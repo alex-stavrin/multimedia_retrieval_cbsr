@@ -22,11 +22,10 @@ class ModelViewer(QMainWindow):
     def __init__(
         self,
         qt_app: QApplication,
-        window_title: str,
-        window_size: tuple[int, int],
-        background_color: str,
-        meshes: list[Mesh],
-        points: list[Points],
+        window_title: str = "Multimedia Retrieval CBSR",
+        window_size: tuple[int, int] = (1000, 1000),
+        background_color: str = "#FFFFFF",
+        meshes: list[Mesh] = None,
     ):
 
         super().__init__()
@@ -51,7 +50,22 @@ class ModelViewer(QMainWindow):
 
         # pass meshes and points and store them
         self.meshes = meshes
-        self.points = points
+        self.points = []
+
+        for mesh in self.meshes:
+            # add shading and lighting to meshes
+            mesh.compute_normals(points=True, cells=True)
+            mesh.phong()
+            mesh.c("#A0A0A0")
+            mesh.lighting("plastic")
+
+            # make edges of mesh stand out
+            mesh.linewidth(3)
+            mesh.linecolor("#000000")
+
+            # make vertices of mesh stand out
+            points: Points = Points(mesh.vertices, r=10, c="#000000")
+            self.points.append(points)
 
         self.world_origin = Points([(0, 0, 0)], r=12, c="red").clone2d(size=1)
         position = self.world_origin.GetPositionCoordinate()
@@ -91,11 +105,6 @@ class ModelViewer(QMainWindow):
         controls = QVBoxLayout(side_bar)
         controls.setContentsMargins(16, 16, 16, 16)
         controls.setSpacing(12)
-
-        # this is the name of the 3d model path
-        self.mesh_name_label = QLabel()
-        self.mesh_name_label.setWordWrap(True)
-        controls.addWidget(self.mesh_name_label)
 
         # checkbox to toggle edges
         self.edges_checkbox = QCheckBox("Show Edges")
@@ -151,7 +160,7 @@ class ModelViewer(QMainWindow):
     def set_edges_visible(self, visible: bool) -> None:
 
         for mesh in self.meshes:
-            mesh.linewidth(1 if visible else 0)
+            mesh.properties.SetEdgeVisibility(visible)
 
         self.viewer.render()
 
@@ -170,9 +179,6 @@ class ModelViewer(QMainWindow):
 
         super().closeEvent(event)
 
-    def add_mesh_name_text(self, mesh_name: str) -> None:
-        self.mesh_name_label.setText(mesh_name)
-
     def on_shading_option_changed(self, input_selection_text: str) -> None:
         for mesh in self.meshes:
             if input_selection_text == "Flat Shading":
@@ -190,7 +196,6 @@ class ModelViewer(QMainWindow):
             *self.points,
             *self.world_axes,
             self.world_origin,
-            axes=7,
             mode=8,
             interactive=False
         )
@@ -198,7 +203,9 @@ class ModelViewer(QMainWindow):
         camera = self.viewer.camera
 
         camera.ParallelProjectionOff()
+        # Set fov to 90
         camera.SetViewAngle(90)
+        # Set near plane to 0.01 and far plane to 10.000
         camera.SetClippingRange(0.01, 10000)
 
         style = self.viewer.interactor.GetInteractorStyle()
