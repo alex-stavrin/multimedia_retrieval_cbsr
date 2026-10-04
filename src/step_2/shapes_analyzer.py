@@ -1,12 +1,16 @@
-import vedo
-import os
-from dataclasses import dataclass
-from src.step_2.mesh_types import Box, FaceType
-import numpy as np
 import csv
-from src.step_1.model_viewer import ModelViewer
-from PySide6.QtWidgets import QApplication
+import os
 import sys
+import numpy as np
+import vedo
+
+from tqdm import tqdm
+from dataclasses import dataclass
+from PySide6.QtWidgets import QApplication
+
+from src.helper.database_functions import retrieve_all_shape_files
+from src.step_1.model_viewer import ModelViewer
+from src.step_2.mesh_types import Box, FaceType
 
 
 @dataclass
@@ -63,21 +67,22 @@ class ShapeAnalysis:
 
 
 def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
-    # Retrieve from file with cheks
-    if shape_path is not str:
-        ValueError(f"File path must be string: {type(shape_path)}")
+    if not isinstance(shape_path, str):
+        raise TypeError(f"File path must be string: {type(shape_path)}")
 
-    if not os.path.exists(shape_path):
-        ValueError(f"{shape_path.__qualname__} does not exist: {shape_path}.")
+    if not os.path.isfile(shape_path):
+        raise ValueError(f"File does not exist: {shape_path}")
 
-    if not shape_path.endswith(".obj"):
-        ValueError(f"{shape_path.__qualname__} is of invalid type: {shape_path}.")
+    if not shape_path.lower().endswith(".obj"):
+        raise ValueError(f"File is not an .obj file: {shape_path}")
 
-    # Get class of object
-    split_path = shape_path.split("/")
-    if len(split_path) <= 1:
-        ValueError(f"File path does not contain class superfolder: {shape_path}")
-    shape_class = shape_path.split("/")[-2]
+    # Class of the object is the name of the folder containing it
+    parent_dir = os.path.basename(os.path.dirname(os.path.abspath(shape_path)))
+    if not parent_dir:
+        raise ValueError(
+            f"File path does not contain class superfolder: {shape_path}"
+        )
+    shape_class = parent_dir
 
     # Create mesh object from file
     mesh = vedo.Mesh(shape_path)
@@ -85,31 +90,31 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     # Get bounding box of mesh
     bounds_array = mesh.bounds()
     if bounds_array is None:
-        ValueError(
-            f"Could not retrieve bounding box coords from shape: {shape_path},"
-            + f", bounding cords: {bounds_array}"
+        raise ValueError(
+            f"Could not retrieve bounding box from shape: {shape_path}"
         )
 
-    # Put into more readable class
     bounding_box = Box(*bounds_array)
 
-    # Retrieve celss for face/cell type
-    cells: list = mesh.cells
+    # Retrieve cells for face/cell type
+    cells = mesh.cells
     if cells is None or len(cells) == 0:
-        ValueError(f"Could not retrieve any cells from shape: {shape_path}")
+        raise ValueError(
+            f"Could not retrieve any cells from shape: {shape_path}"
+        )
 
     # Classify cells
-    face_type = FaceType.POLY
-    if all(len(cell) == 3 for cell in cells):
+    cell_sizes = {len(cell) for cell in cells}
+    if cell_sizes == {3}:
         face_type = FaceType.TRIANGLES
+    elif cell_sizes == {4}:
+        face_type = FaceType.QUADS
+    elif cell_sizes == {3, 4}:
+        face_type = FaceType.MIXED
+    else:
+        face_type = FaceType.POLY
 
-    if all(len(cell) == 4 for cell in cells):
-        if face_type == FaceType.TRIANGLES:
-            face_type = FaceType.MIXED
-        else:
-            face_type = FaceType.QUADS
-
-    relative_path = split_path[-2] + "/" + split_path[-1]
+    relative_path = f"{shape_class}/{os.path.basename(shape_path)}"
 
     return ShapeAnalysis(
         relative_path,
@@ -121,138 +126,141 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     )
 
 
-def retrieve_all_shape_files(root_dir: str):
-    resulting_shape_paths = np.array([])
+def collect_shape_paths(inputs: list[str]) -> list[str]:
+    """Expand a list of inputs into individual .obj file paths.
 
-    cwd = os.getcwd() + "/"
+    Each input can be either a single .obj file or a directory (searched
+    recursively). Duplicates are removed while keeping the original order.
+    """
+    all_paths: list[str] = []
 
-    # Go through all directories and files
-    for file_system_info in os.walk(root_dir):
-        # Check if the first file, of the files in a directory, is of type .obj
-        if not file_system_info[2][0].endswith(".obj"):
-            continue
+    for path in inputs:
+        if os.path.isdir(path):
+            all_paths.extend(retrieve_all_shape_files(path))
+        elif os.path.isfile(path):
+            if not path.lower().endswith(".obj"):
+                raise ValueError(f"Input is not an .obj file: {path}")
+            all_paths.append(os.path.abspath(path))
+        else:
+            raise ValueError(f"Input does not exist: {path}")
 
-        cur_path = file_system_info[0] + "/"
+    return list(dict.fromkeys(all_paths))
 
-        for file in file_system_info[2]:
-            # Get absolute directory to avoid issues
-            shape_path = cwd + cur_path + file
-            resulting_shape_paths = np.append(resulting_shape_paths, shape_path)
 
-    return resulting_shape_paths
+def analyze_shapes(shape_paths: list[str]) -> list[ShapeAnalysis]:
+    """Analyze the given .obj files,
+    showing a progress bar for larger batches."""
+    all_analyses: list[ShapeAnalysis] = []
+
+    for shape_path in tqdm(shape_paths):
+        all_analyses.append(analyze_shape_from_file(shape_path))
+
+    return all_analyses
+
+
+def analyze_inputs(inputs: list[str], output_path: str | None = None):
+    """Analyze any mix of single .obj files and database directories.
+
+    Writes a CSV to output_path if given, otherwise prints the analyses.
+    """
+    if isinstance(inputs, str):
+        inputs = [inputs]
+
+    shape_paths = collect_shape_paths(inputs)
+    if len(shape_paths) == 0:
+        raise ValueError(f"No .obj files found in inputs: {inputs}")
+
+    analyses = analyze_shapes(shape_paths)
+
+    if output_path is None:
+        for analysis in analyses:
+            print(analysis)
+    else:
+        output_dir = os.path.dirname(os.path.abspath(output_path))
+        if not os.path.isdir(output_dir):
+            raise ValueError(f"Output directory does not exist: {output_dir}")
+        ShapeAnalysis.write_analyses_to_csv(analyses, output_path)
+        print(f"Wrote {len(analyses)} analyses to {output_path}")
+
+    return analyses
 
 
 def analyze_database(root_dir: str, output_path: str):
-    if not isinstance(root_dir, str) or output_path is not str:
-        TypeError("File paths must be string")
+    """Kept for backwards compatibility; analyzes a whole directory."""
+    return analyze_inputs([root_dir], output_path)
 
-    if not os.path.exists(root_dir):
-        ValueError(f"Root dir does not exist: {root_dir}")
 
-    if not os.path.exists(output_path):
-        ValueError(f"Output path does not exist: {output_path}")
+def visualize_analyses(
+    analyses: list[ShapeAnalysis], shape_paths: list[str]
+) -> int:
+    meshes: list[vedo.Mesh] = []
 
-    all_shape_paths: np.ndarray = retrieve_all_shape_files(root_dir)
+    for analysis, shape_path in zip(analyses, shape_paths):
+        bounds = analysis.bounding_box
 
-    all_analyses = []
-    n_total_shapes = len(all_shape_paths)
-    last_percentage = 0
-
-    bar_length = 40
-    print("Starting to analyse shapes in database")
-    for i, shape_path in enumerate(all_shape_paths, start=1):
-        analysis: ShapeAnalysis = analyze_shape_from_file(shape_path)
-        all_analyses.append(analysis)
-
-        percentage_done: float = int(i / n_total_shapes * 100)
-
-        if percentage_done > last_percentage:
-            last_percentage = percentage_done
-
-            filled = int(bar_length * percentage_done / 100)
-            bar = "#" * filled + "-" * (bar_length - filled)
-
-            print(
-                f"\r[{bar}] {percentage_done:3d}% ({i}/{n_total_shapes})",
-                end="",
-                flush=True,
+        # vedo.Box accepts a 6-tuple of bounds through `size`
+        bounding_box = (
+            vedo.Box(
+                size=(
+                    bounds.x_min,
+                    bounds.x_max,
+                    bounds.y_min,
+                    bounds.y_max,
+                    bounds.z_min,
+                    bounds.z_max,
+                )
             )
-    # Newline at end
-    print()
+            .wireframe()
+            .color("black")
+            .linewidth(2)
+        )
+        meshes.extend([vedo.Mesh(shape_path), bounding_box])
 
-    ShapeAnalysis.write_analyses_to_csv(all_analyses, output_path)
+    app = QApplication(sys.argv)
+    model_viewer = ModelViewer(qt_app=app, meshes=meshes)
+    return model_viewer.exec()
 
 
 def main():
-    # Only import when running main, to import necessarily when we import
-    # it as a module
     import argparse
 
-    parser = argparse.ArgumentParser(description="Analyze a 3D shape from an OBJ file.")
-
-    parser.add_argument(
-        "-i", "--input", type=str, help="Path to the OBJ file to analyze"
-    )
-    parser.add_argument("-o", "--output", type=str, help="Where to store CSV output.")
-    parser.add_argument(
-        "-s",
-        "--single",
-        type=bool,
-        default=False,
-        help="Whether the given input is a single file.",
+    parser = argparse.ArgumentParser(
+        description="Analyze 3D shapes from OBJ files and/or "
+        "database directories."
     )
 
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        nargs="+",
+        required=True,
+        help="One or more .obj files and/or directories to analyze "
+        "(directories are searched recursively).",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default=None,
+        help="Where to store CSV output. If omitted, results are printed.",
+    )
     parser.add_argument(
         "-v",
         "--visual",
-        type=bool,
-        default=False,
-        help="If we want to visualize the bounding box.",
+        action="store_true",
+        help="Visualize the shapes with their bounding boxes.",
     )
 
     args = parser.parse_args()
 
-    if args.single:
-        analysis = analyze_shape_from_file(args.input)
-        print(analysis)
+    analyses = analyze_inputs(args.input, args.output)
 
-        if args.visual:
-            print("Should visualize")
+    if args.visual:
+        return visualize_analyses(analyses, collect_shape_paths(args.input))
 
-            bounds = analysis.bounding_box
-
-            bounding_box = (
-                vedo.Box(
-                    pos=[
-                        bounds.x_min,
-                        bounds.x_max,
-                        bounds.y_min,
-                        bounds.y_max,
-                        bounds.z_min,
-                        bounds.z_max,
-                    ]
-                )
-                .wireframe()
-                .color("black")
-                .linewidth(2)
-            )
-
-            meshes: list[vedo.Mesh] = [vedo.Mesh(args.input), bounding_box]
-
-            app = QApplication(sys.argv)
-            model_viewer: ModelViewer = ModelViewer(
-                qt_app=app,
-                meshes=meshes,
-            )
-
-            return model_viewer.exec()
-    else:
-        analyze_database(args.input, args.output)
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
-
-
-if __name__ == "__init___":
     sys.exit(main())
