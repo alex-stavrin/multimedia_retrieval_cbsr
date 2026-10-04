@@ -1,14 +1,20 @@
 import os
+import re
 from dataclasses import dataclass
 
 import numpy as np
 import vedo
 
-from mesh_types import Box
+from src.helper.mesh_types import Box
+
+# A recomputed quantity counts as correct if it is within this distance of its
+# target. Far above the ~1e-7 rounding from single-precision/text storage,
+# far below any real normalization error.
+TOLERANCE = 1e-6
 
 
 @dataclass
-class NormalizationReport:
+class CenteringReport:
     shape_path: str
     barycenter_before: np.ndarray
     barycenter_after: np.ndarray
@@ -17,28 +23,58 @@ class NormalizationReport:
     scale_factor: float
 
 
-def normalize_mesh(mesh: vedo.Mesh) -> NormalizationReport:
-    """Translate the mesh's barycenter to the origin, then uniformly scale
-    it so its largest bounding-box dimension fits a unit cube. Mutates
-    and returns info about `mesh`."""
-    barycenter_before = mesh.center_of_mass()
-    bounding_box_before = Box(*mesh.bounds())
+def center(mesh: vedo.Mesh) -> np.ndarray:
+    """Translate the mesh's barycenter to the origin. Mutates `mesh` and
+    returns the barycenter that was subtracted."""
+    barycenter = mesh.center_of_mass()
+    mesh.shift(*(-barycenter))
+    return barycenter
 
-    mesh.shift(*(-barycenter_before))
 
+def scale_to_unit_cube(mesh: vedo.Mesh) -> float:
+    """Uniformly scale the mesh, about the world origin, so its current
+    axis-aligned bounding box's largest dimension becomes exactly 1.
+
+    This must run AFTER any rotation/alignment step (e.g. Step 3.1's PCA
+    alignment), not before: the bounding box computed here depends on the
+    mesh's current orientation, so scaling before alignment would give two
+    instances of the same shape -- differing only by their original
+    rotation -- different scale factors. Mutates `mesh` and returns the
+    scale factor applied."""
     bounds = mesh.bounds()
     extents = (bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
     max_extent = max(extents)
     if max_extent <= 0:
-        raise ValueError("Mesh has zero extent on every axis, cannot scale to a unit cube.")
+        raise ValueError(
+            "Mesh has zero extent on every axis, cannot scale to a unit cube."
+        )
 
     scale_factor = 1.0 / max_extent
-    # origin=False scales about world (0,0,0), i.e. the barycenter we just
-    # shifted there. origin=True (the default) would instead pivot around
-    # the mesh's own transform position and re-introduce an offset.
+    # origin=False scales about world (0,0,0) rather than the mesh's own
+    # transform position (vedo's default, origin=True), which would pivot
+    # around the wrong point and reintroduce an offset.
     mesh.scale(scale_factor, origin=False)
+    return scale_factor
 
-    return NormalizationReport(
+
+def center_and_scale(mesh: vedo.Mesh) -> CenteringReport:
+    """Translate the mesh's barycenter to the origin, then uniformly scale
+    it so its largest bounding-box dimension fits a unit cube. Mutates
+    and returns info about `mesh`.
+
+    This is Step 2.5 in isolation (centering immediately followed by
+    scaling, with no alignment in between). For the full, correctly-ordered
+    pipeline used from Step 3.1 onwards, call `center()`, then alignment
+    and flipping, then `scale_to_unit_cube()` separately -- see
+    `src.step_3.full_normalization.full_normalize`.
+    """
+    barycenter_before = mesh.center_of_mass()
+    bounding_box_before = Box(*mesh.bounds())
+
+    center(mesh)
+    scale_factor = scale_to_unit_cube(mesh)
+
+    return CenteringReport(
         shape_path="",
         barycenter_before=barycenter_before,
         barycenter_after=mesh.center_of_mass(),
@@ -48,13 +84,14 @@ def normalize_mesh(mesh: vedo.Mesh) -> NormalizationReport:
     )
 
 
-def normalize_shape_file(input_path: str, output_path: str) -> NormalizationReport:
-    """Load a mesh from disk, normalize it, and write the result to `output_path`."""
+def center_and_scale_file(input_path: str, output_path: str) -> CenteringReport:
+    """Load a mesh from disk, center and scale it, and write the result to
+    `output_path`."""
     if not os.path.exists(input_path):
         raise ValueError(f"File does not exist: {input_path}")
 
     mesh = vedo.Mesh(input_path)
-    report = normalize_mesh(mesh)
+    report = center_and_scale(mesh)
     report.shape_path = input_path
 
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -63,11 +100,13 @@ def normalize_shape_file(input_path: str, output_path: str) -> NormalizationRepo
     return report
 
 
-def normalize_database(input_root: str, output_root: str) -> list[NormalizationReport]:
-    """Normalize every .obj file under `input_root`, mirroring the
+def center_and_scale_database(
+    input_root: str, output_root: str
+) -> list[CenteringReport]:
+    """Center and scale every .obj file under `input_root`, mirroring the
     class-subfolder layout into `output_root`. Skips files that fail to
-    load or normalize rather than aborting the whole run."""
-    reports: list[NormalizationReport] = []
+    load or process rather than aborting the whole run."""
+    reports: list[CenteringReport] = []
 
     for dirpath, _, filenames in os.walk(input_root):
         for filename in filenames:
@@ -79,51 +118,139 @@ def normalize_database(input_root: str, output_root: str) -> list[NormalizationR
             output_path = os.path.join(output_root, relative_path)
 
             try:
-                reports.append(normalize_shape_file(input_path, output_path))
+                reports.append(center_and_scale_file(input_path, output_path))
             except Exception as e:
                 print(f"Skipping {input_path}: {e}")
 
     return reports
 
 
-def summarize_reports(reports: list[NormalizationReport]) -> None:
-    """Print aggregate stats confirming normalization worked across the
-    database: barycenters should sit at the origin and every shape's
-    largest bounding-box dimension should be 1 (a unit cube)."""
+def summarize_reports(reports: list[CenteringReport]) -> None:
+    """Print, over every processed shape, how close the barycenter landed to
+    the origin and the largest bounding-box dimension to 1."""
     if not reports:
-        print("No shapes were normalized.")
+        print("No shapes were centered/scaled.")
         return
 
-    barycenter_distances = [float(np.linalg.norm(r.barycenter_after)) for r in reports]
-    max_extents = [
-        max(
-            r.bounding_box_after.x_max - r.bounding_box_after.x_min,
-            r.bounding_box_after.y_max - r.bounding_box_after.y_min,
-            r.bounding_box_after.z_max - r.bounding_box_after.z_min,
-        )
-        for r in reports
-    ]
+    barycenter_distances = np.array(
+        [np.linalg.norm(r.barycenter_after) for r in reports]
+    )
+    max_extents = np.array(
+        [
+            max(
+                r.bounding_box_after.x_max - r.bounding_box_after.x_min,
+                r.bounding_box_after.y_max - r.bounding_box_after.y_min,
+                r.bounding_box_after.z_max - r.bounding_box_after.z_min,
+            )
+            for r in reports
+        ]
+    )
 
-    print(f"Normalized {len(reports)} shapes")
-    print(f"Barycenter distance from origin: mean={np.mean(barycenter_distances):.2e}, max={np.max(barycenter_distances):.2e}")
-    print(f"Largest bounding-box dimension:  mean={np.mean(max_extents):.6f}, max={np.max(max_extents):.6f}")
+    n = len(reports)
+    print(f"Centered and scaled {n} shapes")
+    print(
+        f"Barycenter distance from origin: mean={barycenter_distances.mean():.2e}, "
+        f"max={barycenter_distances.max():.2e}, "
+        f"within {TOLERANCE:g}: {np.sum(barycenter_distances < TOLERANCE)}/{n}"
+    )
+    print(
+        f"Largest bounding-box dimension:  min={max_extents.min():.9f}, "
+        f"max={max_extents.max():.9f}, "
+        f"within {TOLERANCE:g} of 1: {np.sum(np.abs(max_extents - 1) < TOLERANCE)}/{n}"
+    )
+
+
+def read_obj_vertices(path: str) -> np.ndarray:
+    """Read only the vertex positions of an .obj file, with no mesh library,
+    so checks built on it don't share any code (or bugs) with the code they
+    verify."""
+    with open(path, "rb") as f:
+        data = f.read()
+    rows = re.findall(rb"^v[ \t]+(\S+)[ \t]+(\S+)[ \t]+(\S+)", data, re.M)
+    return np.array(rows).astype(np.float64)
+
+
+def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
+    """Re-read every normalized .obj file under `root` and recompute, from
+    the saved vertices alone, the quantities normalization is meant to fix:
+    barycenter at the origin, largest bounding-box dimension equal to 1 and,
+    if `check_alignment`, coordinate variance ordered x >= y >= z (PCA
+    alignment, Step 3.1). Returns True only if every shape passes every
+    check."""
+    barycenter_distances, max_extents, ordered = [], [], []
+
+    for dirpath, _, filenames in os.walk(root):
+        for filename in filenames:
+            if not filename.endswith(".obj"):
+                continue
+            vertices = read_obj_vertices(os.path.join(dirpath, filename))
+            barycenter_distances.append(np.linalg.norm(vertices.mean(axis=0)))
+            max_extents.append((vertices.max(axis=0) - vertices.min(axis=0)).max())
+            variance = vertices.var(axis=0)
+            # Near-equal variances (e.g. a table with width ~ depth) can swap
+            # by rounding noise, so allow a small slack on the ordering.
+            ordered.append(
+                variance[0] >= variance[1] - 1e-5 and variance[1] >= variance[2] - 1e-5
+            )
+
+    n = len(barycenter_distances)
+    if n == 0:
+        print(f"No .obj files found under {root}")
+        return False
+
+    barycenter_distances = np.array(barycenter_distances)
+    max_extents = np.array(max_extents)
+    barycenter_ok = int(np.sum(barycenter_distances < TOLERANCE))
+    extent_ok = int(np.sum(np.abs(max_extents - 1) < TOLERANCE))
+
+    print(f"Re-read {n} saved shapes and recomputed from the files alone:")
+    print(
+        f"  barycenter distance from origin: max={barycenter_distances.max():.2e}, "
+        f"within {TOLERANCE:g}: {barycenter_ok}/{n}"
+    )
+    print(
+        f"  largest bounding-box dimension:  min={max_extents.min():.9f}, "
+        f"max={max_extents.max():.9f}, within {TOLERANCE:g} of 1: {extent_ok}/{n}"
+    )
+    all_ok = barycenter_ok == n and extent_ok == n
+
+    if check_alignment:
+        ordered_ok = int(np.sum(ordered))
+        print(f"  variance ordered x>=y>=z: {ordered_ok}/{n}")
+        all_ok = all_ok and ordered_ok == n
+
+    return all_ok
 
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Normalize 3D shapes: center each barycenter at the origin and scale to fit a unit cube."
+        description="Center and scale 3D shapes: barycenter to the origin, "
+        "scale to fit a unit cube."
     )
-    parser.add_argument("-i", "--input", type=str, required=True, help="Path to an OBJ file, or a database root directory")
-    parser.add_argument("-o", "--output", type=str, required=True, help="Path to write the normalized OBJ file, or output root directory")
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        required=True,
+        help="Path to an OBJ file, or a database root directory",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        required=True,
+        help="Path to write the result, or output root directory",
+    )
     args = parser.parse_args()
 
     if os.path.isdir(args.input):
-        reports = normalize_database(args.input, args.output)
+        reports = center_and_scale_database(args.input, args.output)
         summarize_reports(reports)
+        verify_saved_database(args.output)
     else:
-        report = normalize_shape_file(args.input, args.output)
+        report = center_and_scale_file(args.input, args.output)
         print(report)
 
 
