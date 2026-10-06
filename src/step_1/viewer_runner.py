@@ -8,7 +8,22 @@ import numpy
 
 def main():
 
-    mesh_path_names: list[str] = sys.argv[1:]
+    import argparse
+
+    arguements_parser = argparse.ArgumentParser()
+    arguements_parser.add_argument("mesh_paths", nargs="+")
+    arguements_parser.add_argument(
+        "--delta",
+        "-d",
+        nargs=3,
+        type=float,
+        default=[0.0, 0.0, 0.0],
+        metavar=("X", "Y", "Z"),
+    )
+
+    arguements = arguements_parser.parse_args()
+
+    mesh_path_names = arguements.mesh_paths
 
     if not mesh_path_names:
         raise ValueError("Please provide at least one 3d shape")
@@ -24,7 +39,7 @@ def main():
 
     app = QApplication(sys.argv)
     model_viewer: ModelViewer = ModelViewer(
-        qt_app=app, meshes=meshes, models_delta=numpy.array([0.5, 0, 0])
+        qt_app=app, meshes=meshes, models_delta=numpy.array(arguements.delta)
     )
 
     return model_viewer.exec()
