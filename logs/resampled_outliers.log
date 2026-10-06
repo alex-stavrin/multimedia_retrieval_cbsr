@@ -1,409 +1,2497 @@
-SUBDIVIDED MODELS
+SUBDIVIDED MODELS (1733 total)
 =================
-AquaticAnimal/m59.obj
-Bird/m42.obj
-Bird/m43.obj
-Bird/m47.obj
-Bird/m50.obj
-Bookset/D01122.obj
-BuildingNonResidential/m390.obj
-BuildingNonResidential/m392.obj
-BuildingNonResidential/m471.obj
-BuildingNonResidential/m475.obj
-Bus/D00411.obj
-Car/m1532.obj
-Chess/D01053.obj
-Chess/m1605.obj
-Computer/D01071.obj
-Computer/D01085.obj
-Computer/D01102.obj
-Computer/m1765.obj
-Computer/m1766.obj
-Computer/m1769.obj
-Cup/m500.obj
-Cup/m526.obj
-DeskLamp/D00378.obj
-DeskLamp/m606.obj
-DeskLamp/m611.obj
-DeskLamp/m613.obj
-Door/D01121.obj
-Door/D01139.obj
-Door/D01143.obj
-Door/D01144.obj
-Door/D01155.obj
-Door/D01167.obj
-Door/D01177.obj
-Door/D01194.obj
-Door/m1708.obj
-Door/m1711.obj
-Door/m1724.obj
-Door/m1726.obj
-Drum/D00115.obj
-Drum/D00709.obj
-FloorLamp/m622.obj
-FloorLamp/m623.obj
-FloorLamp/m624.obj
-Gun/m651.obj
-Hand/D01024.obj
-Hand/m334.obj
-House/m423.obj
-House/m434.obj
-House/m435.obj
-House/m454.obj
-House/m462.obj
-Humanoid/m163.obj
-Humanoid/m177.obj
-Humanoid/m191.obj
-Jet/m1231.obj
-Jet/m1300.obj
-Jet/m1301.obj
-Knife/D01119.obj
-Knife/D01175.obj
-Motorcycle/m1484.obj
-MultiSeat/m778.obj
-MultiSeat/m782.obj
-MultiSeat/m783.obj
-MultiSeat/m784.obj
-MultiSeat/m836.obj
-MultiSeat/m840.obj
-MultiSeat/m841.obj
-NonWheelChair/m793.obj
-NonWheelChair/m800.obj
-NonWheelChair/m807.obj
-NonWheelChair/m809.obj
-NonWheelChair/m818.obj
-NonWheelChair/m820.obj
-NonWheelChair/m827.obj
-PianoBoard/D00212.obj
-PlantIndoors/m1032.obj
-PlantWildNonTree/m1052.obj
-PlantWildNonTree/m983.obj
-Quadruped/m102.obj
-RectangleTable/D00188.obj
-RectangleTable/D00302.obj
-RectangleTable/D00421.obj
-RectangleTable/m763.obj
-RectangleTable/m764.obj
-RectangleTable/m870.obj
-RectangleTable/m871.obj
-RectangleTable/m874.obj
-RectangleTable/m876.obj
-RectangleTable/m877.obj
-RectangleTable/m881.obj
-RectangleTable/m883.obj
-RectangleTable/m888.obj
-RectangleTable/m894.obj
-RectangleTable/m895.obj
-RectangleTable/m896.obj
-RectangleTable/m897.obj
-RectangleTable/m904.obj
-RectangleTable/m905.obj
-RectangleTable/m907.obj
-RectangleTable/m912.obj
-RectangleTable/m913.obj
-RectangleTable/m915.obj
-RectangleTable/m917.obj
-RectangleTable/m919.obj
-Rocket/D00015.obj
-Rocket/D00426.obj
-Rocket/D00472.obj
-Rocket/D00614.obj
-RoundTable/m922.obj
-RoundTable/m931.obj
-RoundTable/m933.obj
-RoundTable/m937.obj
-Shelf/D00592.obj
-Shelf/D00956.obj
-Shelf/m845.obj
-Shelf/m849.obj
-Shelf/m851.obj
-Shelf/m852.obj
-Shelf/m853.obj
-Shelf/m854.obj
-Shelf/m855.obj
-Shelf/m856.obj
-Shelf/m857.obj
-Shelf/m858.obj
-Shelf/m860.obj
-Shelf/m868.obj
-Ship/D00935.obj
-Ship/m1450.obj
-Sign/m1670.obj
-Sign/m1671.obj
-Sign/m1673.obj
-Sign/m1674.obj
-Sign/m1675.obj
-Sign/m1684.obj
-Spoon/D00422.obj
-Spoon/D00474.obj
-Tool/m1102.obj
-Train/D01014.obj
-Train/D01027.obj
-Tree/m1082.obj
-Tree/m1097.obj
-Truck/D00331.obj
-Truck/D00424.obj
-TruckNonContainer/D00572.obj
-TruckNonContainer/D00731.obj
-Vase/m533.obj
-Wheel/m746.obj
+AircraftBuoyant/m1340.obj had 778 and now has 6606 vertices
+AircraftBuoyant/m1339.obj had 1878 and now has 8051 vertices
+AircraftBuoyant/m1344.obj had 1093 and now has 8781 vertices
+AircraftBuoyant/m1345.obj had 3174 and now has 9174 vertices
+AircraftBuoyant/m1346.obj had 742 and now has 6242 vertices
+AircraftBuoyant/m1348.obj had 795 and now has 6275 vertices
+AircraftBuoyant/m1342.obj had 1252 and now has 7528 vertices
+AircraftBuoyant/m1347.obj had 3055 and now has 9320 vertices
+AircraftBuoyant/m1349.obj had 432 and now has 8752 vertices
+AircraftBuoyant/m1350.obj had 1097 and now has 9001 vertices
+AircraftBuoyant/m1341.obj had 425 and now has 7503 vertices
+AircraftBuoyant/m1352.obj had 3298 and now has 9584 vertices
+Apartment/D00348.obj had 2006 and now has 5014 vertices
+Apartment/D00366.obj had 1294 and now has 7508 vertices
+Apartment/D00639.obj had 4849 and now has 7613 vertices
+Apartment/D00792.obj had 1327 and now has 5427 vertices
+Apartment/D00859.obj had 1378 and now has 9979 vertices
+Apartment/m463.obj had 2022 and now has 5694 vertices
+Apartment/m465.obj had 2335 and now has 6698 vertices
+Apartment/D00869.obj had 4930 and now has 7850 vertices
+Apartment/D00953.obj had 4158 and now has 7914 vertices
+AircraftBuoyant/m1337.obj had 201 and now has 7514 vertices
+AircraftBuoyant/m1343.obj had 178 and now has 7502 vertices
+AquaticAnimal/m59.obj had 44 and now has 6764 vertices
+AquaticAnimal/m62.obj had 241 and now has 6455 vertices
+AquaticAnimal/m64.obj had 247 and now has 6019 vertices
+AquaticAnimal/m63.obj had 1112 and now has 8280 vertices
+AquaticAnimal/m65.obj had 1004 and now has 8724 vertices
+AquaticAnimal/m60.obj had 1606 and now has 7500 vertices
+AquaticAnimal/m69.obj had 317 and now has 7596 vertices
+AquaticAnimal/m70.obj had 320 and now has 7600 vertices
+AquaticAnimal/m58.obj had 477 and now has 7500 vertices
+AquaticAnimal/m66.obj had 4117 and now has 7508 vertices
+AquaticAnimal/m72.obj had 331 and now has 8001 vertices
+AquaticAnimal/m73.obj had 285 and now has 7617 vertices
+AquaticAnimal/m75.obj had 298 and now has 6954 vertices
+AquaticAnimal/m79.obj had 166 and now has 9198 vertices
+AquaticAnimal/m71.obj had 420 and now has 7500 vertices
+Bed/D00031.obj had 1867 and now has 5457 vertices
+AquaticAnimal/m61.obj had 216 and now has 7521 vertices
+AquaticAnimal/m81.obj had 857 and now has 7549 vertices
+AquaticAnimal/m80.obj had 1104 and now has 9520 vertices
+AquaticAnimal/m68.obj had 553 and now has 7501 vertices
+Bed/D00110.obj had 1926 and now has 5570 vertices
+AquaticAnimal/m78.obj had 468 and now has 7525 vertices
+AquaticAnimal/m76.obj had 1583 and now has 7500 vertices
+Bed/D00213.obj had 2277 and now has 6813 vertices
+Bed/D00307.obj had 2644 and now has 7903 vertices
+Bed/D00217.obj had 3238 and now has 9510 vertices
+Bed/D00565.obj had 826 and now has 7338 vertices
+Bed/D00735.obj had 453 and now has 9339 vertices
+Bed/D00650.obj had 3752 and now has 7510 vertices
+Bed/D00988.obj had 768 and now has 8456 vertices
+Bed/m947.obj had 441 and now has 8033 vertices
+Bed/m946.obj had 449 and now has 8821 vertices
+Bed/m949.obj had 706 and now has 6258 vertices
+Bed/D00545.obj had 415 and now has 7500 vertices
+Bed/m951.obj had 363 and now has 7793 vertices
+Bed/m950.obj had 437 and now has 9849 vertices
+Bicycle/D00033.obj had 2192 and now has 6640 vertices
+Bicycle/D00016.obj had 2769 and now has 7818 vertices
+Bed/D00836.obj had 1563 and now has 7493 vertices
+Bed/m948.obj had 4597 and now has 7535 vertices
+AquaticAnimal/m74.obj had 162 and now has 7497 vertices
+Bicycle/D00621.obj had 2769 and now has 7818 vertices
+Bicycle/D00750.obj had 3053 and now has 8361 vertices
+Bicycle/D00567.obj had 436 and now has 7491 vertices
+Bicycle/m1473.obj had 2192 and now has 6640 vertices
+Bicycle/m1478.obj had 2769 and now has 7818 vertices
+Biplane/D00069.obj had 3242 and now has 9568 vertices
+Bicycle/m1472.obj had 524 and now has 7535 vertices
+Biplane/D00199.obj had 2584 and now has 6348 vertices
+Biplane/D00410.obj had 2167 and now has 6421 vertices
+Bicycle/m1476.obj had 436 and now has 7491 vertices
+Biplane/D00276.obj had 567 and now has 7521 vertices
+Biplane/D00132.obj had 287 and now has 7553 vertices
+Biplane/m1119.obj had 863 and now has 7063 vertices
+Biplane/D00632.obj had 624 and now has 7551 vertices
+Biplane/D00666.obj had 469 and now has 7521 vertices
+Biplane/m1121.obj had 1062 and now has 8714 vertices
+Biplane/m1123.obj had 1015 and now has 8039 vertices
+Biplane/m1124.obj had 390 and now has 7826 vertices
+Biplane/m1126.obj had 770 and now has 6034 vertices
+Biplane/m1125.obj had 434 and now has 8934 vertices
+Biplane/m1128.obj had 718 and now has 5646 vertices
+Biplane/m1127.obj had 354 and now has 7114 vertices
+Biplane/m1129.obj had 3351 and now has 9623 vertices
+Biplane/m1132.obj had 882 and now has 6594 vertices
+Biplane/m1134.obj had 338 and now has 6994 vertices
+Biplane/m1138.obj had 2050 and now has 5636 vertices
+Biplane/m1136.obj had 904 and now has 7416 vertices
+Biplane/m1137.obj had 408 and now has 7220 vertices
+Biplane/m1139.obj had 2920 and now has 7154 vertices
+Biplane/m1131.obj had 482 and now has 7527 vertices
+Biplane/m1143.obj had 3336 and now has 9906 vertices
+Bird/D00089.obj had 233 and now has 6239 vertices
+Biplane/m1144.obj had 3627 and now has 7573 vertices
+Biplane/m1133.obj had 624 and now has 7551 vertices
+Biplane/m1146.obj had 1700 and now has 7585 vertices
+Bird/D00234.obj had 1247 and now has 7504 vertices
+Bird/D00386.obj had 1751 and now has 5249 vertices
+Bird/D00438.obj had 1824 and now has 5533 vertices
+Bird/D00599.obj had 1792 and now has 5418 vertices
+Bird/D00625.obj had 1091 and now has 6683 vertices
+Bird/D00546.obj had 1162 and now has 9210 vertices
+Biplane/m1135.obj had 264 and now has 7541 vertices
+Bird/D00689.obj had 2683 and now has 8071 vertices
+Bird/D00862.obj had 757 and now has 6785 vertices
+Bird/D00762.obj had 950 and now has 8534 vertices
+Bird/D00922.obj had 903 and now has 8079 vertices
+Bird/D00736.obj had 3947 and now has 7499 vertices
+Bird/m31.obj had 1802 and now has 5350 vertices
+Bird/m29.obj had 2972 and now has 8850 vertices
+Bird/m34.obj had 233 and now has 6239 vertices
+Bird/m33.obj had 3144 and now has 9308 vertices
+Bird/D00961.obj had 1344 and now has 7491 vertices
+Bird/D00999.obj had 373 and now has 7500 vertices
+Bird/m32.obj had 1129 and now has 7501 vertices
+Bird/m35.obj had 699 and now has 6275 vertices
+Bird/m37.obj had 567 and now has 5087 vertices
+Bird/m39.obj had 649 and now has 5273 vertices
+Bird/m41.obj had 1824 and now has 5533 vertices
+Bird/m30.obj had 390 and now has 7496 vertices
+Bird/m40.obj had 2684 and now has 8074 vertices
+Bird/D00323.obj had 260 and now has 7538 vertices
+Bird/m43.obj had 41 and now has 6575 vertices
+Bird/m47.obj had 101 and now has 6701 vertices
+Bird/m36.obj had 1289 and now has 7512 vertices
+Bird/m49.obj had 2329 and now has 6671 vertices
+Bird/m50.obj had 93 and now has 7373 vertices
+Bird/m52.obj had 294 and now has 7574 vertices
+Bird/m51.obj had 309 and now has 8083 vertices
+Bird/m44.obj had 401 and now has 7500 vertices
+Bird/m38.obj had 464 and now has 7501 vertices
+Bird/m48.obj had 427 and now has 7504 vertices
+Bookset/D01013.obj had 320 and now has 7515 vertices
+Bird/m42.obj had 116 and now has 7495 vertices
+Bookset/D01042.obj had 668 and now has 7555 vertices
+Bookset/D01078.obj had 1203 and now has 8064 vertices
+Bookset/D01065.obj had 360 and now has 7538 vertices
+Bookset/D01109.obj had 1203 and now has 8064 vertices
+Bookset/D01038.obj had 2208 and now has 7601 vertices
+Bookset/D01050.obj had 140 and now has 7499 vertices
+Bookset/D01122.obj had 110 and now has 8220 vertices
+Bookset/D01146.obj had 2694 and now has 9440 vertices
+Bookset/D01108.obj had 1628 and now has 7606 vertices
+Bookset/D01009.obj had 444 and now has 7454 vertices
+Bookset/D01096.obj had 624 and now has 7531 vertices
+Bookset/D01184.obj had 247 and now has 6475 vertices
+Bookset/D01199.obj had 240 and now has 6336 vertices
+Bottle/D00020.obj had 971 and now has 7697 vertices
+Bookset/D01135.obj had 1645 and now has 7578 vertices
+Bottle/D00123.obj had 1067 and now has 9243 vertices
+Bottle/D00139.obj had 2452 and now has 7312 vertices
+Bottle/D00208.obj had 2000 and now has 5464 vertices
+Bottle/D00281.obj had 1304 and now has 7953 vertices
+Bottle/D00311.obj had 829 and now has 6520 vertices
+Bottle/D00347.obj had 2426 and now has 6461 vertices
+Bookset/D01030.obj had 208 and now has 7498 vertices
+Bookset/D01190.obj had 2417 and now has 7747 vertices
+Bottle/D00390.obj had 1499 and now has 7503 vertices
+Bookset/D01183.obj had 891 and now has 7570 vertices
+Bottle/D00350.obj had 569 and now has 7511 vertices
+Bookset/D01110.obj had 166 and now has 7497 vertices
+Bottle/D00940.obj had 737 and now has 5596 vertices
+Bottle/D00892.obj had 2474 and now has 7414 vertices
+Bottle/m483.obj had 371 and now has 8431 vertices
+Bottle/m486.obj had 2101 and now has 5995 vertices
+Bottle/D00716.obj had 446 and now has 7503 vertices
+Bottle/D00959.obj had 479 and now has 7512 vertices
+Bottle/m482.obj had 542 and now has 7524 vertices
+Bottle/m484.obj had 460 and now has 7506 vertices
+Bottle/m485.obj had 526 and now has 7519 vertices
+Bottle/D00711.obj had 192 and now has 7504 vertices
+Bottle/m492.obj had 360 and now has 9505 vertices
+BuildingNonResidential/m382.obj had 252 and now has 5452 vertices
+BuildingNonResidential/m383.obj had 2328 and now has 6788 vertices
+BuildingNonResidential/m384.obj had 2984 and now has 7562 vertices
+Bottle/m489.obj had 558 and now has 7514 vertices
+Bottle/m490.obj had 574 and now has 7515 vertices
+Bottle/m491.obj had 544 and now has 7520 vertices
+Bottle/m488.obj had 144 and now has 7500 vertices
+BuildingNonResidential/m387.obj had 844 and now has 7516 vertices
+Bottle/m487.obj had 133 and now has 7495 vertices
+Bookset/D01182.obj had 188 and now has 7502 vertices
+BuildingNonResidential/m390.obj had 40 and now has 5485 vertices
+BuildingNonResidential/m389.obj had 2509 and now has 7609 vertices
+BuildingNonResidential/m394.obj had 750 and now has 5734 vertices
+BuildingNonResidential/m385.obj had 674 and now has 7586 vertices
+BuildingNonResidential/m396.obj had 445 and now has 6555 vertices
+BuildingNonResidential/m392.obj had 33 and now has 9713 vertices
+BuildingNonResidential/m395.obj had 630 and now has 9678 vertices
+BuildingNonResidential/m391.obj had 246 and now has 7536 vertices
+BuildingNonResidential/m397.obj had 1362 and now has 7508 vertices
+BuildingNonResidential/m400.obj had 488 and now has 7523 vertices
+BuildingNonResidential/m407.obj had 229 and now has 5481 vertices
+BuildingNonResidential/m404.obj had 1054 and now has 7381 vertices
+BuildingNonResidential/m398.obj had 498 and now has 7512 vertices
+BuildingNonResidential/m393.obj had 241 and now has 7533 vertices
+BuildingNonResidential/m386.obj had 532 and now has 7512 vertices
+BuildingNonResidential/m409.obj had 1509 and now has 9461 vertices
+BuildingNonResidential/m410.obj had 1217 and now has 9521 vertices
+BuildingNonResidential/m408.obj had 1252 and now has 7519 vertices
+BuildingNonResidential/m414.obj had 1056 and now has 8832 vertices
+BuildingNonResidential/m412.obj had 1990 and now has 7752 vertices
+BuildingNonResidential/m472.obj had 358 and now has 9510 vertices
+BuildingNonResidential/m413.obj had 3749 and now has 7534 vertices
+BuildingNonResidential/m475.obj had 112 and now has 7232 vertices
+BuildingNonResidential/m418.obj had 1576 and now has 7566 vertices
+BuildingNonResidential/m477.obj had 1047 and now has 7879 vertices
+BuildingNonResidential/m474.obj had 1361 and now has 7509 vertices
+BuildingNonResidential/m415.obj had 508 and now has 7518 vertices
+BuildingNonResidential/m471.obj had 118 and now has 7498 vertices
+BuildingNonResidential/m478.obj had 1750 and now has 7617 vertices
+BuildingNonResidential/m481.obj had 473 and now has 7525 vertices
+BuildingNonResidential/m479.obj had 648 and now has 7557 vertices
+Car/D00168.obj had 4999 and now has 7608 vertices
+Car/D00265.obj had 4960 and now has 7677 vertices
+Bus/D00516.obj had 4096 and now has 8022 vertices
+Bus/D00832.obj had 3155 and now has 7873 vertices
+Car/D00541.obj had 2956 and now has 7726 vertices
+Bus/D00446.obj had 4915 and now has 8422 vertices
+Car/D00618.obj had 3506 and now has 9383 vertices
+Car/D00670.obj had 4978 and now has 7641 vertices
+Bus/D00436.obj had 4587 and now has 8034 vertices
+Car/m1489.obj had 1684 and now has 5036 vertices
+Car/m1490.obj had 2868 and now has 8434 vertices
+Car/m1497.obj had 3655 and now has 7509 vertices
+Car/m1488.obj had 4952 and now has 7670 vertices
+Car/m1502.obj had 4970 and now has 8063 vertices
+Car/m1506.obj had 4284 and now has 7642 vertices
+Car/m1500.obj had 1644 and now has 7506 vertices
+Bus/D00411.obj had 4964 and now has 7803 vertices
+Car/m1508.obj had 4336 and now has 7818 vertices
+Car/m1504.obj had 1621 and now has 7545 vertices
+Car/m1515.obj had 250 and now has 5333 vertices
+Car/m1522.obj had 2676 and now has 7372 vertices
+Car/m1521.obj had 308 and now has 7848 vertices
+Car/m1517.obj had 3956 and now has 7554 vertices
+Car/m1523.obj had 1830 and now has 5470 vertices
+Car/m1519.obj had 4275 and now has 7532 vertices
+Car/m1526.obj had 320 and now has 7600 vertices
+Car/m1531.obj had 2170 and now has 6230 vertices
+Car/m1529.obj had 4168 and now has 7662 vertices
+Car/m1532.obj had 132 and now has 5492 vertices
+Car/m1530.obj had 1268 and now has 7534 vertices
+Car/m1524.obj had 1517 and now has 7504 vertices
+Car/m1536.obj had 1503 and now has 5156 vertices
+Car/m1538.obj had 1830 and now has 5470 vertices
+Car/m1543.obj had 386 and now has 7510 vertices
+Car/m1547.obj had 249 and now has 5969 vertices
+Car/m1542.obj had 4384 and now has 7751 vertices
+Car/m1553.obj had 1239 and now has 8899 vertices
+Car/m1561.obj had 332 and now has 7586 vertices
+Car/m1563.obj had 616 and now has 5056 vertices
+Cellphone/D00312.obj had 1012 and now has 8720 vertices
+Cellphone/D00192.obj had 1230 and now has 7512 vertices
+Cellphone/D00032.obj had 3500 and now has 7510 vertices
+Cellphone/D00440.obj had 763 and now has 6430 vertices
+Cellphone/D00369.obj had 926 and now has 7865 vertices
+Cellphone/D00902.obj had 2408 and now has 6868 vertices
+Cellphone/D00559.obj had 3120 and now has 8483 vertices
+Cellphone/D00979.obj had 3120 and now has 8480 vertices
+Cellphone/D00997.obj had 4796 and now has 7502 vertices
+Chess/D01049.obj had 214 and now has 5661 vertices
+Chess/D01017.obj had 380 and now has 7500 vertices
+Chess/D01053.obj had 89 and now has 6809 vertices
+Chess/D01080.obj had 250 and now has 6698 vertices
+Chess/D01019.obj had 416 and now has 7500 vertices
+Chess/D01099.obj had 2386 and now has 7136 vertices
+Chess/D01105.obj had 282 and now has 7562 vertices
+Chess/D01021.obj had 1474 and now has 7500 vertices
+Chess/D01043.obj had 389 and now has 7500 vertices
+Chess/D01126.obj had 802 and now has 7202 vertices
+Chess/D01045.obj had 1542 and now has 7500 vertices
+Chess/D01112.obj had 1182 and now has 7500 vertices
+Chess/D01188.obj had 242 and now has 6482 vertices
+Chess/D01130.obj had 1282 and now has 7493 vertices
+Chess/D01171.obj had 4002 and now has 7500 vertices
+Chess/D01123.obj had 390 and now has 7500 vertices
+Chess/m1589.obj had 3782 and now has 7555 vertices
+Chess/D01138.obj had 416 and now has 7500 vertices
+Chess/D01145.obj had 390 and now has 7500 vertices
+Chess/m1599.obj had 250 and now has 6698 vertices
+Chess/m1598.obj had 1182 and now has 7500 vertices
+Chess/m1604.obj had 214 and now has 5661 vertices
+Chess/m1605.obj had 89 and now has 6809 vertices
+Chess/m1606.obj had 2386 and now has 7136 vertices
+Chess/m1602.obj had 1542 and now has 7500 vertices
+Chess/m1607.obj had 802 and now has 7202 vertices
+Chess/m1608.obj had 242 and now has 6482 vertices
+Chess/m1600.obj had 416 and now has 7500 vertices
+Chess/D01186.obj had 154 and now has 7500 vertices
+Chess/m1603.obj had 389 and now has 7500 vertices
+Chess/m1613.obj had 282 and now has 7562 vertices
+City/D01007.obj had 3163 and now has 6263 vertices
+City/D01010.obj had 1049 and now has 8613 vertices
+City/D01056.obj had 1638 and now has 8268 vertices
+City/D01039.obj had 1344 and now has 9423 vertices
+Chess/m1612.obj had 1282 and now has 7493 vertices
+City/D01092.obj had 1380 and now has 6621 vertices
+City/D01091.obj had 1321 and now has 9836 vertices
+City/D01103.obj had 2274 and now has 5211 vertices
+Chess/m1614.obj had 390 and now has 7500 vertices
+City/D01173.obj had 2341 and now has 6558 vertices
+City/m1652.obj had 2274 and now has 5211 vertices
+City/m1660.obj had 2341 and now has 6558 vertices
+Chess/m1611.obj had 1474 and now has 7500 vertices
+City/m1661.obj had 1344 and now has 9421 vertices
+City/m1664.obj had 1049 and now has 8613 vertices
+ClassicPiano/D00120.obj had 231 and now has 5475 vertices
+Chess/m1609.obj had 154 and now has 7500 vertices
+ClassicPiano/D00254.obj had 1335 and now has 9351 vertices
+ClassicPiano/D00009.obj had 2027 and now has 7618 vertices
+ClassicPiano/D00561.obj had 1826 and now has 7657 vertices
+ClassicPiano/D00034.obj had 1611 and now has 7538 vertices
+ClassicPiano/D00305.obj had 1711 and now has 7617 vertices
+ClassicPiano/D00967.obj had 4279 and now has 9811 vertices
+ClassicPiano/D00579.obj had 2369 and now has 7822 vertices
+Computer/D01002.obj had 2591 and now has 7700 vertices
+ClassicPiano/D00789.obj had 3136 and now has 7852 vertices
+Computer/D01028.obj had 2503 and now has 6720 vertices
+Computer/D01026.obj had 396 and now has 7504 vertices
+Computer/D01033.obj had 2986 and now has 8652 vertices
+Computer/D01037.obj had 135 and now has 5335 vertices
+Computer/D01071.obj had 29 and now has 5232 vertices
+Computer/D01072.obj had 325 and now has 8359 vertices
+ClassicPiano/D00845.obj had 750 and now has 7491 vertices
+Computer/D01070.obj had 3935 and now has 7524 vertices
+ClassicPiano/D00005.obj had 626 and now has 7436 vertices
+Computer/D01098.obj had 668 and now has 5036 vertices
+ClassicPiano/D00811.obj had 615 and now has 7426 vertices
+Computer/D01085.obj had 46 and now has 9242 vertices
+Computer/D01082.obj had 4269 and now has 7822 vertices
+Computer/D01100.obj had 2986 and now has 8652 vertices
+Computer/D01073.obj had 4638 and now has 7528 vertices
+Computer/D01164.obj had 2674 and now has 7943 vertices
+Computer/m1764.obj had 668 and now has 5036 vertices
+Computer/D01185.obj had 270 and now has 7264 vertices
+Computer/m1766.obj had 29 and now has 5232 vertices
+Computer/m1767.obj had 2591 and now has 7700 vertices
+Computer/m1770.obj had 2986 and now has 8652 vertices
+Computer/m1769.obj had 46 and now has 9242 vertices
+Computer/m1773.obj had 2503 and now has 6720 vertices
+Computer/m1774.obj had 284 and now has 9904 vertices
+Computer/m1776.obj had 270 and now has 7264 vertices
+Computer/m1775.obj had 396 and now has 7504 vertices
+Computer/m1777.obj had 325 and now has 8359 vertices
+ComputerKeyboard/D00278.obj had 1043 and now has 6161 vertices
+ClassicPiano/D00983.obj had 204 and now has 7464 vertices
+ComputerKeyboard/D00493.obj had 1300 and now has 9244 vertices
+ComputerKeyboard/D00569.obj had 348 and now has 8652 vertices
+ComputerKeyboard/D00654.obj had 1179 and now has 8580 vertices
+Computer/D01102.obj had 28 and now has 7504 vertices
+Computer/m1765.obj had 28 and now has 7504 vertices
+ComputerKeyboard/D00127.obj had 706 and now has 7411 vertices
+ComputerKeyboard/D00905.obj had 1282 and now has 8962 vertices
+Cup/D00067.obj had 353 and now has 9479 vertices
+ComputerKeyboard/D00600.obj had 1837 and now has 7648 vertices
+Cup/D00206.obj had 2092 and now has 5676 vertices
+ComputerKeyboard/D00116.obj had 805 and now has 7283 vertices
+Cup/D00270.obj had 2687 and now has 7408 vertices
+ComputerKeyboard/D00990.obj had 1646 and now has 7607 vertices
+Cup/D00328.obj had 2827 and now has 7706 vertices
+Cup/D00214.obj had 395 and now has 7500 vertices
+Cup/D00463.obj had 4710 and now has 7500 vertices
+ComputerKeyboard/D00673.obj had 1002 and now has 7277 vertices
+Cup/D00035.obj had 235 and now has 7430 vertices
+Cup/D00874.obj had 2296 and now has 5643 vertices
+Cup/m494.obj had 770 and now has 6914 vertices
+Cup/D00519.obj had 856 and now has 7504 vertices
+Cup/D00642.obj had 1686 and now has 7509 vertices
+Cup/m497.obj had 3008 and now has 9020 vertices
+Cup/D00882.obj had 1553 and now has 7500 vertices
+Cup/m500.obj had 71 and now has 5591 vertices
+Cup/m498.obj had 380 and now has 9740 vertices
+Cup/m499.obj had 339 and now has 8607 vertices
+Cup/m495.obj had 1401 and now has 7510 vertices
+Cup/m502.obj had 752 and now has 6752 vertices
+Cup/m501.obj had 1072 and now has 9072 vertices
+Cup/m526.obj had 120 and now has 9160 vertices
+DeskLamp/D00268.obj had 1868 and now has 5540 vertices
+DeskLamp/D00257.obj had 2208 and now has 6574 vertices
+DeskLamp/D00048.obj had 4189 and now has 7512 vertices
+Cup/m496.obj had 502 and now has 7500 vertices
+DeskLamp/D00435.obj had 2252 and now has 6728 vertices
+DeskLamp/D00531.obj had 2300 and now has 6846 vertices
+DeskLamp/D00693.obj had 655 and now has 5551 vertices
+DeskLamp/D00147.obj had 503 and now has 7506 vertices
+DeskLamp/D00715.obj had 1964 and now has 5880 vertices
+DeskLamp/D00686.obj had 3558 and now has 7514 vertices
+DeskLamp/D00776.obj had 1001 and now has 8849 vertices
+ComputerKeyboard/D00692.obj had 4176 and now has 7844 vertices
+DeskLamp/m605.obj had 531 and now has 5731 vertices
+DeskLamp/m606.obj had 87 and now has 5887 vertices
+DeskLamp/m608.obj had 699 and now has 5955 vertices
+DeskLamp/m604.obj had 1316 and now has 7544 vertices
+DeskLamp/m613.obj had 136 and now has 8136 vertices
+DeskLamp/m611.obj had 87 and now has 8087 vertices
+DeskLamp/m609.obj had 1137 and now has 7505 vertices
+DeskLamp/m615.obj had 2689 and now has 8095 vertices
+DeskLamp/m614.obj had 336 and now has 9228 vertices
+DeskLamp/D00698.obj had 615 and now has 7444 vertices
+DeskPhone/D00220.obj had 3924 and now has 7512 vertices
+DeskLamp/m603.obj had 166 and now has 7502 vertices
+DeskPhone/D00135.obj had 531 and now has 7537 vertices
+DeskPhone/D00486.obj had 1699 and now has 5013 vertices
+DeskPhone/D00318.obj had 4313 and now has 7527 vertices
+DeskPhone/D00556.obj had 586 and now has 5018 vertices
+DeskPhone/D00680.obj had 820 and now has 6846 vertices
+DeskPhone/D00894.obj had 880 and now has 7592 vertices
+DeskPhone/D00829.obj had 3870 and now has 7508 vertices
+DeskLamp/D00378.obj had 69 and now has 7505 vertices
+Door/D01052.obj had 676 and now has 5932 vertices
+Door/D01076.obj had 1724 and now has 5192 vertices
+Door/D01058.obj had 858 and now has 7326 vertices
+Door/D01104.obj had 871 and now has 7959 vertices
+Door/D01121.obj had 16 and now has 5840 vertices
+Door/D01129.obj had 2695 and now has 7029 vertices
+Door/D01136.obj had 716 and now has 6028 vertices
+Door/D01029.obj had 456 and now has 7503 vertices
+Door/D01141.obj had 2447 and now has 6857 vertices
+Door/D01144.obj had 68 and now has 5348 vertices
+Door/D01143.obj had 48 and now has 8760 vertices
+Door/D01114.obj had 1336 and now has 7509 vertices
+Door/D01062.obj had 128 and now has 7500 vertices
+Door/D01155.obj had 128 and now has 7448 vertices
+Door/D01158.obj had 716 and now has 6500 vertices
+Door/D01194.obj had 18 and now has 6570 vertices
+Door/m1708.obj had 16 and now has 5840 vertices
+Door/m1711.obj had 68 and now has 5348 vertices
+Door/m1712.obj had 1724 and now has 5192 vertices
+Door/m1715.obj had 676 and now has 5932 vertices
+Door/m1714.obj had 871 and now has 7865 vertices
+Door/D01167.obj had 124 and now has 7499 vertices
+Door/m1716.obj had 2447 and now has 6857 vertices
+Door/m1717.obj had 858 and now has 7326 vertices
+Door/m1707.obj had 456 and now has 7503 vertices
+Door/m1710.obj had 522 and now has 7512 vertices
+Door/m1720.obj had 716 and now has 6028 vertices
+Door/m1718.obj had 2695 and now has 7029 vertices
+Door/m1721.obj had 716 and now has 6500 vertices
+Door/m1726.obj had 128 and now has 7448 vertices
+Door/m1725.obj had 3232 and now has 9604 vertices
+Door/D01177.obj had 88 and now has 7514 vertices
+Door/m1728.obj had 2018 and now has 5808 vertices
+Door/m1722.obj had 1336 and now has 7509 vertices
+Door/m1729.obj had 336 and now has 7668 vertices
+Door/m1730.obj had 336 and now has 7668 vertices
+Door/m1727.obj had 3724 and now has 7518 vertices
+Door/m1731.obj had 1974 and now has 6058 vertices
+Door/m1723.obj had 128 and now has 7500 vertices
+Door/m1732.obj had 300 and now has 7775 vertices
+Drum/D00115.obj had 36 and now has 8196 vertices
+Drum/D00063.obj had 1800 and now has 8952 vertices
+Door/m1724.obj had 124 and now has 7499 vertices
+Drum/D00383.obj had 360 and now has 5640 vertices
+Drum/D00298.obj had 1609 and now has 7558 vertices
+Drum/D00404.obj had 1296 and now has 9540 vertices
+Drum/D00551.obj had 240 and now has 6528 vertices
+Door/D01139.obj had 31 and now has 7504 vertices
+Drum/D00193.obj had 1800 and now has 7537 vertices
+Drum/D00596.obj had 169 and now has 5485 vertices
+Drum/D00709.obj had 102 and now has 5304 vertices
+Fish/D00012.obj had 4240 and now has 7744 vertices
+Fish/D00022.obj had 3912 and now has 7682 vertices
+Fish/D00024.obj had 3952 and now has 7681 vertices
+Fish/D00030.obj had 3760 and now has 7654 vertices
+Drum/D00982.obj had 1835 and now has 7575 vertices
+Fish/D00142.obj had 3048 and now has 8334 vertices
+Fish/D00165.obj had 4264 and now has 7739 vertices
+Drum/D00189.obj had 651 and now has 7308 vertices
+Fish/D00251.obj had 4006 and now has 7703 vertices
+Drum/D00557.obj had 444 and now has 7463 vertices
+Fish/D00351.obj had 3206 and now has 8755 vertices
+Fish/D00293.obj had 4072 and now has 7700 vertices
+Fish/D00398.obj had 3820 and now has 7660 vertices
+Fish/D00450.obj had 3784 and now has 7655 vertices
+Fish/D00535.obj had 3934 and now has 7677 vertices
+Fish/D00636.obj had 3374 and now has 9078 vertices
+Fish/D00633.obj had 3712 and now has 7638 vertices
+Fish/D00682.obj had 3980 and now has 7659 vertices
+Fish/D00643.obj had 3928 and now has 7687 vertices
+Fish/D00950.obj had 3427 and now has 9225 vertices
+Fish/D00763.obj had 4122 and now has 7724 vertices
+FloorLamp/D00028.obj had 871 and now has 6205 vertices
+Fish/D00850.obj had 4382 and now has 7759 vertices
+FloorLamp/D00093.obj had 3756 and now has 7475 vertices
+Drum/D00375.obj had 4790 and now has 8113 vertices
+FloorLamp/D00388.obj had 3767 and now has 7550 vertices
+FloorLamp/D00408.obj had 4018 and now has 7515 vertices
+FloorLamp/D00228.obj had 1322 and now has 7502 vertices
+FloorLamp/D00447.obj had 4911 and now has 7505 vertices
+FloorLamp/D00495.obj had 4282 and now has 7515 vertices
+FloorLamp/D00740.obj had 1128 and now has 7502 vertices
+FloorLamp/D00856.obj had 3339 and now has 7500 vertices
+FloorLamp/D00888.obj had 1819 and now has 5451 vertices
+Drum/D00308.obj had 168 and now has 7428 vertices
+FloorLamp/m621.obj had 778 and now has 6890 vertices
+FloorLamp/m617.obj had 4440 and now has 7511 vertices
+FloorLamp/m619.obj had 361 and now has 9409 vertices
+FloorLamp/D00981.obj had 454 and now has 7510 vertices
+FloorLamp/m624.obj had 46 and now has 9242 vertices
+Glasses/D00432.obj had 408 and now has 9508 vertices
+FloorLamp/m618.obj had 1622 and now has 7502 vertices
+Glasses/D00225.obj had 1524 and now has 7510 vertices
+Glasses/D00560.obj had 4230 and now has 7518 vertices
+Glasses/D00630.obj had 3019 and now has 8979 vertices
+Glasses/D00475.obj had 1566 and now has 7509 vertices
+Glasses/D00717.obj had 1836 and now has 5430 vertices
+Glasses/D00813.obj had 696 and now has 6152 vertices
+Glasses/D00730.obj had 3334 and now has 9510 vertices
+Glasses/D00877.obj had 2864 and now has 7858 vertices
+Glasses/D00883.obj had 2804 and now has 8308 vertices
+Glasses/D00994.obj had 2199 and now has 6510 vertices
+FloorLamp/m622.obj had 54 and now has 7502 vertices
+Guitar/D00097.obj had 270 and now has 6094 vertices
+Guitar/D00023.obj had 3655 and now has 7543 vertices
+Guitar/D00222.obj had 1068 and now has 9054 vertices
+Guitar/D00124.obj had 2013 and now has 7579 vertices
+Glasses/D00937.obj had 312 and now has 7500 vertices
+Guitar/D00374.obj had 1491 and now has 7570 vertices
+Guitar/D00414.obj had 947 and now has 6387 vertices
+Guitar/D00534.obj had 1864 and now has 5464 vertices
+Guitar/D00464.obj had 3016 and now has 8673 vertices
+Guitar/D00416.obj had 4694 and now has 7585 vertices
+Guitar/D00645.obj had 1033 and now has 8761 vertices
+Gun/D00103.obj had 1931 and now has 7449 vertices
+Glasses/D00656.obj had 220 and now has 7425 vertices
+Gun/D00153.obj had 364 and now has 9516 vertices
+Gun/D00140.obj had 4462 and now has 7541 vertices
+Gun/D00161.obj had 302 and now has 7738 vertices
+Gun/D00239.obj had 2121 and now has 6350 vertices
+Gun/D00244.obj had 299 and now has 7547 vertices
+Gun/D00477.obj had 2147 and now has 5767 vertices
+Gun/D00282.obj had 3835 and now has 7508 vertices
+FloorLamp/m623.obj had 78 and now has 7501 vertices
+Gun/D00368.obj had 4651 and now has 7507 vertices
+Gun/D00802.obj had 300 and now has 7632 vertices
+Gun/D00929.obj had 1026 and now has 6311 vertices
+Gun/D00606.obj had 3338 and now has 7501 vertices
+Gun/m649.obj had 1094 and now has 8874 vertices
+Gun/m651.obj had 91 and now has 5291 vertices
+Gun/m653.obj had 2162 and now has 6462 vertices
+Gun/m648.obj had 1238 and now has 7507 vertices
+Gun/m650.obj had 1460 and now has 7576 vertices
+Gun/m654.obj had 1064 and now has 9416 vertices
+Gun/m655.obj had 364 and now has 9516 vertices
+Gun/m658.obj had 293 and now has 7573 vertices
+Gun/m652.obj had 4950 and now has 7831 vertices
+Gun/m661.obj had 370 and now has 9054 vertices
+Gun/m659.obj had 1181 and now has 7509 vertices
+Gun/m665.obj had 1847 and now has 5347 vertices
+Gun/m667.obj had 767 and now has 6767 vertices
+Gun/m662.obj had 460 and now has 7515 vertices
+Gun/m664.obj had 4651 and now has 7507 vertices
+Gun/m669.obj had 1070 and now has 8398 vertices
+Gun/m660.obj had 1085 and now has 7462 vertices
+Gun/m668.obj had 1414 and now has 7550 vertices
+Gun/m670.obj had 3285 and now has 9823 vertices
+Gun/m675.obj had 438 and now has 8758 vertices
+Gun/m663.obj had 502 and now has 7516 vertices
+Gun/m679.obj had 2003 and now has 5777 vertices
+Gun/m677.obj had 3330 and now has 9941 vertices
+Gun/m671.obj had 1190 and now has 7510 vertices
+Gun/m680.obj had 2823 and now has 8323 vertices
+Gun/m681.obj had 630 and now has 5270 vertices
+Gun/m678.obj had 1305 and now has 7539 vertices
+Gun/m685.obj had 280 and now has 7430 vertices
+Gun/m672.obj had 140 and now has 7503 vertices
+Gun/m686.obj had 879 and now has 7763 vertices
+Hand/D01022.obj had 799 and now has 7639 vertices
+Hand/D01024.obj had 114 and now has 8274 vertices
+Gun/m676.obj had 485 and now has 7511 vertices
+Hand/D01106.obj had 2248 and now has 6714 vertices
+Gun/m682.obj had 550 and now has 7535 vertices
+Gun/m683.obj had 502 and now has 7514 vertices
+Hand/D01041.obj had 1546 and now has 7545 vertices
+Hand/D01060.obj had 1521 and now has 7544 vertices
+Hand/D01074.obj had 421 and now has 7500 vertices
+Hand/D01198.obj had 1925 and now has 5771 vertices
+Hand/D01162.obj had 1198 and now has 7500 vertices
+Hand/D01118.obj had 1557 and now has 7500 vertices
+Hand/D01170.obj had 1547 and now has 7500 vertices
+Hand/D01193.obj had 386 and now has 7500 vertices
+Hand/m330.obj had 799 and now has 7639 vertices
+ClassicPiano/D00190.obj had 1572 and now has 7570 vertices
+Hand/m325.obj had 1546 and now has 7545 vertices
+Hand/m326.obj had 1521 and now has 7544 vertices
+Hand/m327.obj had 386 and now has 7500 vertices
+Hand/m333.obj had 1023 and now has 9191 vertices
+Hand/m334.obj had 114 and now has 8274 vertices
+Hand/m337.obj had 1925 and now has 5771 vertices
+Hand/m332.obj had 1198 and now has 7500 vertices
+Hand/m331.obj had 421 and now has 7500 vertices
+Hand/m339.obj had 2248 and now has 6714 vertices
+Hat/m1627.obj had 1009 and now has 9001 vertices
+Hat/m1630.obj had 562 and now has 5042 vertices
+Hat/m1628.obj had 958 and now has 6955 vertices
+Hat/m1631.obj had 2064 and now has 5460 vertices
+Hat/m1629.obj had 2388 and now has 6672 vertices
+Hand/m336.obj had 1557 and now has 7500 vertices
+Hand/m338.obj had 1547 and now has 7500 vertices
+Hat/m1637.obj had 1002 and now has 9002 vertices
+Hat/m1639.obj had 2029 and now has 6029 vertices
+Hat/m1640.obj had 1002 and now has 9002 vertices
+Hat/m1632.obj had 1264 and now has 7491 vertices
+Hat/m1633.obj had 1400 and now has 7527 vertices
+Hat/m1641.obj had 1256 and now has 7502 vertices
+Helicopter/D00191.obj had 4498 and now has 7616 vertices
+Hat/m1636.obj had 426 and now has 7500 vertices
+Helicopter/D00502.obj had 3716 and now has 7878 vertices
+Helicopter/D00658.obj had 2770 and now has 7434 vertices
+Helicopter/D00423.obj had 1362 and now has 7510 vertices
+Helicopter/D00796.obj had 222 and now has 5006 vertices
+Helicopter/D00820.obj had 2929 and now has 6688 vertices
+Helicopter/D00868.obj had 748 and now has 6048 vertices
+Helicopter/D00991.obj had 1988 and now has 5367 vertices
+Helicopter/D00986.obj had 1176 and now has 9416 vertices
+Helicopter/D00470.obj had 496 and now has 7513 vertices
+Helicopter/m1302.obj had 1058 and now has 8586 vertices
+Helicopter/m1304.obj had 1066 and now has 9442 vertices
+Helicopter/m1309.obj had 2046 and now has 5506 vertices
+Helicopter/m1312.obj had 222 and now has 5006 vertices
+Helicopter/m1311.obj had 1006 and now has 9038 vertices
+Helicopter/D00498.obj had 2133 and now has 7414 vertices
+Helicopter/m1310.obj had 1362 and now has 7510 vertices
+Helicopter/m1316.obj had 396 and now has 9262 vertices
+Helicopter/m1313.obj had 1610 and now has 7559 vertices
+Helicopter/m1318.obj had 1162 and now has 9386 vertices
+Helicopter/m1317.obj had 1176 and now has 9416 vertices
+Helicopter/m1321.obj had 2752 and now has 7865 vertices
+Helicopter/m1314.obj had 1644 and now has 7566 vertices
+Helicopter/m1322.obj had 675 and now has 5755 vertices
+Helicopter/m1329.obj had 665 and now has 5633 vertices
+Helicopter/m1315.obj had 510 and now has 7530 vertices
+Helicopter/m1328.obj had 3218 and now has 9666 vertices
+Helicopter/m1330.obj had 294 and now has 7808 vertices
+Helicopter/m1325.obj had 1545 and now has 7609 vertices
+Helicopter/m1334.obj had 267 and now has 7079 vertices
+Helicopter/m1326.obj had 1545 and now has 7590 vertices
+Helicopter/m1319.obj had 598 and now has 7543 vertices
+Helicopter/m1336.obj had 1201 and now has 7508 vertices
+Helicopter/m1332.obj had 496 and now has 7513 vertices
+Helicopter/m1333.obj had 439 and now has 7497 vertices
+House/D00091.obj had 617 and now has 7531 vertices
+House/D00568.obj had 2852 and now has 8236 vertices
+House/D00095.obj had 3375 and now has 7514 vertices
+House/D00665.obj had 1216 and now has 9652 vertices
+House/D00889.obj had 2050 and now has 9226 vertices
+House/m423.obj had 35 and now has 5843 vertices
+House/m431.obj had 966 and now has 6066 vertices
+House/m432.obj had 722 and now has 5550 vertices
+House/m433.obj had 2380 and now has 6616 vertices
+House/m435.obj had 119 and now has 7479 vertices
+House/m434.obj had 22 and now has 9486 vertices
+House/m436.obj had 220 and now has 9820 vertices
+House/m430.obj had 1686 and now has 7612 vertices
+House/m439.obj had 356 and now has 7272 vertices
+House/D00965.obj had 1752 and now has 7634 vertices
+House/m443.obj had 284 and now has 5705 vertices
+House/m448.obj had 762 and now has 6769 vertices
+House/m451.obj had 905 and now has 7689 vertices
+House/m452.obj had 2557 and now has 7656 vertices
+House/m441.obj had 2086 and now has 7816 vertices
+House/m453.obj had 2385 and now has 7498 vertices
+House/m447.obj had 1455 and now has 7571 vertices
+House/m457.obj had 284 and now has 5705 vertices
+House/m454.obj had 200 and now has 8840 vertices
+House/m456.obj had 607 and now has 9746 vertices
+House/m461.obj had 816 and now has 7137 vertices
+House/m462.obj had 25 and now has 8033 vertices
+HumanHead/D00205.obj had 1394 and now has 7982 vertices
+House/m440.obj had 411 and now has 7483 vertices
+House/m460.obj had 4748 and now has 7891 vertices
+HumanHead/D00758.obj had 959 and now has 6548 vertices
+House/m449.obj had 221 and now has 7524 vertices
+HumanHead/D00566.obj had 1919 and now has 7626 vertices
+HumanHead/D00910.obj had 3258 and now has 9362 vertices
+HumanHead/m341.obj had 1884 and now has 5488 vertices
+HumanHead/m340.obj had 1426 and now has 7512 vertices
+HumanHead/D00487.obj had 3224 and now has 7878 vertices
+HumanHead/D00653.obj had 2885 and now has 7794 vertices
+HumanHead/D00629.obj had 3490 and now has 7979 vertices
+HumanHead/m343.obj had 1984 and now has 5729 vertices
+HumanHead/m342.obj had 1543 and now has 7578 vertices
+HumanHead/m344.obj had 1996 and now has 5552 vertices
+HumanHead/m345.obj had 2687 and now has 7488 vertices
+HumanHead/D00984.obj had 2319 and now has 7651 vertices
+HumanHead/m347.obj had 906 and now has 9186 vertices
+HumanHead/m350.obj had 2034 and now has 5980 vertices
+HumanHead/m352.obj had 664 and now has 5452 vertices
+HumanHead/m351.obj had 882 and now has 7465 vertices
+HumanHead/m354.obj had 216 and now has 5754 vertices
+HumanHead/D00434.obj had 4296 and now has 8177 vertices
+HumanHead/m356.obj had 692 and now has 6212 vertices
+HumanHead/m357.obj had 193 and now has 5185 vertices
+HumanHead/D00610.obj had 4503 and now has 8192 vertices
+HumanHead/m359.obj had 314 and now has 8309 vertices
+HumanHead/m360.obj had 270 and now has 7238 vertices
+HumanHead/m361.obj had 295 and now has 7536 vertices
+HumanHead/m363.obj had 1884 and now has 5488 vertices
+HumanHead/m364.obj had 263 and now has 6308 vertices
+HumanHead/m358.obj had 1173 and now has 7511 vertices
+HumanHead/m346.obj had 484 and now has 7509 vertices
+HumanHead/m366.obj had 3009 and now has 8937 vertices
+HumanHead/m368.obj had 2991 and now has 8719 vertices
+HumanHead/m367.obj had 977 and now has 8385 vertices
+Humanoid/m119.obj had 450 and now has 7510 vertices
+Humanoid/m122.obj had 443 and now has 7509 vertices
+Humanoid/m118.obj had 472 and now has 7510 vertices
+Humanoid/m120.obj had 467 and now has 7511 vertices
+Humanoid/m121.obj had 471 and now has 7511 vertices
+Humanoid/m123.obj had 474 and now has 7510 vertices
+Humanoid/m131.obj had 2012 and now has 5024 vertices
+Humanoid/m130.obj had 1025 and now has 8481 vertices
+Humanoid/m124.obj had 473 and now has 7515 vertices
+Humanoid/m125.obj had 1250 and now has 7499 vertices
+Humanoid/m132.obj had 2537 and now has 6586 vertices
+Humanoid/m133.obj had 2344 and now has 6597 vertices
+Humanoid/m134.obj had 1962 and now has 5577 vertices
+Humanoid/m128.obj had 458 and now has 7511 vertices
+Humanoid/m141.obj had 2012 and now has 5024 vertices
+Humanoid/m129.obj had 1871 and now has 7711 vertices
+Humanoid/m126.obj had 577 and now has 7531 vertices
+Humanoid/m144.obj had 676 and now has 5880 vertices
+Humanoid/m146.obj had 2244 and now has 5704 vertices
+HumanHead/m362.obj had 186 and now has 7502 vertices
+Humanoid/m135.obj had 498 and now has 7514 vertices
+Humanoid/m137.obj had 1636 and now has 7504 vertices
+Humanoid/m150.obj had 2001 and now has 5013 vertices
+Humanoid/m136.obj had 469 and now has 7512 vertices
+Humanoid/m151.obj had 2996 and now has 8950 vertices
+Humanoid/m148.obj had 3964 and now has 7540 vertices
+Humanoid/m147.obj had 4677 and now has 7673 vertices
+Humanoid/m154.obj had 445 and now has 9935 vertices
+Humanoid/m157.obj had 747 and now has 6467 vertices
+Humanoid/m160.obj had 894 and now has 7402 vertices
+Humanoid/m155.obj had 1290 and now has 7500 vertices
+Humanoid/m164.obj had 728 and now has 6312 vertices
+Humanoid/m163.obj had 120 and now has 8440 vertices
+Humanoid/m162.obj had 3581 and now has 7525 vertices
+Humanoid/m165.obj had 506 and now has 7498 vertices
+Humanoid/m166.obj had 476 and now has 7268 vertices
+Humanoid/m161.obj had 495 and now has 7525 vertices
+Humanoid/m168.obj had 2640 and now has 8116 vertices
+Humanoid/m169.obj had 1059 and now has 9063 vertices
+Humanoid/m158.obj had 521 and now has 7521 vertices
+Humanoid/m172.obj had 745 and now has 6397 vertices
+Humanoid/m173.obj had 1003 and now has 7811 vertices
+Humanoid/m159.obj had 533 and now has 7515 vertices
+Humanoid/m176.obj had 708 and now has 5860 vertices
+Humanoid/m177.obj had 116 and now has 7516 vertices
+Humanoid/m174.obj had 1196 and now has 7511 vertices
+Humanoid/m167.obj had 435 and now has 7502 vertices
+Humanoid/m183.obj had 3618 and now has 7516 vertices
+Humanoid/m186.obj had 375 and now has 7707 vertices
+Humanoid/m171.obj had 614 and now has 7533 vertices
+Humanoid/m188.obj had 1863 and now has 5212 vertices
+Humanoid/m175.obj had 660 and now has 7558 vertices
+Humanoid/m189.obj had 309 and now has 7147 vertices
+Humanoid/m184.obj had 441 and now has 7509 vertices
+Humanoid/m190.obj had 1022 and now has 8114 vertices
+Humanoid/m194.obj had 2244 and now has 5704 vertices
+Humanoid/m197.obj had 2010 and now has 5022 vertices
+Humanoid/m185.obj had 493 and now has 7513 vertices
+Humanoid/m187.obj had 1618 and now has 7525 vertices
+Humanoid/m196.obj had 4049 and now has 7561 vertices
+Humanoid/m202.obj had 148 and now has 9268 vertices
+Humanoid/m205.obj had 662 and now has 5606 vertices
+Humanoid/m192.obj had 450 and now has 7510 vertices
+Humanoid/m206.obj had 3109 and now has 8757 vertices
+Humanoid/m210.obj had 210 and now has 5462 vertices
+Humanoid/m207.obj had 3238 and now has 9148 vertices
+Humanoid/m208.obj had 349 and now has 9371 vertices
+Humanoid/m204.obj had 1224 and now has 7523 vertices
+Humanoid/m211.obj had 2640 and now has 8116 vertices
+Humanoid/m214.obj had 1739 and now has 5159 vertices
+Humanoid/m215.obj had 689 and now has 5969 vertices
+Humanoid/m191.obj had 124 and now has 7500 vertices
+Humanoid/m203.obj had 477 and now has 7506 vertices
+Humanoid/m217.obj had 955 and now has 8295 vertices
+Humanoid/m218.obj had 947 and now has 8395 vertices
+Humanoid/m219.obj had 178 and now has 8082 vertices
+Humanoid/m212.obj had 1290 and now has 7500 vertices
+Humanoid/m213.obj had 409 and now has 7507 vertices
+Humanoid/m233.obj had 747 and now has 6467 vertices
+Humanoid/m198.obj had 4657 and now has 8172 vertices
+Humanoid/m236.obj had 2841 and now has 8286 vertices
+Humanoid/m240.obj had 716 and now has 6124 vertices
+Humanoid/m232.obj had 429 and now has 7500 vertices
+Humanoid/m235.obj had 408 and now has 7500 vertices
+Humanoid/m239.obj had 551 and now has 7545 vertices
+Humanoid/m238.obj had 559 and now has 7544 vertices
+Humanoid/m234.obj had 529 and now has 7514 vertices
+Humanoid/m237.obj had 480 and now has 7500 vertices
+Humanoid/m241.obj had 589 and now has 7556 vertices
+Humanoid/m242.obj had 598 and now has 7559 vertices
+Humanoid/m243.obj had 568 and now has 7550 vertices
+Humanoid/m244.obj had 540 and now has 7541 vertices
+Humanoid/m245.obj had 574 and now has 7551 vertices
+Humanoid/m246.obj had 583 and now has 7553 vertices
+Humanoid/m257.obj had 372 and now has 9745 vertices
+Humanoid/m259.obj had 402 and now has 9866 vertices
+Humanoid/m260.obj had 1068 and now has 9436 vertices
+Humanoid/m248.obj had 518 and now has 7526 vertices
+Insect/D00081.obj had 313 and now has 7827 vertices
+Insect/D00102.obj had 2572 and now has 7618 vertices
+Humanoid/m266.obj had 1092 and now has 9620 vertices
+Insect/D00109.obj had 3288 and now has 8518 vertices
+Insect/D00160.obj had 253 and now has 6207 vertices
+Insect/D00180.obj had 2572 and now has 7618 vertices
+Insect/D00231.obj had 312 and now has 7722 vertices
+Insect/D00294.obj had 2056 and now has 5122 vertices
+Humanoid/m261.obj had 481 and now has 7512 vertices
+Insect/D00291.obj had 296 and now has 7150 vertices
+Humanoid/m262.obj had 470 and now has 7511 vertices
+Insect/D00136.obj had 1384 and now has 7537 vertices
+Humanoid/m263.obj had 478 and now has 7510 vertices
+Insect/D00315.obj had 314 and now has 7750 vertices
+Insect/D00399.obj had 2763 and now has 8057 vertices
+Insect/D00510.obj had 329 and now has 7479 vertices
+Insect/D00615.obj had 2546 and now has 7634 vertices
+Insect/D00672.obj had 3334 and now has 8824 vertices
+Insect/D00695.obj had 790 and now has 6790 vertices
+Insect/D00309.obj had 1551 and now has 7558 vertices
+Insect/D00713.obj had 1728 and now has 8536 vertices
+Insect/D00590.obj had 1430 and now has 7500 vertices
+Insect/D00746.obj had 4250 and now has 7535 vertices
+Insect/D00786.obj had 2859 and now has 8188 vertices
+Insect/D00734.obj had 1588 and now has 7544 vertices
+Insect/D00855.obj had 299 and now has 7501 vertices
+Insect/D00806.obj had 309 and now has 7823 vertices
+Insect/m1.obj had 255 and now has 5585 vertices
+Insect/m0.obj had 298 and now has 6694 vertices
+Insect/D00774.obj had 1548 and now has 7525 vertices
+Insect/D00787.obj had 562 and now has 7472 vertices
+Insect/D00989.obj had 313 and now has 7957 vertices
+Insect/D00814.obj had 1362 and now has 7517 vertices
+Insect/m12.obj had 278 and now has 6778 vertices
+Insect/m11.obj had 368 and now has 9780 vertices
+Insect/m14.obj had 891 and now has 7603 vertices
+Insect/m16.obj had 2666 and now has 7828 vertices
+Insect/m15.obj had 368 and now has 9780 vertices
+Insect/m19.obj had 3339 and now has 8824 vertices
+Insect/m10.obj had 1362 and now has 7517 vertices
+Insect/D00895.obj had 4173 and now has 7930 vertices
+Insect/m18.obj had 4250 and now has 7535 vertices
+Insect/m21.obj had 346 and now has 7574 vertices
+Insect/m2.obj had 3495 and now has 7542 vertices
+Insect/m22.obj had 333 and now has 8393 vertices
+Insect/m17.obj had 1548 and now has 7525 vertices
+Insect/m7.obj had 265 and now has 6843 vertices
+Insect/m20.obj had 1624 and now has 7546 vertices
+Insect/m4.obj had 4346 and now has 7595 vertices
+Insect/m25.obj had 1249 and now has 7500 vertices
+Insect/m8.obj had 423 and now has 9497 vertices
+Jet/m1150.obj had 622 and now has 5530 vertices
+Jet/m1149.obj had 3003 and now has 8877 vertices
+Insect/m23.obj had 462 and now has 7508 vertices
+Jet/m1151.obj had 858 and now has 7496 vertices
+Insect/m3.obj had 486 and now has 7511 vertices
+Jet/m1147.obj had 1149 and now has 7496 vertices
+Jet/m1153.obj had 743 and now has 6652 vertices
+Insect/m24.obj had 163 and now has 7507 vertices
+Jet/m1152.obj had 3726 and now has 7583 vertices
+Jet/m1155.obj had 3680 and now has 9404 vertices
+Insect/m9.obj had 557 and now has 7542 vertices
+Jet/m1157.obj had 1264 and now has 9616 vertices
+Insect/m13.obj had 491 and now has 7474 vertices
+Jet/m1158.obj had 336 and now has 7980 vertices
+Jet/m1161.obj had 1486 and now has 8254 vertices
+Jet/m1156.obj had 1335 and now has 7534 vertices
+Jet/m1162.obj had 2960 and now has 8574 vertices
+Jet/m1159.obj had 3726 and now has 7583 vertices
+Jet/m1167.obj had 2838 and now has 6830 vertices
+Jet/m1171.obj had 3110 and now has 8732 vertices
+Jet/m1172.obj had 1965 and now has 6893 vertices
+Jet/m1165.obj had 448 and now has 7517 vertices
+Jet/m1169.obj had 1198 and now has 7520 vertices
+Jet/m1173.obj had 2572 and now has 7428 vertices
+Jet/m1154.obj had 520 and now has 7508 vertices
+Jet/m1174.obj had 281 and now has 7457 vertices
+Jet/m1175.obj had 2344 and now has 6936 vertices
+Jet/m1166.obj had 349 and now has 7499 vertices
+Jet/m1163.obj had 1014 and now has 7505 vertices
+Jet/m1178.obj had 258 and now has 7694 vertices
+Jet/m1176.obj had 213 and now has 8559 vertices
+Jet/m1179.obj had 1203 and now has 9178 vertices
+Jet/m1184.obj had 182 and now has 5148 vertices
+Jet/m1168.obj had 500 and now has 7478 vertices
+Jet/m1187.obj had 299 and now has 8047 vertices
+Jet/m1183.obj had 520 and now has 7538 vertices
+Jet/m1188.obj had 279 and now has 7273 vertices
+Jet/m1181.obj had 412 and now has 7500 vertices
+Jet/m1177.obj had 507 and now has 7501 vertices
+Jet/m1194.obj had 757 and now has 5509 vertices
+Jet/m1193.obj had 1020 and now has 9137 vertices
+Jet/m1195.obj had 340 and now has 6320 vertices
+Jet/m1191.obj had 1295 and now has 7523 vertices
+Jet/m1180.obj had 531 and now has 7500 vertices
+Jet/m1197.obj had 235 and now has 6527 vertices
+Jet/m1199.obj had 602 and now has 5146 vertices
+Jet/m1198.obj had 224 and now has 6229 vertices
+Jet/m1200.obj had 197 and now has 6047 vertices
+Jet/m1202.obj had 688 and now has 6012 vertices
+Jet/m1204.obj had 277 and now has 7921 vertices
+Jet/m1205.obj had 369 and now has 7597 vertices
+Jet/m1208.obj had 308 and now has 7055 vertices
+Jet/m1207.obj had 412 and now has 9109 vertices
+Jet/m1196.obj had 523 and now has 7538 vertices
+Jet/m1209.obj had 244 and now has 6482 vertices
+Jet/m1210.obj had 577 and now has 5157 vertices
+Jet/m1213.obj had 254 and now has 6804 vertices
+Jet/m1214.obj had 887 and now has 7890 vertices
+Jet/m1216.obj had 879 and now has 7895 vertices
+Jet/m1217.obj had 305 and now has 8027 vertices
+Jet/m1212.obj had 1173 and now has 7505 vertices
+Jet/m1182.obj had 179 and now has 7500 vertices
+Jet/m1218.obj had 274 and now has 5424 vertices
+Jet/m1211.obj had 486 and now has 7521 vertices
+Jet/m1221.obj had 372 and now has 9316 vertices
+Jet/m1222.obj had 332 and now has 8288 vertices
+Jet/m1185.obj had 152 and now has 7494 vertices
+Jet/m1223.obj had 1117 and now has 7500 vertices
+Jet/m1190.obj had 142 and now has 7494 vertices
+Jet/m1228.obj had 329 and now has 5113 vertices
+Jet/m1220.obj had 437 and now has 7502 vertices
+Jet/m1230.obj had 2360 and now has 6685 vertices
+Jet/m1229.obj had 3388 and now has 9810 vertices
+Jet/m1215.obj had 162 and now has 7502 vertices
+Jet/m1224.obj had 559 and now has 7536 vertices
+Jet/m1231.obj had 79 and now has 5279 vertices
+Jet/m1232.obj had 203 and now has 5637 vertices
+Jet/m1233.obj had 233 and now has 6941 vertices
+Jet/m1234.obj had 236 and now has 6632 vertices
+Jet/m1235.obj had 193 and now has 5081 vertices
+Jet/m1238.obj had 196 and now has 5344 vertices
+Jet/m1237.obj had 212 and now has 6452 vertices
+Jet/m1239.obj had 428 and now has 9216 vertices
+Jet/m1240.obj had 182 and now has 5096 vertices
+Jet/m1227.obj had 265 and now has 7544 vertices
+Jet/m1241.obj had 480 and now has 9840 vertices
+Jet/m1245.obj had 215 and now has 5753 vertices
+Jet/m1242.obj had 380 and now has 8284 vertices
+Jet/m1243.obj had 282 and now has 8030 vertices
+Jet/m1247.obj had 777 and now has 6959 vertices
+Jet/m1248.obj had 296 and now has 7550 vertices
+Jet/m1236.obj had 396 and now has 7495 vertices
+Jet/m1249.obj had 310 and now has 8318 vertices
+Jet/m1219.obj had 185 and now has 7500 vertices
+Jet/m1226.obj had 161 and now has 7500 vertices
+Jet/m1250.obj had 2539 and now has 7509 vertices
+Jet/m1252.obj had 3072 and now has 7906 vertices
+Jet/m1253.obj had 348 and now has 6536 vertices
+Jet/m1258.obj had 2178 and now has 5766 vertices
+Jet/m1255.obj had 3167 and now has 9608 vertices
+Jet/m1261.obj had 431 and now has 8907 vertices
+Jet/m1246.obj had 366 and now has 7496 vertices
+Jet/m1251.obj had 1198 and now has 7520 vertices
+Jet/m1263.obj had 1244 and now has 9612 vertices
+Jet/m1264.obj had 1144 and now has 9128 vertices
+Jet/m1265.obj had 423 and now has 9263 vertices
+Jet/m1268.obj had 240 and now has 5128 vertices
+Jet/m1266.obj had 3408 and now has 9216 vertices
+Jet/m1270.obj had 295 and now has 6171 vertices
+Jet/m1271.obj had 328 and now has 7140 vertices
+Jet/m1274.obj had 426 and now has 9318 vertices
+Jet/m1277.obj had 2239 and now has 6463 vertices
+Jet/m1225.obj had 183 and now has 7522 vertices
+Jet/m1262.obj had 646 and now has 7560 vertices
+Jet/m1279.obj had 734 and now has 5550 vertices
+Jet/m1278.obj had 2304 and now has 6648 vertices
+Jet/m1269.obj had 230 and now has 7530 vertices
+Jet/m1276.obj had 236 and now has 7530 vertices
+Jet/m1283.obj had 275 and now has 5059 vertices
+Jet/m1282.obj had 368 and now has 8272 vertices
+Jet/m1281.obj had 415 and now has 9411 vertices
+Jet/m1285.obj had 802 and now has 6434 vertices
+Jet/m1273.obj had 475 and now has 7505 vertices
+Jet/m1286.obj had 334 and now has 5898 vertices
+Jet/m1275.obj had 204 and now has 7521 vertices
+Jet/m1267.obj had 230 and now has 7528 vertices
+Jet/m1287.obj had 714 and now has 5466 vertices
+Jet/m1290.obj had 279 and now has 5115 vertices
+Jet/m1291.obj had 272 and now has 6044 vertices
+Jet/m1292.obj had 2911 and now has 7947 vertices
+Jet/m1293.obj had 906 and now has 7062 vertices
+Jet/m1296.obj had 250 and now has 5554 vertices
+Jet/m1295.obj had 204 and now has 9964 vertices
+Jet/m1298.obj had 301 and now has 7347 vertices
+Jet/m1301.obj had 74 and now has 5834 vertices
+Jet/m1288.obj had 1502 and now has 7563 vertices
+Jet/m1300.obj had 39 and now has 9235 vertices
+Jet/m1280.obj had 249 and now has 7537 vertices
+Knife/D01015.obj had 886 and now has 7216 vertices
+Knife/D01025.obj had 208 and now has 5464 vertices
+Knife/D01051.obj had 683 and now has 5522 vertices
+Knife/D01063.obj had 885 and now has 6103 vertices
+Knife/D01075.obj had 726 and now has 5100 vertices
+Knife/D01077.obj had 334 and now has 8254 vertices
+Knife/D01107.obj had 976 and now has 6799 vertices
+Jet/m1297.obj had 640 and now has 7555 vertices
+Jet/m1299.obj had 210 and now has 7523 vertices
+Knife/D01119.obj had 113 and now has 8615 vertices
+Knife/D01132.obj had 1058 and now has 6898 vertices
+Knife/D01150.obj had 287 and now has 7103 vertices
+Knife/D01160.obj had 270 and now has 7014 vertices
+Jet/m1294.obj had 257 and now has 7538 vertices
+Knife/D01174.obj had 808 and now has 5602 vertices
+Knife/D01175.obj had 87 and now has 6561 vertices
+Knife/D01187.obj had 422 and now has 8318 vertices
+Knife/m722.obj had 812 and now has 6892 vertices
+Knife/m724.obj had 262 and now has 6970 vertices
+Knife/D01032.obj had 560 and now has 7398 vertices
+Knife/D01054.obj had 130 and now has 7471 vertices
+Knife/m725.obj had 262 and now has 6970 vertices
+Knife/m727.obj had 681 and now has 6065 vertices
+MilitaryVehicle/D00051.obj had 855 and now has 7351 vertices
+Knife/m726.obj had 417 and now has 7502 vertices
+MilitaryVehicle/D00100.obj had 3225 and now has 8792 vertices
+Knife/m728.obj had 463 and now has 7517 vertices
+MilitaryVehicle/D00611.obj had 2625 and now has 7108 vertices
+Knife/D01057.obj had 184 and now has 7484 vertices
+Knife/D01120.obj had 132 and now has 7476 vertices
+Knife/D01168.obj had 692 and now has 7148 vertices
+MilitaryVehicle/D00799.obj had 719 and now has 6087 vertices
+MilitaryVehicle/D00778.obj had 4449 and now has 7811 vertices
+Knife/D01189.obj had 131 and now has 7449 vertices
+Monitor/D00229.obj had 2929 and now has 7753 vertices
+Monitor/D00391.obj had 1812 and now has 5300 vertices
+Monitor/D00007.obj had 1552 and now has 7501 vertices
+Monitor/D00339.obj had 1396 and now has 7555 vertices
+Monitor/D00469.obj had 230 and now has 6002 vertices
+Monitor/D00412.obj had 3149 and now has 7820 vertices
+Monitor/D00141.obj had 1712 and now has 7522 vertices
+Monitor/D00919.obj had 1551 and now has 9513 vertices
+Monoplane/D00019.obj had 837 and now has 7149 vertices
+Monoplane/D00043.obj had 338 and now has 7566 vertices
+Monoplane/D00098.obj had 238 and now has 5100 vertices
+Monoplane/D00169.obj had 2983 and now has 6295 vertices
+Monitor/D00548.obj had 464 and now has 7509 vertices
+Monoplane/D00301.obj had 1264 and now has 9616 vertices
+Monitor/D00920.obj had 1315 and now has 7502 vertices
+Monoplane/D00011.obj had 597 and now has 7537 vertices
+Monoplane/D00402.obj had 393 and now has 9077 vertices
+Monoplane/D00319.obj had 1066 and now has 8379 vertices
+Monoplane/D00798.obj had 2337 and now has 6489 vertices
+Monitor/D00659.obj had 171 and now has 7505 vertices
+Monoplane/D00262.obj had 524 and now has 7532 vertices
+Monoplane/D00304.obj had 1521 and now has 7566 vertices
+Monoplane/D00840.obj had 2512 and now has 7384 vertices
+Monoplane/D00925.obj had 713 and now has 6089 vertices
+Monoplane/D00963.obj had 790 and now has 6102 vertices
+Monoplane/D00167.obj had 593 and now has 7541 vertices
+Monoplane/D00482.obj had 1672 and now has 7619 vertices
+Motorcycle/D00269.obj had 3061 and now has 8605 vertices
+Motorcycle/D00224.obj had 3920 and now has 7565 vertices
+Motorcycle/D00396.obj had 3397 and now has 9493 vertices
+Monoplane/D00995.obj had 586 and now has 7548 vertices
+Monoplane/D00864.obj had 627 and now has 7546 vertices
+Motorcycle/D00945.obj had 4481 and now has 7337 vertices
+Mug/D00172.obj had 1800 and now has 5160 vertices
+Motorcycle/m1484.obj had 118 and now has 7318 vertices
+Mug/D00321.obj had 773 and now has 5008 vertices
+Mug/D00372.obj had 785 and now has 6805 vertices
+Mug/D00684.obj had 1723 and now has 5169 vertices
+Mug/D00745.obj had 3238 and now has 9698 vertices
+Mug/D00705.obj had 4158 and now has 7500 vertices
+Motorcycle/m1481.obj had 547 and now has 7514 vertices
+Mug/D00760.obj had 3266 and now has 9785 vertices
+Mug/D00770.obj had 3300 and now has 9892 vertices
+Mug/D00833.obj had 2021 and now has 5981 vertices
+Mug/D00825.obj had 1166 and now has 8120 vertices
+Mug/D00908.obj had 1404 and now has 7680 vertices
+Mug/m504.obj had 1725 and now has 5175 vertices
+Mug/m503.obj had 799 and now has 6999 vertices
+Mug/m507.obj had 3330 and now has 9922 vertices
+Mug/m508.obj had 998 and now has 8950 vertices
+MultiSeat/D00237.obj had 1940 and now has 5780 vertices
+MultiSeat/D00046.obj had 1191 and now has 7503 vertices
+MultiSeat/D00053.obj had 3214 and now has 7515 vertices
+Mug/D00923.obj had 738 and now has 7364 vertices
+MultiSeat/D00036.obj had 144 and now has 7503 vertices
+MultiSeat/D00285.obj had 3770 and now has 7516 vertices
+MultiSeat/D00245.obj had 1672 and now has 7511 vertices
+MultiSeat/D00588.obj had 307 and now has 5949 vertices
+MultiSeat/D00586.obj had 3922 and now has 7508 vertices
+MultiSeat/D00607.obj had 3156 and now has 9428 vertices
+MultiSeat/D00145.obj had 168 and now has 7505 vertices
+MultiSeat/m774.obj had 264 and now has 6088 vertices
+MultiSeat/D00652.obj had 4607 and now has 7507 vertices
+MultiSeat/m776.obj had 880 and now has 8502 vertices
+MultiSeat/m779.obj had 660 and now has 5732 vertices
+MultiSeat/m777.obj had 1051 and now has 8484 vertices
+MultiSeat/D00329.obj had 540 and now has 7503 vertices
+MultiSeat/m780.obj had 312 and now has 6396 vertices
+MultiSeat/m781.obj had 352 and now has 6956 vertices
+MultiSeat/m782.obj had 40 and now has 5606 vertices
+MultiSeat/m830.obj had 238 and now has 5698 vertices
+MultiSeat/m832.obj had 1970 and now has 5362 vertices
+MultiSeat/m833.obj had 350 and now has 7487 vertices
+MultiSeat/m775.obj had 545 and now has 7528 vertices
+MultiSeat/m835.obj had 257 and now has 5327 vertices
+MultiSeat/m836.obj had 28 and now has 5352 vertices
+MultiSeat/m838.obj had 2162 and now has 6454 vertices
+MultiSeat/m831.obj had 448 and now has 7498 vertices
+MultiSeat/m840.obj had 94 and now has 7294 vertices
+MultiSeat/m834.obj had 164 and now has 7508 vertices
+MultiSeat/m829.obj had 540 and now has 7511 vertices
+MultiSeat/m841.obj had 36 and now has 8264 vertices
+MultiSeat/m778.obj had 46 and now has 7500 vertices
+Musical_Instrument/m625.obj had 3655 and now has 7543 vertices
+Musical_Instrument/m626.obj had 4500 and now has 7568 vertices
+Musical_Instrument/m632.obj had 1033 and now has 8761 vertices
+Musical_Instrument/m633.obj had 524 and now has 7436 vertices
+MultiSeat/m839.obj had 540 and now has 7503 vertices
+Musical_Instrument/m630.obj had 4694 and now has 7575 vertices
+Musical_Instrument/m634.obj had 1372 and now has 7567 vertices
+Musical_Instrument/m638.obj had 3884 and now has 7531 vertices
+Musical_Instrument/m640.obj had 3712 and now has 7512 vertices
+Musical_Instrument/m641.obj had 1864 and now has 5464 vertices
+Musical_Instrument/m643.obj had 1331 and now has 7542 vertices
+Musical_Instrument/m645.obj had 362 and now has 7572 vertices
+NonWheelChair/D00037.obj had 2936 and now has 8038 vertices
+NonWheelChair/D00170.obj had 678 and now has 5742 vertices
+Musical_Instrument/m647.obj had 3645 and now has 7604 vertices
+NonWheelChair/D00185.obj had 261 and now has 5899 vertices
+NonWheelChair/D00445.obj had 1882 and now has 6142 vertices
+NonWheelChair/D00512.obj had 345 and now has 7439 vertices
+NonWheelChair/D00694.obj had 730 and now has 6378 vertices
+NonWheelChair/D00240.obj had 1474 and now has 7506 vertices
+NonWheelChair/D00741.obj had 4133 and now has 9327 vertices
+NonWheelChair/D00914.obj had 1931 and now has 5715 vertices
+MultiSeat/m784.obj had 24 and now has 7502 vertices
+NonWheelChair/D00928.obj had 2006 and now has 5982 vertices
+NonWheelChair/D00853.obj had 3512 and now has 7501 vertices
+NonWheelChair/m785.obj had 960 and now has 8112 vertices
+NonWheelChair/D00936.obj had 3120 and now has 9316 vertices
+NonWheelChair/m786.obj had 641 and now has 5625 vertices
+NonWheelChair/D00707.obj had 2921 and now has 7513 vertices
+NonWheelChair/m789.obj had 2446 and now has 7254 vertices
+NonWheelChair/m788.obj had 320 and now has 8276 vertices
+NonWheelChair/m791.obj had 2288 and now has 6796 vertices
+NonWheelChair/m790.obj had 2912 and now has 8606 vertices
+NonWheelChair/m794.obj had 678 and now has 5606 vertices
+NonWheelChair/m787.obj had 1373 and now has 7512 vertices
+MultiSeat/m783.obj had 66 and now has 7502 vertices
+NonWheelChair/m795.obj had 3018 and now has 9002 vertices
+Musical_Instrument/m646.obj had 227 and now has 7523 vertices
+NonWheelChair/m797.obj had 867 and now has 7743 vertices
+NonWheelChair/m799.obj had 938 and now has 8074 vertices
+NonWheelChair/m800.obj had 116 and now has 7716 vertices
+NonWheelChair/m798.obj had 369 and now has 8156 vertices
+NonWheelChair/m804.obj had 326 and now has 7502 vertices
+NonWheelChair/m808.obj had 842 and now has 6218 vertices
+NonWheelChair/m810.obj had 775 and now has 6751 vertices
+NonWheelChair/m807.obj had 104 and now has 7464 vertices
+NonWheelChair/m809.obj had 120 and now has 7320 vertices
+NonWheelChair/D00481.obj had 932 and now has 7508 vertices
+NonWheelChair/m811.obj had 257 and now has 5899 vertices
+NonWheelChair/m813.obj had 257 and now has 5897 vertices
+NonWheelChair/m812.obj had 257 and now has 5899 vertices
+NonWheelChair/m814.obj had 341 and now has 7439 vertices
+NonWheelChair/m815.obj had 341 and now has 7439 vertices
+NonWheelChair/m816.obj had 341 and now has 7437 vertices
+NonWheelChair/m817.obj had 368 and now has 9312 vertices
+NonWheelChair/m820.obj had 132 and now has 8452 vertices
+NonWheelChair/m819.obj had 398 and now has 9030 vertices
+NonWheelChair/m806.obj had 472 and now has 7507 vertices
+NonWheelChair/m821.obj had 349 and now has 9189 vertices
+NonWheelChair/m824.obj had 678 and now has 5742 vertices
+NonWheelChair/m826.obj had 600 and now has 5176 vertices
+NonWheelChair/m822.obj had 967 and now has 8591 vertices
+NonWheelChair/m805.obj had 151 and now has 7501 vertices
+NonWheelChair/m827.obj had 88 and now has 5368 vertices
+NonWheelChair/m828.obj had 713 and now has 6225 vertices
+NonWheelChair/m793.obj had 81 and now has 7511 vertices
+PianoBoard/D00065.obj had 1178 and now has 7250 vertices
+PianoBoard/D00104.obj had 1281 and now has 8378 vertices
+PianoBoard/D00075.obj had 1309 and now has 9088 vertices
+PianoBoard/D00253.obj had 719 and now has 5057 vertices
+NonWheelChair/m823.obj had 440 and now has 7510 vertices
+PianoBoard/D00332.obj had 454 and now has 6726 vertices
+PianoBoard/D00381.obj had 735 and now has 5931 vertices
+PianoBoard/D00460.obj had 754 and now has 5254 vertices
+PianoBoard/D00235.obj had 1616 and now has 7584 vertices
+PianoBoard/D00122.obj had 1934 and now has 7680 vertices
+PianoBoard/D00721.obj had 1228 and now has 8488 vertices
+PianoBoard/D00008.obj had 2078 and now has 7624 vertices
+PianoBoard/D00962.obj had 793 and now has 5659 vertices
+PianoBoard/D00966.obj had 2105 and now has 7365 vertices
+PlantIndoors/D00087.obj had 3855 and now has 8909 vertices
+PianoBoard/D00441.obj had 538 and now has 7459 vertices
+PianoBoard/D00718.obj had 797 and now has 7535 vertices
+PlantIndoors/D00667.obj had 1523 and now has 9779 vertices
+NonWheelChair/m818.obj had 76 and now has 7507 vertices
+PlantIndoors/m1012.obj had 2950 and now has 7242 vertices
+PlantIndoors/m1015.obj had 1325 and now has 9769 vertices
+PlantIndoors/m1023.obj had 2659 and now has 5894 vertices
+PlantIndoors/m1026.obj had 1522 and now has 9775 vertices
+PlantIndoors/m1027.obj had 3855 and now has 8909 vertices
+PlantIndoors/m1031.obj had 729 and now has 5865 vertices
+PlantIndoors/m1029.obj had 316 and now has 7440 vertices
+PlantIndoors/m1030.obj had 395 and now has 9391 vertices
+PlantIndoors/m1032.obj had 96 and now has 6336 vertices
+PlantIndoors/m1034.obj had 228 and now has 5766 vertices
+PlantIndoors/m1035.obj had 1787 and now has 5147 vertices
+PlantIndoors/m1033.obj had 197 and now has 6437 vertices
+PlantIndoors/m1036.obj had 234 and now has 5447 vertices
+PlantIndoors/m989.obj had 1027 and now has 5123 vertices
+PlantIndoors/m994.obj had 395 and now has 6297 vertices
+PlantIndoors/m996.obj had 623 and now has 5139 vertices
+PlantIndoors/m990.obj had 491 and now has 8863 vertices
+PlantIndoors/m992.obj had 491 and now has 8863 vertices
+PlantIndoors/m991.obj had 4867 and now has 8058 vertices
+PlantIndoors/m999.obj had 1235 and now has 6343 vertices
+PlantIndoors/m998.obj had 318 and now has 6532 vertices
+PlantWildNonTree/m1052.obj had 342 and now has 7782 vertices
+PlantIndoors/m997.obj had 695 and now has 7585 vertices
+PlantWildNonTree/m971.obj had 3962 and now has 6824 vertices
+PlantWildNonTree/m975.obj had 241 and now has 6091 vertices
+PlantWildNonTree/m978.obj had 3411 and now has 7377 vertices
+PlantWildNonTree/m976.obj had 1272 and now has 8828 vertices
+PlantWildNonTree/m979.obj had 1236 and now has 5516 vertices
+PlantIndoors/m993.obj had 220 and now has 7524 vertices
+PlantWildNonTree/m982.obj had 332 and now has 8132 vertices
+PlantWildNonTree/m981.obj had 927 and now has 9727 vertices
+PlantWildNonTree/m983.obj had 70 and now has 9024 vertices
+Quadruped/D00111.obj had 2315 and now has 6889 vertices
+PlantWildNonTree/m977.obj had 1548 and now has 7511 vertices
+PlantWildNonTree/m988.obj had 3093 and now has 9093 vertices
+Quadruped/D00226.obj had 2949 and now has 8706 vertices
+PlantWildNonTree/m984.obj had 849 and now has 7660 vertices
+Quadruped/D00218.obj had 3666 and now has 7500 vertices
+PlantWildNonTree/m987.obj had 850 and now has 7661 vertices
+Quadruped/D00261.obj had 3093 and now has 8684 vertices
+Quadruped/D00326.obj had 3077 and now has 9103 vertices
+Quadruped/D00757.obj had 3240 and now has 9064 vertices
+Quadruped/D00380.obj had 505 and now has 7508 vertices
+Quadruped/D00841.obj had 2100 and now has 6259 vertices
+Quadruped/D00934.obj had 1971 and now has 5859 vertices
+Quadruped/m100.obj had 606 and now has 5438 vertices
+PlantWildNonTree/m974.obj had 379 and now has 7566 vertices
+Quadruped/m104.obj had 233 and now has 6239 vertices
+Quadruped/m101.obj had 1143 and now has 9863 vertices
+Quadruped/m102.obj had 127 and now has 9167 vertices
+Quadruped/m106.obj had 346 and now has 9316 vertices
+Quadruped/D00831.obj had 1614 and now has 7514 vertices
+Quadruped/m107.obj had 3051 and now has 9103 vertices
+Quadruped/m109.obj had 1288 and now has 7509 vertices
+Quadruped/m276.obj had 2309 and now has 6896 vertices
+Quadruped/m111.obj had 1238 and now has 7505 vertices
+Quadruped/m105.obj had 146 and now has 7504 vertices
+Quadruped/m279.obj had 275 and now has 7087 vertices
+Quadruped/m278.obj had 359 and now has 8757 vertices
+Quadruped/m110.obj had 453 and now has 7500 vertices
+Quadruped/m273.obj had 485 and now has 7505 vertices
+Quadruped/m282.obj had 1848 and now has 5435 vertices
+Quadruped/m280.obj had 2894 and now has 8398 vertices
+Quadruped/m87.obj had 691 and now has 6015 vertices
+Quadruped/m86.obj had 176 and now has 9976 vertices
+Quadruped/m90.obj had 1783 and now has 5309 vertices
+Quadruped/m277.obj had 445 and now has 7502 vertices
+Quadruped/m92.obj had 1971 and now has 5859 vertices
+Quadruped/m93.obj had 278 and now has 6310 vertices
+Quadruped/m95.obj had 956 and now has 8588 vertices
+Quadruped/m94.obj had 3332 and now has 9660 vertices
+RectangleTable/D00134.obj had 224 and now has 5690 vertices
+RectangleTable/D00187.obj had 2136 and now has 5824 vertices
+Quadruped/m97.obj had 3601 and now has 7519 vertices
+Quadruped/m88.obj had 1618 and now has 7503 vertices
+Quadruped/m91.obj had 1614 and now has 7514 vertices
+Quadruped/m98.obj had 4195 and now has 7530 vertices
+RectangleTable/D00243.obj had 1066 and now has 7431 vertices
+RectangleTable/D00230.obj had 3713 and now has 7604 vertices
+RectangleTable/D00302.obj had 134 and now has 8762 vertices
+Quadruped/m99.obj had 1450 and now has 7502 vertices
+RectangleTable/D00418.obj had 2003 and now has 8270 vertices
+PianoBoard/D00212.obj had 3238 and now has 6883 vertices
+RectangleTable/D00421.obj had 99 and now has 6735 vertices
+RectangleTable/D00678.obj had 1768 and now has 5187 vertices
+RectangleTable/D00317.obj had 1042 and now has 7461 vertices
+RectangleTable/D00571.obj had 1245 and now has 7512 vertices
+RectangleTable/D00766.obj had 2973 and now has 7637 vertices
+RectangleTable/D00944.obj had 1016 and now has 9000 vertices
+RectangleTable/m763.obj had 116 and now has 5556 vertices
+RectangleTable/m765.obj had 1005 and now has 7909 vertices
+RectangleTable/D00295.obj had 190 and now has 7504 vertices
+RectangleTable/D00505.obj had 189 and now has 7509 vertices
+RectangleTable/m871.obj had 60 and now has 7420 vertices
+RectangleTable/m872.obj had 2229 and now has 6642 vertices
+RectangleTable/D00954.obj had 652 and now has 7541 vertices
+RectangleTable/m873.obj had 679 and now has 5501 vertices
+RectangleTable/D00530.obj had 210 and now has 7504 vertices
+RectangleTable/m876.obj had 44 and now has 6336 vertices
+RectangleTable/m878.obj had 320 and now has 7262 vertices
+RectangleTable/m875.obj had 528 and now has 7541 vertices
+RectangleTable/D00188.obj had 240 and now has 7509 vertices
+RectangleTable/m879.obj had 276 and now has 7504 vertices
+RectangleTable/m883.obj had 96 and now has 6976 vertices
+RectangleTable/m870.obj had 48 and now has 7500 vertices
+RectangleTable/m877.obj had 56 and now has 7503 vertices
+RectangleTable/m882.obj had 598 and now has 7530 vertices
+RectangleTable/m888.obj had 36 and now has 7296 vertices
+RectangleTable/m874.obj had 68 and now has 7507 vertices
+RectangleTable/m881.obj had 60 and now has 7504 vertices
+RectangleTable/m887.obj had 340 and now has 8348 vertices
+RectangleTable/D00714.obj had 672 and now has 7513 vertices
+RectangleTable/m886.obj had 996 and now has 7367 vertices
+RectangleTable/m889.obj had 511 and now has 7500 vertices
+RectangleTable/m896.obj had 144 and now has 6544 vertices
+RectangleTable/m890.obj had 508 and now has 7508 vertices
+RectangleTable/m764.obj had 72 and now has 7505 vertices
+RectangleTable/m893.obj had 184 and now has 7513 vertices
+RectangleTable/m897.obj had 128 and now has 6208 vertices
+RectangleTable/m902.obj had 198 and now has 5034 vertices
+RectangleTable/m904.obj had 128 and now has 6208 vertices
+RectangleTable/m892.obj had 174 and now has 7520 vertices
+RectangleTable/m891.obj had 190 and now has 7504 vertices
+RectangleTable/m905.obj had 48 and now has 8155 vertices
+RectangleTable/m894.obj had 80 and now has 7511 vertices
+RectangleTable/m907.obj had 158 and now has 8718 vertices
+RectangleTable/m895.obj had 80 and now has 7511 vertices
+RectangleTable/m912.obj had 36 and now has 7296 vertices
+RectangleTable/m913.obj had 104 and now has 7624 vertices
+RectangleTable/m917.obj had 96 and now has 6976 vertices
+RectangleTable/m915.obj had 40 and now has 7300 vertices
+RectangleTable/m898.obj had 288 and now has 7553 vertices
+RectangleTable/m919.obj had 78 and now has 5038 vertices
+Rocket/D00015.obj had 88 and now has 6328 vertices
+RectangleTable/m920.obj had 426 and now has 9994 vertices
+RectangleTable/m901.obj had 190 and now has 7504 vertices
+RectangleTable/m914.obj had 576 and now has 7541 vertices
+Rocket/D00343.obj had 1053 and now has 9085 vertices
+RectangleTable/m906.obj had 178 and now has 7508 vertices
+Rocket/D00426.obj had 36 and now has 6812 vertices
+RectangleTable/m908.obj had 288 and now has 7553 vertices
+Rocket/D00354.obj had 3242 and now has 9590 vertices
+Rocket/D00428.obj had 1175 and now has 9222 vertices
+Rocket/D00437.obj had 1810 and now has 5653 vertices
+Rocket/D00485.obj had 2101 and now has 6124 vertices
+Rocket/D00528.obj had 204 and now has 5300 vertices
+Rocket/D00585.obj had 1014 and now has 7788 vertices
+Rocket/D00346.obj had 1508 and now has 7523 vertices
+RectangleTable/m910.obj had 352 and now has 7396 vertices
+Rocket/D00697.obj had 217 and now has 5807 vertices
+Rocket/D00614.obj had 161 and now has 9121 vertices
+Rocket/D00764.obj had 250 and now has 5418 vertices
+Rocket/D00851.obj had 1175 and now has 9222 vertices
+RoundTable/D00083.obj had 1072 and now has 9200 vertices
+RoundTable/D00194.obj had 371 and now has 8223 vertices
+RoundTable/D00401.obj had 355 and now has 7518 vertices
+RoundTable/D00344.obj had 136 and now has 9576 vertices
+RoundTable/D00407.obj had 215 and now has 5519 vertices
+RoundTable/D00503.obj had 1706 and now has 5022 vertices
+RoundTable/D00501.obj had 744 and now has 6616 vertices
+Rocket/D00433.obj had 170 and now has 7507 vertices
+RoundTable/D00646.obj had 1921 and now has 5521 vertices
+RoundTable/D00581.obj had 4126 and now has 6876 vertices
+RoundTable/D00649.obj had 2136 and now has 6392 vertices
+RoundTable/D00827.obj had 1732 and now has 5168 vertices
+RoundTable/D00756.obj had 837 and now has 7436 vertices
+RoundTable/D00948.obj had 1740 and now has 5204 vertices
+RoundTable/D00866.obj had 288 and now has 8556 vertices
+RoundTable/m921.obj had 1921 and now has 5521 vertices
+RoundTable/D00524.obj had 1141 and now has 7502 vertices
+RoundTable/m924.obj had 215 and now has 5519 vertices
+RoundTable/m925.obj had 216 and now has 5520 vertices
+RoundTable/D00909.obj had 1238 and now has 7505 vertices
+RoundTable/m926.obj had 218 and now has 5522 vertices
+Rocket/D00942.obj had 186 and now has 7500 vertices
+RoundTable/D00107.obj had 356 and now has 7482 vertices
+RoundTable/m928.obj had 463 and now has 7525 vertices
+Rocket/D00472.obj had 93 and now has 7505 vertices
+RoundTable/m922.obj had 54 and now has 7502 vertices
+RoundTable/m923.obj had 201 and now has 7508 vertices
+RoundTable/m937.obj had 72 and now has 5672 vertices
+RoundTable/m935.obj had 128 and now has 9768 vertices
+RoundTable/m927.obj had 201 and now has 7508 vertices
+RoundTable/m930.obj had 501 and now has 7505 vertices
+RoundTable/m929.obj had 444 and now has 7532 vertices
+Shelf/D00074.obj had 1903 and now has 8532 vertices
+Shelf/D00129.obj had 1207 and now has 9314 vertices
+Shelf/D00198.obj had 2064 and now has 9412 vertices
+RoundTable/m934.obj had 148 and now has 7503 vertices
+RoundTable/m931.obj had 54 and now has 7502 vertices
+Shelf/D00242.obj had 1874 and now has 5458 vertices
+Shelf/D00468.obj had 960 and now has 7608 vertices
+Shelf/D00781.obj had 4773 and now has 9590 vertices
+RoundTable/m938.obj had 422 and now has 7500 vertices
+Shelf/D00881.obj had 249 and now has 5441 vertices
+RoundTable/m933.obj had 55 and now has 7501 vertices
+Shelf/D00337.obj had 1628 and now has 7501 vertices
+Shelf/D00887.obj had 261 and now has 5509 vertices
+Shelf/D00917.obj had 2452 and now has 6246 vertices
+Shelf/D00171.obj had 1505 and now has 7517 vertices
+Shelf/D00956.obj had 122 and now has 7042 vertices
+Shelf/D00818.obj had 1872 and now has 7511 vertices
+Shelf/m846.obj had 1101 and now has 9493 vertices
+Shelf/m849.obj had 128 and now has 7808 vertices
+Shelf/m847.obj had 158 and now has 9918 vertices
+Shelf/D00772.obj had 202 and now has 7518 vertices
+Shelf/m852.obj had 104 and now has 9224 vertices
+Shelf/m853.obj had 100 and now has 9220 vertices
+Shelf/m855.obj had 46 and now has 5370 vertices
+Shelf/m854.obj had 96 and now has 8256 vertices
+Shelf/m844.obj had 200 and now has 7516 vertices
+Shelf/D00352.obj had 129 and now has 7500 vertices
+Shelf/m857.obj had 112 and now has 6832 vertices
+Shelf/m859.obj had 2556 and now has 7272 vertices
+Shelf/m850.obj had 184 and now has 7513 vertices
+Shelf/m845.obj had 60 and now has 7504 vertices
+Shelf/D00592.obj had 74 and now has 7507 vertices
+Shelf/m861.obj had 150 and now has 9430 vertices
+Shelf/m864.obj had 323 and now has 5594 vertices
+Shelf/m858.obj had 48 and now has 7509 vertices
+Shelf/m860.obj had 56 and now has 7503 vertices
+Shelf/m862.obj had 544 and now has 7514 vertices
+Shelf/m856.obj had 64 and now has 7505 vertices
+Shelf/m868.obj had 112 and now has 7312 vertices
+Ship/D00042.obj had 2275 and now has 5982 vertices
+Ship/D00027.obj had 4202 and now has 9089 vertices
+Ship/D00099.obj had 374 and now has 9072 vertices
+Shelf/m866.obj had 221 and now has 7525 vertices
+Ship/D00292.obj had 4340 and now has 9092 vertices
+Shelf/m865.obj had 255 and now has 7537 vertices
+Ship/D00647.obj had 1713 and now has 5087 vertices
+Shelf/m863.obj had 289 and now has 7549 vertices
+Ship/D00791.obj had 4200 and now has 9087 vertices
+Ship/D00935.obj had 124 and now has 8124 vertices
+Ship/D00949.obj had 2547 and now has 5620 vertices
+Ship/m1427.obj had 757 and now has 5093 vertices
+Ship/m1428.obj had 817 and now has 5149 vertices
+Ship/D00896.obj had 4991 and now has 7628 vertices
+Shelf/m851.obj had 68 and now has 7503 vertices
+Ship/m1433.obj had 926 and now has 5834 vertices
+Ship/m1435.obj had 4241 and now has 9087 vertices
+Ship/m1432.obj had 573 and now has 7554 vertices
+Ship/m1436.obj had 1704 and now has 5044 vertices
+Ship/m1430.obj had 774 and now has 7621 vertices
+Ship/m1431.obj had 674 and now has 7583 vertices
+Ship/m1429.obj had 749 and now has 7608 vertices
+Ship/m1441.obj had 3153 and now has 7248 vertices
+Ship/m1438.obj had 1309 and now has 7526 vertices
+Ship/m1447.obj had 3189 and now has 9189 vertices
+Ship/m1440.obj had 4230 and now has 7817 vertices
+Ship/m1434.obj had 600 and now has 7529 vertices
+Ship/m1450.obj had 98 and now has 6338 vertices
+Ship/m1449.obj had 330 and now has 8910 vertices
+Ship/m1451.obj had 775 and now has 6767 vertices
+Ship/m1437.obj had 658 and now has 7579 vertices
+Ship/m1452.obj had 776 and now has 6584 vertices
+Ship/m1439.obj had 428 and now has 7501 vertices
+Ship/m1454.obj had 325 and now has 8099 vertices
+Ship/m1457.obj had 2333 and now has 6818 vertices
+Ship/m1455.obj had 314 and now has 7802 vertices
+Ship/m1458.obj had 2509 and now has 7128 vertices
+Ship/m1459.obj had 331 and now has 7234 vertices
+Ship/m1463.obj had 629 and now has 5573 vertices
+Ship/m1464.obj had 2873 and now has 8407 vertices
+Ship/m1468.obj had 467 and now has 9359 vertices
+Ship/m1460.obj had 4892 and now has 7565 vertices
+Ship/m1462.obj had 4916 and now has 7579 vertices
+Ship/m1471.obj had 2511 and now has 6063 vertices
+Ship/m1456.obj had 497 and now has 7514 vertices
+Sign/m1670.obj had 221 and now has 8901 vertices
+Ship/m1448.obj had 182 and now has 7507 vertices
+Ship/m1467.obj had 574 and now has 7517 vertices
+Sign/m1674.obj had 50 and now has 9488 vertices
+Ship/m1469.obj had 1724 and now has 7565 vertices
+Sign/m1675.obj had 40 and now has 6332 vertices
+Sign/m1680.obj had 360 and now has 9564 vertices
+Sign/m1676.obj had 4031 and now has 7505 vertices
+Ship/m1470.obj had 145 and now has 7503 vertices
+Sign/m1673.obj had 80 and now has 7510 vertices
+Sign/m1679.obj had 417 and now has 7507 vertices
+Sign/m1683.obj had 3000 and now has 8896 vertices
+Sign/m1685.obj had 760 and now has 6136 vertices
+Sign/m1684.obj had 44 and now has 9240 vertices
+Sign/m1682.obj had 4492 and now has 7539 vertices
+Sign/m1672.obj had 231 and now has 7531 vertices
+Sign/m1678.obj had 642 and now has 7552 vertices
+Sign/m1671.obj had 119 and now has 7528 vertices
+Skyscraper/D00130.obj had 1036 and now has 7368 vertices
+Skyscraper/D00641.obj had 3299 and now has 6698 vertices
+Skyscraper/D00872.obj had 365 and now has 9049 vertices
+Spoon/D00014.obj had 748 and now has 5233 vertices
+Skyscraper/D00998.obj had 4708 and now has 9807 vertices
+Spoon/D00144.obj had 243 and now has 5871 vertices
+Spoon/D00196.obj had 1512 and now has 5568 vertices
+Spoon/D00422.obj had 109 and now has 6973 vertices
+Spoon/D00157.obj had 386 and now has 7409 vertices
+Spoon/D00562.obj had 4958 and now has 7613 vertices
+Spoon/D00085.obj had 575 and now has 7264 vertices
+Spoon/D00517.obj had 487 and now has 7435 vertices
+Spoon/D00661.obj had 1848 and now has 7626 vertices
+Spoon/D00338.obj had 481 and now has 7312 vertices
+Spoon/D00790.obj had 284 and now has 6776 vertices
+Spoon/D00927.obj had 910 and now has 6358 vertices
+Spoon/D00842.obj had 291 and now has 6879 vertices
+Starship/m1353.obj had 2124 and now has 6271 vertices
+Starship/m1356.obj had 1946 and now has 5247 vertices
+Starship/m1359.obj had 265 and now has 6869 vertices
+Starship/m1358.obj had 1196 and now has 9152 vertices
+Spoon/D00497.obj had 144 and now has 7424 vertices
+Starship/m1360.obj had 2904 and now has 7135 vertices
+Starship/m1361.obj had 1038 and now has 9070 vertices
+Starship/m1365.obj had 718 and now has 5502 vertices
+Spoon/D00593.obj had 144 and now has 7451 vertices
+Starship/m1370.obj had 1748 and now has 5149 vertices
+Starship/m1369.obj had 1004 and now has 7884 vertices
+Spoon/D00669.obj had 556 and now has 7244 vertices
+Starship/m1375.obj had 1694 and now has 5074 vertices
+Starship/m1372.obj had 3366 and now has 9710 vertices
+Starship/m1378.obj had 2059 and now has 5863 vertices
+Starship/m1366.obj had 568 and now has 7515 vertices
+Starship/m1371.obj had 1558 and now has 7612 vertices
+Starship/m1379.obj had 1018 and now has 8449 vertices
+Spoon/D00674.obj had 173 and now has 7399 vertices
+Starship/m1386.obj had 1707 and now has 5091 vertices
+Starship/m1384.obj had 3820 and now has 7530 vertices
+SubmachineGun/D00052.obj had 2258 and now has 6522 vertices
+Starship/m1376.obj had 467 and now has 7497 vertices
+SubmachineGun/D00256.obj had 760 and now has 6064 vertices
+SubmachineGun/D00219.obj had 1520 and now has 7528 vertices
+SubmachineGun/D00062.obj had 2291 and now has 7528 vertices
+Spoon/D00474.obj had 72 and now has 7461 vertices
+SubmachineGun/D00384.obj had 1806 and now has 7544 vertices
+SubmachineGun/D00060.obj had 577 and now has 7531 vertices
+SubmachineGun/D00489.obj had 1434 and now has 9836 vertices
+SubmachineGun/D00431.obj had 1783 and now has 7525 vertices
+SubmachineGun/D00733.obj had 4970 and now has 7743 vertices
+SubmachineGun/D00613.obj had 1424 and now has 7493 vertices
+SubmachineGun/D00537.obj had 3629 and now has 7500 vertices
+SubmachineGun/D00878.obj had 2027 and now has 7527 vertices
+SubmachineGun/D00893.obj had 170 and now has 7510 vertices
+SubmachineGun/D00970.obj had 451 and now has 7517 vertices
+Sword/D00162.obj had 1150 and now has 7500 vertices
+Spoon/D00964.obj had 211 and now has 7395 vertices
+Sword/D00635.obj had 725 and now has 5573 vertices
+Sword/D00712.obj had 327 and now has 8153 vertices
+Sword/D00513.obj had 4136 and now has 7608 vertices
+Sword/D00807.obj had 176 and now has 8600 vertices
+Sword/D00195.obj had 1429 and now has 7488 vertices
+SubmachineGun/D00960.obj had 182 and now has 7513 vertices
+Sword/m687.obj had 800 and now has 6816 vertices
+Sword/m688.obj had 1977 and now has 5915 vertices
+Sword/D00916.obj had 2993 and now has 7682 vertices
+Sword/D00808.obj had 1787 and now has 7485 vertices
+Sword/m694.obj had 2903 and now has 8570 vertices
+Sword/D00812.obj had 3694 and now has 7833 vertices
+Sword/m699.obj had 557 and now has 5005 vertices
+Sword/D00149.obj had 190 and now has 7506 vertices
+Sword/m700.obj had 800 and now has 6816 vertices
+Sword/m692.obj had 3694 and now has 7730 vertices
+Sword/m698.obj had 3949 and now has 7567 vertices
+Sword/m693.obj had 196 and now has 7519 vertices
+Sword/m701.obj had 960 and now has 8560 vertices
+Sword/m702.obj had 1005 and now has 9005 vertices
+Sword/m697.obj had 526 and now has 7503 vertices
+Sword/m707.obj had 4325 and now has 7504 vertices
+Sword/m713.obj had 1023 and now has 9023 vertices
+Sword/m704.obj had 408 and now has 7500 vertices
+Sword/m712.obj had 4890 and now has 7601 vertices
+Sword/m719.obj had 624 and now has 5536 vertices
+Sword/m718.obj had 361 and now has 8943 vertices
+Sword/m703.obj had 588 and now has 7518 vertices
+Sword/m716.obj had 4757 and now has 7485 vertices
+Sword/m720.obj had 318 and now has 8378 vertices
+Sword/m721.obj had 275 and now has 7165 vertices
+Sword/m714.obj had 526 and now has 7503 vertices
+Tool/D01003.obj had 3963 and now has 7500 vertices
+Tool/D01012.obj had 4463 and now has 7500 vertices
+Tool/D01086.obj had 3804 and now has 7500 vertices
+Tool/D01040.obj had 4794 and now has 7500 vertices
+Tool/D01084.obj had 4491 and now has 7500 vertices
+Sword/m689.obj had 178 and now has 7499 vertices
+Sword/m690.obj had 180 and now has 7498 vertices
+Tool/D01111.obj had 4284 and now has 7500 vertices
+Tool/D01113.obj had 4407 and now has 7500 vertices
+Tool/D01140.obj had 3906 and now has 7500 vertices
+Tool/D01152.obj had 3942 and now has 7500 vertices
+Tool/D01131.obj had 4487 and now has 7500 vertices
+Tool/D01148.obj had 4478 and now has 7500 vertices
+Tool/m1099.obj had 302 and now has 8102 vertices
+Tool/m1100.obj had 232 and now has 6108 vertices
+Tool/D01165.obj had 4457 and now has 7500 vertices
+Tool/m1102.obj had 24 and now has 6316 vertices
+Tool/D01159.obj had 4478 and now has 7500 vertices
+Tool/D01176.obj had 4298 and now has 7500 vertices
+Tool/m1106.obj had 1902 and now has 5973 vertices
+Tool/m1108.obj had 2186 and now has 5942 vertices
+Tool/m1104.obj had 362 and now has 9566 vertices
+Tool/m1107.obj had 1116 and now has 9912 vertices
+Tool/m1110.obj had 850 and now has 7598 vertices
+Tool/m1113.obj had 2042 and now has 6118 vertices
+Tool/m1112.obj had 316 and now has 8389 vertices
+Tool/m1105.obj had 1550 and now has 7501 vertices
+Tool/m1109.obj had 1490 and now has 7517 vertices
+Tool/m1117.obj had 1720 and now has 5144 vertices
+Tool/m1114.obj had 1344 and now has 7505 vertices
+Tool/m1115.obj had 1327 and now has 7534 vertices
+Tool/m1116.obj had 1155 and now has 7509 vertices
+Tool/m1101.obj had 135 and now has 7501 vertices
+Tool/m589.obj had 2354 and now has 6400 vertices
+Tool/m588.obj had 3353 and now has 9901 vertices
+Tool/m587.obj had 4129 and now has 7511 vertices
+Tool/m1111.obj had 523 and now has 7501 vertices
+Tool/m591.obj had 3185 and now has 9566 vertices
+Tool/m1103.obj had 199 and now has 7505 vertices
+Tool/m590.obj had 4461 and now has 7681 vertices
+Train/D01031.obj had 1257 and now has 9816 vertices
+Train/D01035.obj had 3142 and now has 7617 vertices
+Train/D01147.obj had 2424 and now has 7752 vertices
+Train/m1578.obj had 333 and now has 7795 vertices
+Train/D01008.obj had 4469 and now has 8305 vertices
+Train/m1580.obj had 1400 and now has 7541 vertices
+Train/D01089.obj had 4390 and now has 8247 vertices
+Train/m1583.obj had 309 and now has 7758 vertices
+Train/m1588.obj had 4400 and now has 7705 vertices
+Train/m1587.obj had 4658 and now has 7553 vertices
+Tree/D00367.obj had 2903 and now has 6475 vertices
+Train/D01094.obj had 454 and now has 7382 vertices
+Train/D01163.obj had 4522 and now has 8186 vertices
+Train/m1584.obj had 174 and now has 7506 vertices
+Tree/D00456.obj had 1936 and now has 8724 vertices
+Train/D01027.obj had 4906 and now has 7592 vertices
+Tree/m1062.obj had 334 and now has 9330 vertices
+Tree/m1064.obj had 2681 and now has 9881 vertices
+Tree/m1065.obj had 3007 and now has 9447 vertices
+Tree/m1070.obj had 1194 and now has 5730 vertices
+Tree/m1066.obj had 1904 and now has 7725 vertices
+Tree/m1067.obj had 1058 and now has 8082 vertices
+Tree/m1068.obj had 1366 and now has 8934 vertices
+Train/D01014.obj had 4274 and now has 7625 vertices
+Tree/m1072.obj had 1356 and now has 6540 vertices
+Tree/m1071.obj had 1086 and now has 8334 vertices
+Tree/m1075.obj had 574 and now has 5022 vertices
+Tree/m1077.obj had 832 and now has 6716 vertices
+Tree/m1082.obj had 82 and now has 5682 vertices
+Tree/m1078.obj had 724 and now has 9772 vertices
+Tree/m1091.obj had 2457 and now has 6271 vertices
+Tree/m1092.obj had 337 and now has 8631 vertices
+Tree/m1093.obj had 1197 and now has 9013 vertices
+Tree/m1063.obj had 470 and now has 7501 vertices
+Tree/m1096.obj had 835 and now has 6339 vertices
+Tree/m1095.obj had 1303 and now has 7083 vertices
+Tree/m1098.obj had 3441 and now has 7140 vertices
+Truck/D00241.obj had 1162 and now has 8152 vertices
+Tree/m1089.obj had 170 and now has 7511 vertices
+Truck/D00002.obj had 482 and now has 7480 vertices
+Tree/m1079.obj had 155 and now has 7507 vertices
+Truck/D00406.obj had 1419 and now has 7535 vertices
+Truck/D00047.obj had 3644 and now has 7954 vertices
+Truck/D00056.obj had 4148 and now has 8067 vertices
+Truck/D00947.obj had 2530 and now has 7668 vertices
+Truck/m1574.obj had 3780 and now has 7526 vertices
+Tree/m1097.obj had 35 and now has 7506 vertices
+Truck/m1573.obj had 1461 and now has 7526 vertices
+Truck/m1576.obj had 3519 and now has 7520 vertices
+Truck/m1570.obj had 1445 and now has 7581 vertices
+TruckNonContainer/D00148.obj had 2448 and now has 7604 vertices
+Truck/D00331.obj had 4990 and now has 8035 vertices
+TruckNonContainer/D00252.obj had 2288 and now has 7662 vertices
+TruckNonContainer/D00215.obj had 4409 and now has 8396 vertices
+Vase/m528.obj had 3128 and now has 9260 vertices
+TruckNonContainer/D00737.obj had 2578 and now has 7837 vertices
+Vase/m529.obj had 1750 and now has 7586 vertices
+Vase/m531.obj had 1296 and now has 7500 vertices
+Vase/m532.obj had 240 and now has 6480 vertices
+Vase/m533.obj had 32 and now has 8260 vertices
+Vase/m534.obj had 241 and now has 6481 vertices
+Vase/m527.obj had 176 and now has 7500 vertices
+Truck/D00424.obj had 3725 and now has 7438 vertices
+Vase/m538.obj had 301 and now has 8595 vertices
+Vase/m536.obj had 4578 and now has 7500 vertices
+Vase/m539.obj had 2526 and now has 7530 vertices
+TruckNonContainer/D00879.obj had 4278 and now has 7747 vertices
+Vase/m540.obj had 304 and now has 8156 vertices
+Vase/m541.obj had 312 and now has 5096 vertices
+Vase/m542.obj had 296 and now has 7732 vertices
+TruckNonContainer/D00143.obj had 3622 and now has 7445 vertices
+Vase/m543.obj had 624 and now has 5408 vertices
+Vase/m544.obj had 1002 and now has 9002 vertices
+Vase/m537.obj had 504 and now has 7500 vertices
+Vase/m546.obj had 1002 and now has 9002 vertices
+Violin/D00108.obj had 1529 and now has 9743 vertices
+Vase/m535.obj had 176 and now has 7506 vertices
+Vase/m545.obj had 402 and now has 7500 vertices
+TruckNonContainer/D00572.obj had 4657 and now has 7764 vertices
+Violin/D00349.obj had 1299 and now has 8709 vertices
+Violin/D00376.obj had 1069 and now has 7288 vertices
+Vase/m547.obj had 529 and now has 7512 vertices
+TruckNonContainer/D00731.obj had 4918 and now has 7953 vertices
+Violin/D00324.obj had 2454 and now has 7687 vertices
+Violin/D00570.obj had 2297 and now has 7664 vertices
+Violin/D00620.obj had 771 and now has 5424 vertices
+Violin/D00506.obj had 2841 and now has 7867 vertices
+Violin/D00216.obj had 3864 and now has 7944 vertices
+Violin/D00701.obj had 2198 and now has 7651 vertices
+Violin/D00340.obj had 4315 and now has 7897 vertices
+Wheel/m733.obj had 648 and now has 5828 vertices
+Wheel/m735.obj had 720 and now has 6320 vertices
+Violin/D00891.obj had 1959 and now has 7586 vertices
+Wheel/m734.obj had 1396 and now has 8660 vertices
+Violin/D00602.obj had 3627 and now has 7777 vertices
+Wheel/m739.obj had 794 and now has 7290 vertices
+Wheel/m738.obj had 413 and now has 9513 vertices
+Wheel/m737.obj had 3783 and now has 7637 vertices
+Violin/D00743.obj had 466 and now has 7453 vertices
+Violin/D00250.obj had 4066 and now has 7682 vertices
+Wheel/m741.obj had 722 and now has 6410 vertices
+Wheel/m742.obj had 256 and now has 6860 vertices
+Wheel/m740.obj had 4352 and now has 7712 vertices
+Wheel/m746.obj had 80 and now has 5200 vertices
+Wheel/m745.obj had 830 and now has 7470 vertices
+Wheel/m736.obj had 504 and now has 7507 vertices
+Wheel/m744.obj had 3721 and now has 7500 vertices
+Violin/D00675.obj had 4149 and now has 7906 vertices
+Violin/D00704.obj had 799 and now has 7345 vertices
+Wheel/m748.obj had 1247 and now has 7500 vertices
+WheelChair/D00183.obj had 3475 and now has 8705 vertices
+WheelChair/D00203.obj had 867 and now has 7743 vertices
+Wheel/m743.obj had 512 and now has 7500 vertices
+WheelChair/D00274.obj had 2012 and now has 5079 vertices
+WheelChair/D00499.obj had 2362 and now has 6439 vertices
+WheelChair/D00526.obj had 679 and now has 5607 vertices
+WheelChair/D00604.obj had 986 and now has 7094 vertices
+WheelChair/D00782.obj had 1144 and now has 8894 vertices
+Wheel/m747.obj had 128 and now has 7500 vertices
+WheelChair/D00453.obj had 709 and now has 7582 vertices
+Wheel/m749.obj had 160 and now has 7501 vertices
 
-DECIMATED MODELS
+DECIMATED MODELS (389 total)
 ================
-Apartment/D00086.obj
-Apartment/D00478.obj
-Apartment/D00626.obj
-Apartment/D00860.obj
-AquaticAnimal/m53.obj
-AquaticAnimal/m54.obj
-AquaticAnimal/m55.obj
-AquaticAnimal/m57.obj
-Bed/D00121.obj
-Bed/D00210.obj
-Bed/D00839.obj
-Bicycle/D00040.obj
-Bicycle/D00077.obj
-Bicycle/D00078.obj
-Bicycle/D00462.obj
-Bicycle/D00536.obj
-Bicycle/D00555.obj
-Bicycle/D00558.obj
-Bicycle/D00708.obj
-Bicycle/D00838.obj
-Bicycle/D00847.obj
-Bicycle/D00930.obj
-Bicycle/D00931.obj
-Bicycle/m1477.obj
-Biplane/D00277.obj
-Biplane/D00490.obj
-Biplane/D00601.obj
-Biplane/D00616.obj
-Biplane/D00634.obj
-Biplane/D00854.obj
-Biplane/D00890.obj
-Biplane/D00900.obj
-Biplane/m1120.obj
-Bird/D00113.obj
-Bird/m45.obj
-Bottle/D00166.obj
-BuildingNonResidential/m402.obj
-BuildingNonResidential/m405.obj
-Bus/D00084.obj
-Bus/D00182.obj
-Bus/D00264.obj
-Bus/D00677.obj
-Car/D00236.obj
-Car/D00260.obj
-Car/D00299.obj
-Car/D00405.obj
-Car/D00452.obj
-Car/D00671.obj
-Car/D00724.obj
-Car/D00803.obj
-Car/D00865.obj
-Car/D00976.obj
-Car/m1499.obj
-Car/m1503.obj
-Car/m1509.obj
-Car/m1510.obj
-Car/m1514.obj
-Car/m1528.obj
-Car/m1535.obj
-Car/m1544.obj
-Car/m1551.obj
-Car/m1555.obj
-Car/m1556.obj
-Car/m1559.obj
-Car/m1560.obj
-Cellphone/D00079.obj
-Cellphone/D00152.obj
-Cellphone/D00362.obj
-Cellphone/D00542.obj
-Chess/m1593.obj
-Chess/m1595.obj
-Chess/m1596.obj
-City/D01101.obj
-City/D01195.obj
-Computer/D01128.obj
-Computer/m1772.obj
-ComputerKeyboard/D00420.obj
-DeskLamp/D00547.obj
-DeskLamp/D00744.obj
-DeskPhone/D00154.obj
-DeskPhone/D00316.obj
-DeskPhone/D00403.obj
-DeskPhone/D00511.obj
-DeskPhone/D00706.obj
-DeskPhone/D00773.obj
-DeskPhone/D00897.obj
-DeskPhone/D00899.obj
-FloorLamp/D00580.obj
-FloorLamp/D00875.obj
-FloorLamp/D00924.obj
-Glasses/D00575.obj
-Glasses/D00816.obj
-Guitar/D00041.obj
-Guitar/D00335.obj
-Guitar/D00494.obj
-Guitar/D00849.obj
-Gun/D00207.obj
-Gun/D00819.obj
-Gun/D00972.obj
-Gun/m656.obj
-Gun/m657.obj
-Gun/m684.obj
-Hand/D01153.obj
-Hand/D01172.obj
-Hand/m323.obj
-Hand/m324.obj
-Helicopter/D00361.obj
-Helicopter/D00644.obj
-Helicopter/D00751.obj
-Helicopter/m1307.obj
-Helicopter/m1308.obj
-House/D00001.obj
-House/D00286.obj
-House/D00359.obj
-House/D00389.obj
-House/D00415.obj
-House/D00574.obj
-House/D00901.obj
-House/D00903.obj
-House/m446.obj
-HumanHead/m349.obj
-HumanHead/m355.obj
-HumanHead/m365.obj
-Humanoid/m149.obj
-Humanoid/m156.obj
-Humanoid/m170.obj
-Humanoid/m180.obj
-Humanoid/m195.obj
-Humanoid/m222.obj
-Humanoid/m228.obj
-Humanoid/m229.obj
-Humanoid/m254.obj
-Humanoid/m255.obj
-Humanoid/m265.obj
-Insect/D00430.obj
-Insect/D00662.obj
-Insect/D00668.obj
-Insect/D00884.obj
-MilitaryVehicle/D00017.obj
-MilitaryVehicle/D00173.obj
-MilitaryVehicle/D00272.obj
-MilitaryVehicle/D00334.obj
-MilitaryVehicle/D00458.obj
-MilitaryVehicle/D00529.obj
-MilitaryVehicle/D00577.obj
-MilitaryVehicle/D00723.obj
-MilitaryVehicle/D00801.obj
-Monitor/D00387.obj
-Monitor/D00863.obj
-Monitor/D00978.obj
-Monitor/D01000.obj
-Motorcycle/D00039.obj
-Motorcycle/D00342.obj
-Motorcycle/D00345.obj
-Motorcycle/D00476.obj
-Motorcycle/D00521.obj
-Motorcycle/D00703.obj
-Motorcycle/D00858.obj
-Motorcycle/D00886.obj
-Motorcycle/m1482.obj
-Motorcycle/m1483.obj
-Mug/D00202.obj
-Mug/D00227.obj
-Mug/D00747.obj
-MultiSeat/D00146.obj
-MultiSeat/D00263.obj
-MultiSeat/D00273.obj
-MultiSeat/D00648.obj
-MultiSeat/D00749.obj
-MultiSeat/m837.obj
-Musical_Instrument/m631.obj
-Musical_Instrument/m639.obj
-Musical_Instrument/m644.obj
-NonWheelChair/D00419.obj
-PlantIndoors/D00049.obj
-PlantIndoors/D00073.obj
-PlantIndoors/D00080.obj
-PlantIndoors/D00128.obj
-PlantIndoors/D00159.obj
-PlantIndoors/D00238.obj
-PlantIndoors/D00280.obj
-PlantIndoors/D00370.obj
-PlantIndoors/D00379.obj
-PlantIndoors/D00491.obj
-PlantIndoors/D00595.obj
-PlantIndoors/D00609.obj
-PlantIndoors/D00622.obj
-PlantIndoors/D00624.obj
-PlantIndoors/D00800.obj
-PlantIndoors/D00968.obj
-PlantIndoors/m1000.obj
-PlantIndoors/m1005.obj
-PlantIndoors/m1006.obj
-PlantIndoors/m1014.obj
-PlantIndoors/m1020.obj
-PlantWildNonTree/m962.obj
-PlantWildNonTree/m972.obj
-PlantWildNonTree/m973.obj
-PlantWildNonTree/m985.obj
-Quadruped/D00150.obj
-Quadruped/D00583.obj
-Quadruped/m103.obj
-Quadruped/m274.obj
-Quadruped/m275.obj
-Rocket/D00564.obj
-Rocket/D00975.obj
-Ship/D00429.obj
-Ship/D00539.obj
-Ship/D00771.obj
-Ship/D00809.obj
-Ship/D00907.obj
-Skyscraper/D00006.obj
-Skyscraper/D00058.obj
-Skyscraper/D00125.obj
-Skyscraper/D00126.obj
-Skyscraper/D00259.obj
-Skyscraper/D00520.obj
-Skyscraper/D00532.obj
-Skyscraper/D00584.obj
-Skyscraper/D00729.obj
-Skyscraper/D00870.obj
-Starship/m1368.obj
-SubmachineGun/D00068.obj
-SubmachineGun/D00371.obj
-SubmachineGun/D00459.obj
-Sword/D00066.obj
-Sword/D00249.obj
-Sword/m717.obj
-Train/D01055.obj
-Train/D01180.obj
-Tree/D00096.obj
-Tree/D00200.obj
-Tree/D00221.obj
-Tree/D00223.obj
-Tree/D00393.obj
-Tree/D00439.obj
-Tree/D00479.obj
-Tree/D00533.obj
-Tree/D00573.obj
-Tree/D00727.obj
-Tree/D00765.obj
-Tree/D00777.obj
-Tree/D00810.obj
-Tree/D00834.obj
-Tree/D00911.obj
-Tree/D00996.obj
-Tree/m1069.obj
-Truck/D00835.obj
-Truck/D00987.obj
-Truck/m1575.obj
-TruckNonContainer/D00353.obj
-WheelChair/D00004.obj
-WheelChair/D00088.obj
-WheelChair/D00394.obj
-WheelChair/D00449.obj
-WheelChair/D00628.obj
-WheelChair/D00720.obj
+Apartment/D00310.obj had 14464 and now has 5934 vertices
+AircraftBuoyant/m1351.obj had 12987 and now has 7735 vertices
+Apartment/D00045.obj had 14865 and now has 8439 vertices
+Apartment/D00156.obj had 12732 and now has 7675 vertices
+Apartment/D00138.obj had 10827 and now has 7518 vertices
+Apartment/D00086.obj had 20493 and now has 7631 vertices
+Apartment/D00478.obj had 19857 and now has 9443 vertices
+Apartment/D00651.obj had 12732 and now has 7679 vertices
+Apartment/D00681.obj had 13823 and now has 8343 vertices
+Apartment/D00921.obj had 12842 and now has 6689 vertices
+Apartment/D00860.obj had 19857 and now has 9442 vertices
+Apartment/D00626.obj had 73184 and now has 6558 vertices
+AquaticAnimal/m53.obj had 18409 and now has 7610 vertices
+AquaticAnimal/m54.obj had 18143 and now has 7689 vertices
+AquaticAnimal/m55.obj had 19505 and now has 7613 vertices
+AquaticAnimal/m57.obj had 18878 and now has 7568 vertices
+AquaticAnimal/m67.obj had 14000 and now has 7500 vertices
+AquaticAnimal/m77.obj had 11578 and now has 7523 vertices
+Bed/D00121.obj had 15368 and now has 7530 vertices
+Bed/D00417.obj had 12808 and now has 7510 vertices
+Bed/D00210.obj had 22063 and now has 7597 vertices
+Bed/D00969.obj had 13151 and now has 7663 vertices
+Bed/D00839.obj had 16364 and now has 7515 vertices
+Bicycle/D00077.obj had 16416 and now has 7481 vertices
+Bicycle/D00078.obj had 22674 and now has 7751 vertices
+Bicycle/D00040.obj had 25426 and now has 7782 vertices
+Bicycle/D00558.obj had 19417 and now has 7670 vertices
+Bicycle/D00536.obj had 30832 and now has 7969 vertices
+Bicycle/D00555.obj had 34364 and now has 8296 vertices
+Bicycle/D00708.obj had 22495 and now has 7773 vertices
+Bicycle/D00838.obj had 23397 and now has 7773 vertices
+Bicycle/D00847.obj had 22672 and now has 7747 vertices
+Bicycle/D00930.obj had 29173 and now has 7904 vertices
+Bicycle/D00462.obj had 56754 and now has 7885 vertices
+Biplane/D00246.obj had 14082 and now has 5022 vertices
+Bicycle/D00931.obj had 32603 and now has 8035 vertices
+Bicycle/m1477.obj had 22682 and now has 7729 vertices
+Biplane/D00178.obj had 10942 and now has 7794 vertices
+Biplane/D00277.obj had 22427 and now has 7590 vertices
+Biplane/D00601.obj had 18086 and now has 7431 vertices
+Biplane/D00616.obj had 20306 and now has 7521 vertices
+Biplane/D00490.obj had 24998 and now has 7640 vertices
+Biplane/m1118.obj had 10676 and now has 7513 vertices
+Biplane/D00854.obj had 18966 and now has 7686 vertices
+Biplane/D00890.obj had 45079 and now has 7990 vertices
+Biplane/D00634.obj had 48973 and now has 7823 vertices
+Biplane/D00900.obj had 27750 and now has 8038 vertices
+Biplane/m1141.obj had 11819 and now has 7547 vertices
+Bird/D00271.obj had 12813 and now has 7497 vertices
+Bird/D00113.obj had 15871 and now has 7510 vertices
+Bird/D00284.obj had 13253 and now has 7497 vertices
+Biplane/m1120.obj had 65722 and now has 8122 vertices
+Bird/m45.obj had 16542 and now has 7503 vertices
+Bottle/D00166.obj had 23142 and now has 7567 vertices
+Bottle/D00451.obj had 11448 and now has 9202 vertices
+Bottle/D00679.obj had 12640 and now has 7587 vertices
+Bottle/D00696.obj had 13754 and now has 7547 vertices
+Bottle/D00726.obj had 10163 and now has 9294 vertices
+BuildingNonResidential/m402.obj had 21288 and now has 7614 vertices
+BuildingNonResidential/m405.obj had 21009 and now has 7522 vertices
+BuildingNonResidential/m470.obj had 14464 and now has 7573 vertices
+Bus/D00084.obj had 12919 and now has 9081 vertices
+Bus/D00264.obj had 11096 and now has 8249 vertices
+Bus/D00182.obj had 13436 and now has 9336 vertices
+Bus/D00677.obj had 11974 and now has 8779 vertices
+Car/D00236.obj had 26709 and now has 8373 vertices
+Car/D00260.obj had 38335 and now has 8478 vertices
+Car/D00299.obj had 23527 and now has 7521 vertices
+Car/D00405.obj had 62279 and now has 7417 vertices
+Car/D00767.obj had 13728 and now has 7536 vertices
+Car/D00724.obj had 17676 and now has 8028 vertices
+Car/D00452.obj had 25495 and now has 7633 vertices
+Car/D00671.obj had 29817 and now has 7802 vertices
+Car/D00865.obj had 15085 and now has 7401 vertices
+Car/D00976.obj had 18122 and now has 8219 vertices
+Car/D00803.obj had 25807 and now has 7641 vertices
+Car/m1499.obj had 15465 and now has 7728 vertices
+Car/m1505.obj had 10969 and now has 7639 vertices
+Car/m1511.obj had 10828 and now has 7549 vertices
+Car/m1513.obj had 13106 and now has 7205 vertices
+Car/m1503.obj had 24786 and now has 8008 vertices
+Car/m1516.obj had 12279 and now has 7439 vertices
+Car/m1514.obj had 18662 and now has 7619 vertices
+Car/m1525.obj had 10545 and now has 7473 vertices
+Car/m1509.obj had 47558 and now has 7604 vertices
+Car/m1528.obj had 18656 and now has 7829 vertices
+Car/m1535.obj had 15178 and now has 7503 vertices
+Car/m1510.obj had 54710 and now has 7510 vertices
+Car/m1555.obj had 16607 and now has 7453 vertices
+Car/m1551.obj had 18528 and now has 7736 vertices
+Car/m1559.obj had 15606 and now has 7610 vertices
+Car/m1562.obj had 12016 and now has 7809 vertices
+Car/m1560.obj had 21686 and now has 7424 vertices
+Cellphone/D00018.obj had 14103 and now has 7782 vertices
+Cellphone/D00079.obj had 20212 and now has 7839 vertices
+Car/m1556.obj had 35131 and now has 8896 vertices
+Cellphone/D00554.obj had 14822 and now has 7977 vertices
+Cellphone/D00152.obj had 44041 and now has 7518 vertices
+Cellphone/D00362.obj had 29805 and now has 7660 vertices
+Cellphone/D00542.obj had 16185 and now has 8504 vertices
+Car/m1544.obj had 60326 and now has 7646 vertices
+Chess/m1596.obj had 16803 and now has 7600 vertices
+Chess/m1593.obj had 25650 and now has 7671 vertices
+City/D01192.obj had 14752 and now has 8211 vertices
+City/D01195.obj had 16857 and now has 8094 vertices
+City/D01101.obj had 26070 and now has 8698 vertices
+Chess/m1595.obj had 60671 and now has 7608 vertices
+Computer/D01023.obj had 11463 and now has 7857 vertices
+Computer/D01128.obj had 17301 and now has 7636 vertices
+Computer/m1772.obj had 17301 and now has 7636 vertices
+ComputerKeyboard/D00420.obj had 11072 and now has 7131 vertices
+Cup/D00174.obj had 12252 and now has 7500 vertices
+Cup/D00457.obj had 10872 and now has 7500 vertices
+Cup/D00550.obj had 13747 and now has 7526 vertices
+Cup/D00738.obj had 10318 and now has 7537 vertices
+DeskLamp/D00330.obj had 13579 and now has 9502 vertices
+DeskLamp/D00547.obj had 22837 and now has 7525 vertices
+DeskLamp/D00797.obj had 14960 and now has 7583 vertices
+DeskLamp/D00744.obj had 21616 and now has 7270 vertices
+DeskLamp/D00912.obj had 10656 and now has 7525 vertices
+DeskPhone/D00118.obj had 12443 and now has 6881 vertices
+DeskLamp/m616.obj had 14129 and now has 7586 vertices
+DeskPhone/D00154.obj had 17247 and now has 7537 vertices
+DeskPhone/D00576.obj had 13619 and now has 7530 vertices
+DeskPhone/D00403.obj had 27361 and now has 7572 vertices
+DeskPhone/D00511.obj had 31349 and now has 7554 vertices
+DeskPhone/D00773.obj had 23711 and now has 7137 vertices
+DeskPhone/D00957.obj had 14677 and now has 7519 vertices
+DeskPhone/D00706.obj had 44937 and now has 5777 vertices
+DeskPhone/D00316.obj had 48093 and now has 7645 vertices
+DeskPhone/D00958.obj had 11731 and now has 7596 vertices
+DeskPhone/D00897.obj had 27510 and now has 7567 vertices
+DeskPhone/D00899.obj had 39872 and now has 7535 vertices
+FloorLamp/D00400.obj had 14213 and now has 9578 vertices
+FloorLamp/D00563.obj had 11136 and now has 7388 vertices
+FloorLamp/D00580.obj had 39647 and now has 7722 vertices
+FloorLamp/D00875.obj had 15152 and now has 7540 vertices
+FloorLamp/D00876.obj had 14464 and now has 7501 vertices
+FloorLamp/D00924.obj had 17626 and now has 7577 vertices
+Glasses/D00575.obj had 17472 and now has 7543 vertices
+Glasses/D00660.obj had 10770 and now has 9290 vertices
+Glasses/D00640.obj had 13986 and now has 7534 vertices
+Glasses/D00816.obj had 15752 and now has 7521 vertices
+Guitar/D00041.obj had 28373 and now has 7458 vertices
+Guitar/D00335.obj had 32795 and now has 7623 vertices
+Guitar/D00549.obj had 10340 and now has 7567 vertices
+Guitar/D00494.obj had 32748 and now has 7813 vertices
+Gun/D00207.obj had 16366 and now has 7572 vertices
+Gun/D00425.obj had 10850 and now has 7413 vertices
+Guitar/D00849.obj had 29495 and now has 7948 vertices
+Gun/D00826.obj had 11855 and now has 7498 vertices
+Gun/D00819.obj had 17257 and now has 7553 vertices
+Gun/D00972.obj had 28870 and now has 7546 vertices
+Gun/m656.obj had 15763 and now has 7499 vertices
+Gun/m657.obj had 18283 and now has 7513 vertices
+Gun/m666.obj had 13440 and now has 7471 vertices
+Gun/m684.obj had 27919 and now has 7533 vertices
+Hand/D01153.obj had 25001 and now has 7501 vertices
+Hand/m324.obj had 25001 and now has 7501 vertices
+Hand/D01172.obj had 43386 and now has 7616 vertices
+Hand/m323.obj had 43386 and now has 7616 vertices
+Helicopter/D00038.obj had 13309 and now has 7672 vertices
+Helicopter/D00471.obj had 10985 and now has 7568 vertices
+Helicopter/D00361.obj had 27062 and now has 7904 vertices
+Helicopter/D00751.obj had 17617 and now has 7568 vertices
+Helicopter/D00644.obj had 35044 and now has 7494 vertices
+Helicopter/m1307.obj had 18454 and now has 7568 vertices
+House/D00044.obj had 10202 and now has 7556 vertices
+House/D00325.obj had 10373 and now has 8465 vertices
+Helicopter/m1308.obj had 58392 and now has 7504 vertices
+House/D00286.obj had 28479 and now has 8899 vertices
+House/D00389.obj had 27493 and now has 9196 vertices
+House/D00001.obj had 46622 and now has 9785 vertices
+House/D00415.obj had 25185 and now has 8375 vertices
+House/D00359.obj had 35522 and now has 9223 vertices
+House/D00574.obj had 15615 and now has 8237 vertices
+House/D00901.obj had 17257 and now has 9144 vertices
+House/m429.obj had 14312 and now has 7464 vertices
+House/D00903.obj had 28137 and now has 8548 vertices
+House/m446.obj had 20624 and now has 7076 vertices
+HumanHead/m355.obj had 17358 and now has 7501 vertices
+HumanHead/m349.obj had 26749 and now has 7559 vertices
+HumanHead/m365.obj had 17666 and now has 7501 vertices
+Humanoid/m139.obj had 12180 and now has 7530 vertices
+Humanoid/m145.obj had 12758 and now has 7499 vertices
+Humanoid/m153.obj had 10333 and now has 7360 vertices
+Humanoid/m152.obj had 10694 and now has 7555 vertices
+Humanoid/m149.obj had 17342 and now has 7501 vertices
+Humanoid/m156.obj had 16776 and now has 7471 vertices
+Humanoid/m170.obj had 16052 and now has 7516 vertices
+Humanoid/m179.obj had 10735 and now has 7506 vertices
+Humanoid/m178.obj had 14603 and now has 7500 vertices
+Humanoid/m182.obj had 11090 and now has 7500 vertices
+Humanoid/m180.obj had 15088 and now has 7664 vertices
+Humanoid/m195.obj had 22608 and now has 7504 vertices
+Humanoid/m221.obj had 10576 and now has 7504 vertices
+Humanoid/m220.obj had 12911 and now has 7578 vertices
+Humanoid/m223.obj had 10473 and now has 7477 vertices
+Humanoid/m222.obj had 17639 and now has 7492 vertices
+Humanoid/m231.obj had 13022 and now has 7480 vertices
+Humanoid/m228.obj had 15201 and now has 7700 vertices
+Humanoid/m230.obj had 14796 and now has 7604 vertices
+Humanoid/m229.obj had 18153 and now has 7541 vertices
+Humanoid/m250.obj had 10589 and now has 7345 vertices
+Humanoid/m253.obj had 11806 and now has 7561 vertices
+Humanoid/m254.obj had 16082 and now has 7438 vertices
+Humanoid/m258.obj had 12410 and now has 7354 vertices
+Humanoid/m255.obj had 16870 and now has 7662 vertices
+Humanoid/m265.obj had 16267 and now has 7501 vertices
+Insect/D00668.obj had 15305 and now has 7514 vertices
+Insect/D00430.obj had 23399 and now has 7569 vertices
+Insect/D00732.obj had 12603 and now has 7515 vertices
+Insect/D00753.obj had 10092 and now has 7529 vertices
+Insect/D00662.obj had 24324 and now has 7771 vertices
+Insect/D00752.obj had 12528 and now has 7511 vertices
+Insect/D00884.obj had 24324 and now has 7775 vertices
+MilitaryVehicle/D00017.obj had 27719 and now has 7999 vertices
+MilitaryVehicle/D00334.obj had 20392 and now has 5859 vertices
+MilitaryVehicle/D00173.obj had 17299 and now has 8726 vertices
+MilitaryVehicle/D00272.obj had 15903 and now has 7748 vertices
+MilitaryVehicle/D00458.obj had 17962 and now has 7929 vertices
+MilitaryVehicle/D00577.obj had 25763 and now has 9368 vertices
+MilitaryVehicle/D00723.obj had 16287 and now has 7625 vertices
+MilitaryVehicle/D00952.obj had 11929 and now has 9744 vertices
+MilitaryVehicle/D00932.obj had 10050 and now has 8079 vertices
+MilitaryVehicle/D00933.obj had 13652 and now has 7380 vertices
+MilitaryVehicle/D00918.obj had 13914 and now has 7964 vertices
+MilitaryVehicle/D00529.obj had 38226 and now has 8824 vertices
+Monitor/D00364.obj had 14887 and now has 7632 vertices
+Monitor/D00444.obj had 10283 and now has 9961 vertices
+Monitor/D00387.obj had 20399 and now has 7502 vertices
+MilitaryVehicle/D00801.obj had 38911 and now has 7750 vertices
+Monitor/D01000.obj had 29914 and now has 7539 vertices
+Monitor/D00978.obj had 16566 and now has 7447 vertices
+Monitor/D00863.obj had 21122 and now has 7316 vertices
+Motorcycle/D00039.obj had 18315 and now has 7584 vertices
+Motorcycle/D00345.obj had 18397 and now has 7060 vertices
+Motorcycle/D00544.obj had 12097 and now has 7677 vertices
+Motorcycle/D00594.obj had 12312 and now has 7703 vertices
+Motorcycle/D00521.obj had 16542 and now has 7580 vertices
+Motorcycle/D00476.obj had 25632 and now has 7860 vertices
+Motorcycle/D00342.obj had 35829 and now has 7790 vertices
+Motorcycle/D00858.obj had 25404 and now has 7571 vertices
+Motorcycle/m1479.obj had 12097 and now has 7677 vertices
+Motorcycle/D00886.obj had 15288 and now has 7249 vertices
+Motorcycle/m1482.obj had 15291 and now has 7252 vertices
+Mug/D00227.obj had 19611 and now has 7519 vertices
+Mug/D00747.obj had 15266 and now has 7502 vertices
+Motorcycle/D00703.obj had 46694 and now has 7378 vertices
+Mug/D00202.obj had 37360 and now has 7500 vertices
+Motorcycle/m1483.obj had 46407 and now has 7380 vertices
+MultiSeat/D00146.obj had 21992 and now has 7521 vertices
+MultiSeat/D00289.obj had 12463 and now has 7509 vertices
+MultiSeat/D00273.obj had 27775 and now has 7567 vertices
+MultiSeat/D00648.obj had 15181 and now has 7514 vertices
+MultiSeat/D00985.obj had 10614 and now has 7504 vertices
+MultiSeat/D00263.obj had 41265 and now has 7604 vertices
+MultiSeat/D00749.obj had 32736 and now has 7700 vertices
+MultiSeat/m837.obj had 15969 and now has 7646 vertices
+Musical_Instrument/m628.obj had 10314 and now has 7566 vertices
+Musical_Instrument/m635.obj had 13705 and now has 7528 vertices
+Musical_Instrument/m639.obj had 23238 and now has 7742 vertices
+Musical_Instrument/m644.obj had 20116 and now has 7722 vertices
+NonWheelChair/D00101.obj had 10766 and now has 7504 vertices
+Musical_Instrument/m631.obj had 47076 and now has 8026 vertices
+NonWheelChair/D00357.obj had 10676 and now has 7505 vertices
+NonWheelChair/D00443.obj had 10328 and now has 7544 vertices
+NonWheelChair/D00419.obj had 20239 and now has 7512 vertices
+NonWheelChair/m796.obj had 12172 and now has 7516 vertices
+PlantIndoors/D00073.obj had 49944 and now has 7811 vertices
+PlantIndoors/D00049.obj had 78288 and now has 7898 vertices
+PlantIndoors/D00128.obj had 64866 and now has 8495 vertices
+PlantIndoors/D00080.obj had 64127 and now has 7436 vertices
+PlantIndoors/D00280.obj had 32742 and now has 7888 vertices
+PlantIndoors/D00370.obj had 26784 and now has 7930 vertices
+PlantIndoors/D00238.obj had 90234 and now has 9467 vertices
+PlantIndoors/D00159.obj had 98256 and now has 8844 vertices
+PlantIndoors/D00379.obj had 31824 and now has 8453 vertices
+PlantIndoors/D00609.obj had 32382 and now has 6696 vertices
+PlantIndoors/D00624.obj had 45486 and now has 7306 vertices
+PlantIndoors/D00622.obj had 60282 and now has 8153 vertices
+PlantIndoors/D00595.obj had 60624 and now has 9584 vertices
+PlantIndoors/D00491.obj had 20165 and now has 9188 vertices
+PlantIndoors/D00968.obj had 34812 and now has 7641 vertices
+PlantIndoors/D00800.obj had 52263 and now has 7969 vertices
+PlantIndoors/m1001.obj had 11431 and now has 7807 vertices
+PlantIndoors/m1004.obj had 13242 and now has 7969 vertices
+PlantIndoors/m1005.obj had 17834 and now has 7086 vertices
+PlantIndoors/m1000.obj had 19105 and now has 7899 vertices
+PlantIndoors/m1006.obj had 16333 and now has 8312 vertices
+PlantIndoors/m1014.obj had 16404 and now has 9586 vertices
+PlantIndoors/m1018.obj had 11666 and now has 7301 vertices
+PlantIndoors/m1017.obj had 13312 and now has 8152 vertices
+PlantIndoors/m1020.obj had 18348 and now has 9465 vertices
+PlantWildNonTree/m963.obj had 11548 and now has 7069 vertices
+PlantWildNonTree/m962.obj had 15136 and now has 8126 vertices
+PlantWildNonTree/m964.obj had 13950 and now has 7715 vertices
+PlantWildNonTree/m967.obj had 12982 and now has 9411 vertices
+PlantWildNonTree/m965.obj had 13871 and now has 8109 vertices
+PlantWildNonTree/m972.obj had 16197 and now has 8794 vertices
+PlantWildNonTree/m973.obj had 15492 and now has 9591 vertices
+Quadruped/D00150.obj had 24936 and now has 7495 vertices
+Quadruped/D00508.obj had 11910 and now has 7510 vertices
+Quadruped/D00409.obj had 12515 and now has 7543 vertices
+Quadruped/D00663.obj had 12046 and now has 7819 vertices
+Quadruped/D00583.obj had 20126 and now has 7546 vertices
+Quadruped/D00795.obj had 13081 and now has 7118 vertices
+PlantWildNonTree/m985.obj had 50833 and now has 8289 vertices
+Quadruped/m103.obj had 16049 and now has 7618 vertices
+Quadruped/m108.obj had 11105 and now has 7508 vertices
+Quadruped/m275.obj had 20586 and now has 7501 vertices
+Quadruped/m274.obj had 23984 and now has 7498 vertices
+Quadruped/m281.obj had 10119 and now has 7490 vertices
+Quadruped/m89.obj had 12515 and now has 7507 vertices
+RectangleTable/D00523.obj had 12600 and now has 7604 vertices
+Rocket/D00564.obj had 73398 and now has 7740 vertices
+Rocket/D00975.obj had 46038 and now has 7791 vertices
+RoundTable/D00094.obj had 12414 and now has 7510 vertices
+RoundTable/D00492.obj had 13002 and now has 7504 vertices
+RoundTable/m932.obj had 10889 and now has 7162 vertices
+Ship/D00175.obj had 13725 and now has 7602 vertices
+Ship/D00429.obj had 19361 and now has 7651 vertices
+Ship/D00907.obj had 21442 and now has 9227 vertices
+Ship/D00539.obj had 23858 and now has 7870 vertices
+Ship/D00771.obj had 33376 and now has 7480 vertices
+Ship/D00809.obj had 40714 and now has 7918 vertices
+Ship/m1461.obj had 12526 and now has 8124 vertices
+Skyscraper/D00125.obj had 18704 and now has 8334 vertices
+Skyscraper/D00059.obj had 12771 and now has 7767 vertices
+Skyscraper/D00532.obj had 19283 and now has 9482 vertices
+Skyscraper/D00664.obj had 10076 and now has 8301 vertices
+Skyscraper/D00006.obj had 48737 and now has 6330 vertices
+Skyscraper/D00584.obj had 28864 and now has 8836 vertices
+Skyscraper/D00126.obj had 39975 and now has 7701 vertices
+Skyscraper/D00822.obj had 10054 and now has 6983 vertices
+Skyscraper/D00058.obj had 73697 and now has 7968 vertices
+Skyscraper/D00520.obj had 51730 and now has 9751 vertices
+Skyscraper/D00729.obj had 51011 and now has 8152 vertices
+Skyscraper/D00259.obj had 50449 and now has 7732 vertices
+Skyscraper/D00870.obj had 65343 and now has 7270 vertices
+Starship/m1362.obj had 13685 and now has 7798 vertices
+Starship/m1368.obj had 31275 and now has 7765 vertices
+Starship/m1380.obj had 11926 and now has 7966 vertices
+Starship/m1381.obj had 14225 and now has 7516 vertices
+Starship/m1385.obj had 11132 and now has 7479 vertices
+SubmachineGun/D00119.obj had 11791 and now has 7528 vertices
+SubmachineGun/D00068.obj had 19423 and now has 7527 vertices
+SubmachineGun/D00371.obj had 18170 and now has 8119 vertices
+SubmachineGun/D00459.obj had 24710 and now has 7541 vertices
+Sword/D00066.obj had 18993 and now has 7516 vertices
+Sword/D00071.obj had 10920 and now has 7509 vertices
+Sword/D00133.obj had 13257 and now has 7524 vertices
+Sword/D00249.obj had 15478 and now has 7492 vertices
+Sword/D00906.obj had 14621 and now has 7504 vertices
+Sword/m710.obj had 10936 and now has 7516 vertices
+Sword/m717.obj had 18888 and now has 7602 vertices
+Train/D01055.obj had 10979 and now has 8734 vertices
+Train/D01180.obj had 13612 and now has 9387 vertices
+Train/m1581.obj had 11299 and now has 7557 vertices
+Tree/D00200.obj had 19368 and now has 9982 vertices
+Tree/D00096.obj had 54223 and now has 8229 vertices
+Tree/D00385.obj had 12534 and now has 8365 vertices
+Tree/D00221.obj had 49630 and now has 9543 vertices
+Tree/D00439.obj had 36902 and now has 7885 vertices
+Tree/D00479.obj had 28407 and now has 7945 vertices
+Tree/D00612.obj had 11385 and now has 7577 vertices
+Tree/D00533.obj had 31972 and now has 7761 vertices
+Tree/D00223.obj had 58864 and now has 8986 vertices
+Tree/D00393.obj had 49528 and now has 8962 vertices
+Tree/D00573.obj had 23696 and now has 7494 vertices
+Tree/D00777.obj had 21856 and now has 8265 vertices
+Tree/D00810.obj had 29528 and now has 9605 vertices
+Tree/D00765.obj had 41501 and now has 6516 vertices
+Tree/D00727.obj had 56409 and now has 7630 vertices
+Tree/D00834.obj had 52078 and now has 7039 vertices
+Tree/D00996.obj had 29340 and now has 9199 vertices
+Tree/D00911.obj had 58369 and now has 9089 vertices
+Tree/m1069.obj had 18418 and now has 8298 vertices
+Truck/D00835.obj had 11749 and now has 8299 vertices
+Truck/D00987.obj had 13228 and now has 8649 vertices
+Truck/m1571.obj had 12792 and now has 7538 vertices
+Truck/m1575.obj had 47209 and now has 7616 vertices
+TruckNonContainer/D00353.obj had 11914 and now has 8969 vertices
+WheelChair/D00004.obj had 27581 and now has 7644 vertices
+WheelChair/D00088.obj had 26911 and now has 7642 vertices
+WheelChair/D00449.obj had 27053 and now has 7376 vertices
+WheelChair/D00394.obj had 36064 and now has 7575 vertices
+WheelChair/D00628.obj had 29552 and now has 7626 vertices
+WheelChair/D00720.obj had 43966 and now has 7534 vertices
+
+FINE MODELS
+ (361 total)================
+ResamplingRecord(relative_path='AircraftBuoyant/m1338.obj', before_vertices=8761, after_vertices=8761)
+ResamplingRecord(relative_path='Apartment/D00496.obj', before_vertices=7737, after_vertices=7737)
+ResamplingRecord(relative_path='Apartment/D00780.obj', before_vertices=8240, after_vertices=8240)
+ResamplingRecord(relative_path='Apartment/m464.obj', before_vertices=8301, after_vertices=8301)
+ResamplingRecord(relative_path='AquaticAnimal/m56.obj', before_vertices=5814, after_vertices=5814)
+ResamplingRecord(relative_path='Bed/D00184.obj', before_vertices=7218, after_vertices=7218)
+ResamplingRecord(relative_path='Bed/D00322.obj', before_vertices=9342, after_vertices=9342)
+ResamplingRecord(relative_path='Bed/D00538.obj', before_vertices=7136, after_vertices=7136)
+ResamplingRecord(relative_path='Bed/D00552.obj', before_vertices=6349, after_vertices=6349)
+ResamplingRecord(relative_path='Bed/m945.obj', before_vertices=8116, after_vertices=8116)
+ResamplingRecord(relative_path='Bicycle/D00514.obj', before_vertices=6951, after_vertices=6951)
+ResamplingRecord(relative_path='Bicycle/D00904.obj', before_vertices=5354, after_vertices=5354)
+ResamplingRecord(relative_path='Bicycle/D00974.obj', before_vertices=6045, after_vertices=6045)
+ResamplingRecord(relative_path='Bicycle/m1475.obj', before_vertices=6049, after_vertices=6049)
+ResamplingRecord(relative_path='Biplane/D00320.obj', before_vertices=9723, after_vertices=9723)
+ResamplingRecord(relative_path='Biplane/D00373.obj', before_vertices=5941, after_vertices=5941)
+ResamplingRecord(relative_path='Biplane/D00515.obj', before_vertices=5381, after_vertices=5381)
+ResamplingRecord(relative_path='Biplane/m1122.obj', before_vertices=6704, after_vertices=6704)
+ResamplingRecord(relative_path='Bird/D00164.obj', before_vertices=8188, after_vertices=8188)
+ResamplingRecord(relative_path='Bird/D00442.obj', before_vertices=9745, after_vertices=9745)
+ResamplingRecord(relative_path='Bird/m28.obj', before_vertices=6076, after_vertices=6076)
+ResamplingRecord(relative_path='Bottle/D00176.obj', before_vertices=7138, after_vertices=7138)
+ResamplingRecord(relative_path='BuildingNonResidential/m399.obj', before_vertices=7530, after_vertices=7530)
+ResamplingRecord(relative_path='BuildingNonResidential/m401.obj', before_vertices=6936, after_vertices=6936)
+ResamplingRecord(relative_path='BuildingNonResidential/m406.obj', before_vertices=7328, after_vertices=7328)
+ResamplingRecord(relative_path='BuildingNonResidential/m416.obj', before_vertices=7056, after_vertices=7056)
+ResamplingRecord(relative_path='BuildingNonResidential/m420.obj', before_vertices=7226, after_vertices=7226)
+ResamplingRecord(relative_path='BuildingNonResidential/m421.obj', before_vertices=6853, after_vertices=6853)
+ResamplingRecord(relative_path='Bus/D00114.obj', before_vertices=7643, after_vertices=7643)
+ResamplingRecord(relative_path='Bus/D00151.obj', before_vertices=9415, after_vertices=9415)
+ResamplingRecord(relative_path='Bus/D00179.obj', before_vertices=5976, after_vertices=5976)
+ResamplingRecord(relative_path='Bus/D00448.obj', before_vertices=7367, after_vertices=7367)
+ResamplingRecord(relative_path='Bus/D00483.obj', before_vertices=6097, after_vertices=6097)
+ResamplingRecord(relative_path='Bus/D00754.obj', before_vertices=8866, after_vertices=8866)
+ResamplingRecord(relative_path='Bus/D00769.obj', before_vertices=8963, after_vertices=8963)
+ResamplingRecord(relative_path='Bus/D00775.obj', before_vertices=9510, after_vertices=9510)
+ResamplingRecord(relative_path='Bus/D00815.obj', before_vertices=7075, after_vertices=7075)
+ResamplingRecord(relative_path='Bus/D00823.obj', before_vertices=7367, after_vertices=7367)
+ResamplingRecord(relative_path='Bus/D00857.obj', before_vertices=5223, after_vertices=5223)
+ResamplingRecord(relative_path='Car/D00377.obj', before_vertices=8260, after_vertices=8260)
+ResamplingRecord(relative_path='Car/D00504.obj', before_vertices=5153, after_vertices=5153)
+ResamplingRecord(relative_path='Car/D00785.obj', before_vertices=7248, after_vertices=7248)
+ResamplingRecord(relative_path='Car/D00793.obj', before_vertices=5322, after_vertices=5322)
+ResamplingRecord(relative_path='Car/m1485.obj', before_vertices=6148, after_vertices=6148)
+ResamplingRecord(relative_path='Car/m1486.obj', before_vertices=5911, after_vertices=5911)
+ResamplingRecord(relative_path='Car/m1487.obj', before_vertices=7454, after_vertices=7454)
+ResamplingRecord(relative_path='Car/m1492.obj', before_vertices=5914, after_vertices=5914)
+ResamplingRecord(relative_path='Car/m1495.obj', before_vertices=6870, after_vertices=6870)
+ResamplingRecord(relative_path='Car/m1496.obj', before_vertices=8404, after_vertices=8404)
+ResamplingRecord(relative_path='Car/m1498.obj', before_vertices=5514, after_vertices=5514)
+ResamplingRecord(relative_path='Car/m1507.obj', before_vertices=6514, after_vertices=6514)
+ResamplingRecord(relative_path='Car/m1512.obj', before_vertices=6816, after_vertices=6816)
+ResamplingRecord(relative_path='Car/m1518.obj', before_vertices=7486, after_vertices=7486)
+ResamplingRecord(relative_path='Car/m1527.obj', before_vertices=7315, after_vertices=7315)
+ResamplingRecord(relative_path='Car/m1533.obj', before_vertices=7374, after_vertices=7374)
+ResamplingRecord(relative_path='Car/m1539.obj', before_vertices=8254, after_vertices=8254)
+ResamplingRecord(relative_path='Car/m1540.obj', before_vertices=8492, after_vertices=8492)
+ResamplingRecord(relative_path='Car/m1545.obj', before_vertices=8278, after_vertices=8278)
+ResamplingRecord(relative_path='Car/m1546.obj', before_vertices=9068, after_vertices=9068)
+ResamplingRecord(relative_path='Car/m1548.obj', before_vertices=8278, after_vertices=8278)
+ResamplingRecord(relative_path='Car/m1550.obj', before_vertices=9369, after_vertices=9369)
+ResamplingRecord(relative_path='Car/m1552.obj', before_vertices=5247, after_vertices=5247)
+ResamplingRecord(relative_path='Car/m1557.obj', before_vertices=8489, after_vertices=8489)
+ResamplingRecord(relative_path='Car/m1558.obj', before_vertices=6943, after_vertices=6943)
+ResamplingRecord(relative_path='Cellphone/D00248.obj', before_vertices=5754, after_vertices=5754)
+ResamplingRecord(relative_path='Cellphone/D00327.obj', before_vertices=6318, after_vertices=6318)
+ResamplingRecord(relative_path='Cellphone/D00527.obj', before_vertices=8796, after_vertices=8796)
+ResamplingRecord(relative_path='Cellphone/D00817.obj', before_vertices=5206, after_vertices=5206)
+ResamplingRecord(relative_path='Cellphone/D00848.obj', before_vertices=9745, after_vertices=9745)
+ResamplingRecord(relative_path='Chess/D01081.obj', before_vertices=6727, after_vertices=6727)
+ResamplingRecord(relative_path='Chess/m1591.obj', before_vertices=7339, after_vertices=7339)
+ResamplingRecord(relative_path='Chess/m1601.obj', before_vertices=6727, after_vertices=6727)
+ResamplingRecord(relative_path='Chess/m1610.obj', before_vertices=6094, after_vertices=6094)
+ResamplingRecord(relative_path='City/D01001.obj', before_vertices=6645, after_vertices=6645)
+ResamplingRecord(relative_path='City/D01018.obj', before_vertices=6529, after_vertices=6529)
+ResamplingRecord(relative_path='City/D01066.obj', before_vertices=9894, after_vertices=9894)
+ResamplingRecord(relative_path='City/D01068.obj', before_vertices=5538, after_vertices=5538)
+ResamplingRecord(relative_path='City/D01079.obj', before_vertices=9201, after_vertices=9201)
+ResamplingRecord(relative_path='City/D01090.obj', before_vertices=7089, after_vertices=7089)
+ResamplingRecord(relative_path='City/D01124.obj', before_vertices=5211, after_vertices=5211)
+ResamplingRecord(relative_path='City/D01133.obj', before_vertices=5804, after_vertices=5804)
+ResamplingRecord(relative_path='City/D01181.obj', before_vertices=5137, after_vertices=5137)
+ResamplingRecord(relative_path='City/m1654.obj', before_vertices=5538, after_vertices=5538)
+ResamplingRecord(relative_path='City/m1659.obj', before_vertices=5804, after_vertices=5804)
+ResamplingRecord(relative_path='City/m1662.obj', before_vertices=9201, after_vertices=9201)
+ResamplingRecord(relative_path='ClassicPiano/D00092.obj', before_vertices=5901, after_vertices=5901)
+ResamplingRecord(relative_path='ClassicPiano/D00233.obj', before_vertices=5205, after_vertices=5205)
+ResamplingRecord(relative_path='ClassicPiano/D00279.obj', before_vertices=7253, after_vertices=7253)
+ResamplingRecord(relative_path='ClassicPiano/D00314.obj', before_vertices=6800, after_vertices=6800)
+ResamplingRecord(relative_path='ClassicPiano/D00605.obj', before_vertices=8121, after_vertices=8121)
+ResamplingRecord(relative_path='ClassicPiano/D00784.obj', before_vertices=5131, after_vertices=5131)
+ResamplingRecord(relative_path='Computer/D01067.obj', before_vertices=5026, after_vertices=5026)
+ResamplingRecord(relative_path='Computer/D01115.obj', before_vertices=8163, after_vertices=8163)
+ResamplingRecord(relative_path='Computer/m1778.obj', before_vertices=5026, after_vertices=5026)
+ResamplingRecord(relative_path='ComputerKeyboard/D00197.obj', before_vertices=6987, after_vertices=6987)
+ResamplingRecord(relative_path='ComputerKeyboard/D00360.obj', before_vertices=6193, after_vertices=6193)
+ResamplingRecord(relative_path='ComputerKeyboard/D00382.obj', before_vertices=8346, after_vertices=8346)
+ResamplingRecord(relative_path='ComputerKeyboard/D00525.obj', before_vertices=8309, after_vertices=8309)
+ResamplingRecord(relative_path='ComputerKeyboard/D00597.obj', before_vertices=8460, after_vertices=8460)
+ResamplingRecord(relative_path='ComputerKeyboard/D00627.obj', before_vertices=6564, after_vertices=6564)
+ResamplingRecord(relative_path='ComputerKeyboard/D00676.obj', before_vertices=7956, after_vertices=7956)
+ResamplingRecord(relative_path='ComputerKeyboard/D00805.obj', before_vertices=6954, after_vertices=6954)
+ResamplingRecord(relative_path='Cup/D00355.obj', before_vertices=7114, after_vertices=7114)
+ResamplingRecord(relative_path='Cup/D00363.obj', before_vertices=5433, after_vertices=5433)
+ResamplingRecord(relative_path='Cup/D00587.obj', before_vertices=7102, after_vertices=7102)
+ResamplingRecord(relative_path='Cup/D00638.obj', before_vertices=6786, after_vertices=6786)
+ResamplingRecord(relative_path='Cup/D00843.obj', before_vertices=9127, after_vertices=9127)
+ResamplingRecord(relative_path='DeskLamp/D00090.obj', before_vertices=6516, after_vertices=6516)
+ResamplingRecord(relative_path='DeskLamp/D00455.obj', before_vertices=7627, after_vertices=7627)
+ResamplingRecord(relative_path='DeskLamp/D00759.obj', before_vertices=5982, after_vertices=5982)
+ResamplingRecord(relative_path='Door/D01005.obj', before_vertices=6044, after_vertices=6044)
+ResamplingRecord(relative_path='Door/m1713.obj', before_vertices=6044, after_vertices=6044)
+ResamplingRecord(relative_path='Drum/D00026.obj', before_vertices=5506, after_vertices=5506)
+ResamplingRecord(relative_path='Drum/D00163.obj', before_vertices=8433, after_vertices=8433)
+ResamplingRecord(relative_path='Drum/D00297.obj', before_vertices=5561, after_vertices=5561)
+ResamplingRecord(relative_path='Drum/D00939.obj', before_vertices=5390, after_vertices=5390)
+ResamplingRecord(relative_path='Drum/D00951.obj', before_vertices=7993, after_vertices=7993)
+ResamplingRecord(relative_path='Drum/D00980.obj', before_vertices=5653, after_vertices=5653)
+ResamplingRecord(relative_path='Fish/D00748.obj', before_vertices=5046, after_vertices=5046)
+ResamplingRecord(relative_path='FloorLamp/D00186.obj', before_vertices=7694, after_vertices=7694)
+ResamplingRecord(relative_path='FloorLamp/D00211.obj', before_vertices=5097, after_vertices=5097)
+ResamplingRecord(relative_path='FloorLamp/D00955.obj', before_vertices=8300, after_vertices=8300)
+ResamplingRecord(relative_path='FloorLamp/m620.obj', before_vertices=5584, after_vertices=5584)
+ResamplingRecord(relative_path='Glasses/D00050.obj', before_vertices=6852, after_vertices=6852)
+ResamplingRecord(relative_path='Glasses/D00201.obj', before_vertices=6519, after_vertices=6519)
+ResamplingRecord(relative_path='Glasses/D00507.obj', before_vertices=6852, after_vertices=6852)
+ResamplingRecord(relative_path='Guitar/D00076.obj', before_vertices=8889, after_vertices=8889)
+ResamplingRecord(relative_path='Guitar/D00232.obj', before_vertices=7781, after_vertices=7781)
+ResamplingRecord(relative_path='Guitar/D00461.obj', before_vertices=8636, after_vertices=8636)
+ResamplingRecord(relative_path='Guitar/D00655.obj', before_vertices=8251, after_vertices=8251)
+ResamplingRecord(relative_path='Guitar/D00844.obj', before_vertices=9253, after_vertices=9253)
+ResamplingRecord(relative_path='Gun/D00137.obj', before_vertices=5308, after_vertices=5308)
+ResamplingRecord(relative_path='Gun/D00204.obj', before_vertices=5558, after_vertices=5558)
+ResamplingRecord(relative_path='Gun/D00209.obj', before_vertices=6826, after_vertices=6826)
+ResamplingRecord(relative_path='Gun/m674.obj', before_vertices=7722, after_vertices=7722)
+ResamplingRecord(relative_path='Hand/D01006.obj', before_vertices=7929, after_vertices=7929)
+ResamplingRecord(relative_path='Hand/D01020.obj', before_vertices=8524, after_vertices=8524)
+ResamplingRecord(relative_path='Hand/D01093.obj', before_vertices=8471, after_vertices=8471)
+ResamplingRecord(relative_path='Hand/D01097.obj', before_vertices=6191, after_vertices=6191)
+ResamplingRecord(relative_path='Hand/D01117.obj', before_vertices=6038, after_vertices=6038)
+ResamplingRecord(relative_path='Hand/D01197.obj', before_vertices=7112, after_vertices=7112)
+ResamplingRecord(relative_path='Hand/D01200.obj', before_vertices=7314, after_vertices=7314)
+ResamplingRecord(relative_path='Hand/m328.obj', before_vertices=6038, after_vertices=6038)
+ResamplingRecord(relative_path='Hand/m329.obj', before_vertices=6191, after_vertices=6191)
+ResamplingRecord(relative_path='Hand/m335.obj', before_vertices=7929, after_vertices=7929)
+ResamplingRecord(relative_path='Hat/m1634.obj', before_vertices=5814, after_vertices=5814)
+ResamplingRecord(relative_path='Hat/m1635.obj', before_vertices=5092, after_vertices=5092)
+ResamplingRecord(relative_path='Hat/m1638.obj', before_vertices=8815, after_vertices=8815)
+ResamplingRecord(relative_path='Helicopter/D00397.obj', before_vertices=5567, after_vertices=5567)
+ResamplingRecord(relative_path='Helicopter/D00473.obj', before_vertices=5823, after_vertices=5823)
+ResamplingRecord(relative_path='Helicopter/D00500.obj', before_vertices=9980, after_vertices=9980)
+ResamplingRecord(relative_path='Helicopter/D00977.obj', before_vertices=5681, after_vertices=5681)
+ResamplingRecord(relative_path='Helicopter/m1305.obj', before_vertices=7105, after_vertices=7105)
+ResamplingRecord(relative_path='Helicopter/m1306.obj', before_vertices=8547, after_vertices=8547)
+ResamplingRecord(relative_path='Helicopter/m1320.obj', before_vertices=7818, after_vertices=7818)
+ResamplingRecord(relative_path='Helicopter/m1323.obj', before_vertices=6136, after_vertices=6136)
+ResamplingRecord(relative_path='Helicopter/m1327.obj', before_vertices=7851, after_vertices=7851)
+ResamplingRecord(relative_path='House/D00454.obj', before_vertices=6044, after_vertices=6044)
+ResamplingRecord(relative_path='House/D00873.obj', before_vertices=6380, after_vertices=6380)
+ResamplingRecord(relative_path='House/D00941.obj', before_vertices=8511, after_vertices=8511)
+ResamplingRecord(relative_path='House/D00946.obj', before_vertices=7423, after_vertices=7423)
+ResamplingRecord(relative_path='HumanHead/D00013.obj', before_vertices=5244, after_vertices=5244)
+ResamplingRecord(relative_path='HumanHead/D00061.obj', before_vertices=5119, after_vertices=5119)
+ResamplingRecord(relative_path='HumanHead/D00072.obj', before_vertices=5284, after_vertices=5284)
+ResamplingRecord(relative_path='HumanHead/D00106.obj', before_vertices=5276, after_vertices=5276)
+ResamplingRecord(relative_path='HumanHead/D00131.obj', before_vertices=5161, after_vertices=5161)
+ResamplingRecord(relative_path='HumanHead/D00313.obj', before_vertices=6146, after_vertices=6146)
+ResamplingRecord(relative_path='HumanHead/D00488.obj', before_vertices=6211, after_vertices=6211)
+ResamplingRecord(relative_path='HumanHead/D00578.obj', before_vertices=7968, after_vertices=7968)
+ResamplingRecord(relative_path='HumanHead/D00591.obj', before_vertices=5167, after_vertices=5167)
+ResamplingRecord(relative_path='HumanHead/D00690.obj', before_vertices=5253, after_vertices=5253)
+ResamplingRecord(relative_path='HumanHead/m348.obj', before_vertices=9166, after_vertices=9166)
+ResamplingRecord(relative_path='HumanHead/m353.obj', before_vertices=7896, after_vertices=7896)
+ResamplingRecord(relative_path='HumanHead/m369.obj', before_vertices=9843, after_vertices=9843)
+ResamplingRecord(relative_path='HumanHead/m370.obj', before_vertices=5641, after_vertices=5641)
+ResamplingRecord(relative_path='Humanoid/m138.obj', before_vertices=7401, after_vertices=7401)
+ResamplingRecord(relative_path='Humanoid/m140.obj', before_vertices=9061, after_vertices=9061)
+ResamplingRecord(relative_path='Humanoid/m143.obj', before_vertices=5647, after_vertices=5647)
+ResamplingRecord(relative_path='Humanoid/m181.obj', before_vertices=8520, after_vertices=8520)
+ResamplingRecord(relative_path='Humanoid/m193.obj', before_vertices=8622, after_vertices=8622)
+ResamplingRecord(relative_path='Humanoid/m199.obj', before_vertices=6540, after_vertices=6540)
+ResamplingRecord(relative_path='Humanoid/m216.obj', before_vertices=9272, after_vertices=9272)
+ResamplingRecord(relative_path='Humanoid/m224.obj', before_vertices=9660, after_vertices=9660)
+ResamplingRecord(relative_path='Humanoid/m226.obj', before_vertices=6368, after_vertices=6368)
+ResamplingRecord(relative_path='Humanoid/m227.obj', before_vertices=7015, after_vertices=7015)
+ResamplingRecord(relative_path='Humanoid/m249.obj', before_vertices=7970, after_vertices=7970)
+ResamplingRecord(relative_path='Humanoid/m251.obj', before_vertices=8077, after_vertices=8077)
+ResamplingRecord(relative_path='Humanoid/m252.obj', before_vertices=9698, after_vertices=9698)
+ResamplingRecord(relative_path='Humanoid/m256.obj', before_vertices=7303, after_vertices=7303)
+ResamplingRecord(relative_path='Humanoid/m264.obj', before_vertices=8798, after_vertices=8798)
+ResamplingRecord(relative_path='Insect/D00082.obj', before_vertices=7162, after_vertices=7162)
+ResamplingRecord(relative_path='Insect/D00117.obj', before_vertices=5090, after_vertices=5090)
+ResamplingRecord(relative_path='Insect/D00333.obj', before_vertices=6007, after_vertices=6007)
+ResamplingRecord(relative_path='Insect/D00788.obj', before_vertices=6175, after_vertices=6175)
+ResamplingRecord(relative_path='Insect/D00973.obj', before_vertices=7638, after_vertices=7638)
+ResamplingRecord(relative_path='Insect/m26.obj', before_vertices=5266, after_vertices=5266)
+ResamplingRecord(relative_path='Insect/m6.obj', before_vertices=9184, after_vertices=9184)
+ResamplingRecord(relative_path='Jet/m1201.obj', before_vertices=6769, after_vertices=6769)
+ResamplingRecord(relative_path='Jet/m1256.obj', before_vertices=9398, after_vertices=9398)
+ResamplingRecord(relative_path='Jet/m1257.obj', before_vertices=8812, after_vertices=8812)
+ResamplingRecord(relative_path='Jet/m1259.obj', before_vertices=6769, after_vertices=6769)
+ResamplingRecord(relative_path='Jet/m1260.obj', before_vertices=6906, after_vertices=6906)
+ResamplingRecord(relative_path='Jet/m1284.obj', before_vertices=6334, after_vertices=6334)
+ResamplingRecord(relative_path='Jet/m1289.obj', before_vertices=5078, after_vertices=5078)
+ResamplingRecord(relative_path='Knife/m723.obj', before_vertices=5076, after_vertices=5076)
+ResamplingRecord(relative_path='MilitaryVehicle/D00761.obj', before_vertices=7768, after_vertices=7768)
+ResamplingRecord(relative_path='MilitaryVehicle/D00971.obj', before_vertices=7344, after_vertices=7344)
+ResamplingRecord(relative_path='Monitor/D00336.obj', before_vertices=9494, after_vertices=9494)
+ResamplingRecord(relative_path='Monitor/D00852.obj', before_vertices=6196, after_vertices=6196)
+ResamplingRecord(relative_path='Monitor/D00915.obj', before_vertices=5124, after_vertices=5124)
+ResamplingRecord(relative_path='Monoplane/D00617.obj', before_vertices=7440, after_vertices=7440)
+ResamplingRecord(relative_path='Monoplane/D00688.obj', before_vertices=5849, after_vertices=5849)
+ResamplingRecord(relative_path='Motorcycle/D00021.obj', before_vertices=9543, after_vertices=9543)
+ResamplingRecord(relative_path='Motorcycle/D00054.obj', before_vertices=5300, after_vertices=5300)
+ResamplingRecord(relative_path='Motorcycle/D00288.obj', before_vertices=6697, after_vertices=6697)
+ResamplingRecord(relative_path='Motorcycle/D00395.obj', before_vertices=7334, after_vertices=7334)
+ResamplingRecord(relative_path='Motorcycle/D00768.obj', before_vertices=9288, after_vertices=9288)
+ResamplingRecord(relative_path='Motorcycle/D00880.obj', before_vertices=5713, after_vertices=5713)
+ResamplingRecord(relative_path='Motorcycle/m1480.obj', before_vertices=9543, after_vertices=9543)
+ResamplingRecord(relative_path='Mug/D00341.obj', before_vertices=7454, after_vertices=7454)
+ResamplingRecord(relative_path='Mug/D00427.obj', before_vertices=5682, after_vertices=5682)
+ResamplingRecord(relative_path='Mug/D00685.obj', before_vertices=5703, after_vertices=5703)
+ResamplingRecord(relative_path='Mug/D00728.obj', before_vertices=9616, after_vertices=9616)
+ResamplingRecord(relative_path='Mug/D00913.obj', before_vertices=7135, after_vertices=7135)
+ResamplingRecord(relative_path='Mug/m506.obj', before_vertices=8692, after_vertices=8692)
+ResamplingRecord(relative_path='Mug/m509.obj', before_vertices=5894, after_vertices=5894)
+ResamplingRecord(relative_path='MultiSeat/D00637.obj', before_vertices=7542, after_vertices=7542)
+ResamplingRecord(relative_path='MultiSeat/m843.obj', before_vertices=8085, after_vertices=8085)
+ResamplingRecord(relative_path='Musical_Instrument/m627.obj', before_vertices=7445, after_vertices=7445)
+ResamplingRecord(relative_path='Musical_Instrument/m629.obj', before_vertices=8225, after_vertices=8225)
+ResamplingRecord(relative_path='Musical_Instrument/m637.obj', before_vertices=8636, after_vertices=8636)
+ResamplingRecord(relative_path='NonWheelChair/D00306.obj', before_vertices=5160, after_vertices=5160)
+ResamplingRecord(relative_path='NonWheelChair/D00480.obj', before_vertices=5063, after_vertices=5063)
+ResamplingRecord(relative_path='NonWheelChair/m801.obj', before_vertices=8188, after_vertices=8188)
+ResamplingRecord(relative_path='PianoBoard/D00181.obj', before_vertices=9628, after_vertices=9628)
+ResamplingRecord(relative_path='PianoBoard/D00623.obj', before_vertices=5694, after_vertices=5694)
+ResamplingRecord(relative_path='PianoBoard/D00755.obj', before_vertices=8133, after_vertices=8133)
+ResamplingRecord(relative_path='PianoBoard/D00885.obj', before_vertices=6622, after_vertices=6622)
+ResamplingRecord(relative_path='PlantIndoors/D00466.obj', before_vertices=9900, after_vertices=9900)
+ResamplingRecord(relative_path='PlantIndoors/D00657.obj', before_vertices=5801, after_vertices=5801)
+ResamplingRecord(relative_path='PlantIndoors/m1002.obj', before_vertices=8260, after_vertices=8260)
+ResamplingRecord(relative_path='PlantIndoors/m1003.obj', before_vertices=8453, after_vertices=8453)
+ResamplingRecord(relative_path='PlantIndoors/m1007.obj', before_vertices=7930, after_vertices=7930)
+ResamplingRecord(relative_path='PlantIndoors/m1008.obj', before_vertices=5383, after_vertices=5383)
+ResamplingRecord(relative_path='PlantIndoors/m1009.obj', before_vertices=5348, after_vertices=5348)
+ResamplingRecord(relative_path='PlantIndoors/m1010.obj', before_vertices=6257, after_vertices=6257)
+ResamplingRecord(relative_path='PlantIndoors/m1011.obj', before_vertices=7529, after_vertices=7529)
+ResamplingRecord(relative_path='PlantIndoors/m1013.obj', before_vertices=6365, after_vertices=6365)
+ResamplingRecord(relative_path='PlantIndoors/m1016.obj', before_vertices=5307, after_vertices=5307)
+ResamplingRecord(relative_path='PlantIndoors/m1021.obj', before_vertices=7641, after_vertices=7641)
+ResamplingRecord(relative_path='PlantIndoors/m1022.obj', before_vertices=7882, after_vertices=7882)
+ResamplingRecord(relative_path='PlantIndoors/m1025.obj', before_vertices=6696, after_vertices=6696)
+ResamplingRecord(relative_path='PlantIndoors/m995.obj', before_vertices=7323, after_vertices=7323)
+ResamplingRecord(relative_path='PlantWildNonTree/m961.obj', before_vertices=6513, after_vertices=6513)
+ResamplingRecord(relative_path='PlantWildNonTree/m966.obj', before_vertices=7920, after_vertices=7920)
+ResamplingRecord(relative_path='PlantWildNonTree/m968.obj', before_vertices=9018, after_vertices=9018)
+ResamplingRecord(relative_path='PlantWildNonTree/m980.obj', before_vertices=8937, after_vertices=8937)
+ResamplingRecord(relative_path='PlantWildNonTree/m986.obj', before_vertices=6656, after_vertices=6656)
+ResamplingRecord(relative_path='Quadruped/D00509.obj', before_vertices=8159, after_vertices=8159)
+ResamplingRecord(relative_path='Quadruped/D00700.obj', before_vertices=9174, after_vertices=9174)
+ResamplingRecord(relative_path='Quadruped/D00794.obj', before_vertices=8184, after_vertices=8184)
+ResamplingRecord(relative_path='Quadruped/D00867.obj', before_vertices=7873, after_vertices=7873)
+ResamplingRecord(relative_path='Quadruped/m112.obj', before_vertices=7691, after_vertices=7691)
+ResamplingRecord(relative_path='Quadruped/m96.obj', before_vertices=5169, after_vertices=5169)
+ResamplingRecord(relative_path='RectangleTable/D00603.obj', before_vertices=7282, after_vertices=7282)
+ResamplingRecord(relative_path='Rocket/D00719.obj', before_vertices=7915, after_vertices=7915)
+ResamplingRecord(relative_path='RoundTable/D00702.obj', before_vertices=6647, after_vertices=6647)
+ResamplingRecord(relative_path='Shelf/D00057.obj', before_vertices=9850, after_vertices=9850)
+ResamplingRecord(relative_path='Shelf/D00631.obj', before_vertices=6295, after_vertices=6295)
+ResamplingRecord(relative_path='Shelf/D00691.obj', before_vertices=5210, after_vertices=5210)
+ResamplingRecord(relative_path='Shelf/D00725.obj', before_vertices=5831, after_vertices=5831)
+ResamplingRecord(relative_path='Ship/D00258.obj', before_vertices=9284, after_vertices=9284)
+ResamplingRecord(relative_path='Ship/D00247.obj', before_vertices=6122, after_vertices=6122)
+ResamplingRecord(relative_path='Ship/D00467.obj', before_vertices=5062, after_vertices=5062)
+ResamplingRecord(relative_path='Ship/D00543.obj', before_vertices=7537, after_vertices=7537)
+ResamplingRecord(relative_path='Ship/D00837.obj', before_vertices=6122, after_vertices=6122)
+ResamplingRecord(relative_path='Ship/m1442.obj', before_vertices=6859, after_vertices=6859)
+ResamplingRecord(relative_path='Ship/m1444.obj', before_vertices=6251, after_vertices=6251)
+ResamplingRecord(relative_path='Ship/m1446.obj', before_vertices=6122, after_vertices=6122)
+ResamplingRecord(relative_path='Ship/m1453.obj', before_vertices=7994, after_vertices=7994)
+ResamplingRecord(relative_path='Ship/m1465.obj', before_vertices=6923, after_vertices=6923)
+ResamplingRecord(relative_path='Ship/m1466.obj', before_vertices=9736, after_vertices=9736)
+ResamplingRecord(relative_path='Sign/m1681.obj', before_vertices=6540, after_vertices=6540)
+ResamplingRecord(relative_path='Skyscraper/D00105.obj', before_vertices=8334, after_vertices=8334)
+ResamplingRecord(relative_path='Skyscraper/D00300.obj', before_vertices=6372, after_vertices=6372)
+ResamplingRecord(relative_path='Skyscraper/D00589.obj', before_vertices=6372, after_vertices=6372)
+ResamplingRecord(relative_path='Spoon/D00683.obj', before_vertices=5039, after_vertices=5039)
+ResamplingRecord(relative_path='Starship/m1354.obj', before_vertices=5724, after_vertices=5724)
+ResamplingRecord(relative_path='Starship/m1355.obj', before_vertices=7730, after_vertices=7730)
+ResamplingRecord(relative_path='Starship/m1357.obj', before_vertices=9664, after_vertices=9664)
+ResamplingRecord(relative_path='Starship/m1364.obj', before_vertices=9018, after_vertices=9018)
+ResamplingRecord(relative_path='Starship/m1373.obj', before_vertices=6098, after_vertices=6098)
+ResamplingRecord(relative_path='Starship/m1374.obj', before_vertices=8080, after_vertices=8080)
+ResamplingRecord(relative_path='Starship/m1382.obj', before_vertices=7006, after_vertices=7006)
+ResamplingRecord(relative_path='Starship/m1383.obj', before_vertices=8722, after_vertices=8722)
+ResamplingRecord(relative_path='SubmachineGun/D00064.obj', before_vertices=6530, after_vertices=6530)
+ResamplingRecord(relative_path='Sword/D00177.obj', before_vertices=5076, after_vertices=5076)
+ResamplingRecord(relative_path='Sword/D00356.obj', before_vertices=5012, after_vertices=5012)
+ResamplingRecord(relative_path='Sword/D00484.obj', before_vertices=6873, after_vertices=6873)
+ResamplingRecord(relative_path='Sword/D00540.obj', before_vertices=8181, after_vertices=8181)
+ResamplingRecord(relative_path='Sword/D00992.obj', before_vertices=5872, after_vertices=5872)
+ResamplingRecord(relative_path='Sword/m691.obj', before_vertices=8583, after_vertices=8583)
+ResamplingRecord(relative_path='Sword/m695.obj', before_vertices=9880, after_vertices=9880)
+ResamplingRecord(relative_path='Sword/m696.obj', before_vertices=5548, after_vertices=5548)
+ResamplingRecord(relative_path='Sword/m705.obj', before_vertices=7910, after_vertices=7910)
+ResamplingRecord(relative_path='Sword/m709.obj', before_vertices=6598, after_vertices=6598)
+ResamplingRecord(relative_path='Sword/m711.obj', before_vertices=9457, after_vertices=9457)
+ResamplingRecord(relative_path='Sword/m715.obj', before_vertices=5548, after_vertices=5548)
+ResamplingRecord(relative_path='Tool/D01044.obj', before_vertices=5201, after_vertices=5201)
+ResamplingRecord(relative_path='Tool/D01069.obj', before_vertices=6198, after_vertices=6198)
+ResamplingRecord(relative_path='Tool/D01127.obj', before_vertices=6104, after_vertices=6104)
+ResamplingRecord(relative_path='Tool/D01142.obj', before_vertices=5110, after_vertices=5110)
+ResamplingRecord(relative_path='Tool/D01156.obj', before_vertices=5508, after_vertices=5508)
+ResamplingRecord(relative_path='Tool/D01154.obj', before_vertices=5202, after_vertices=5202)
+ResamplingRecord(relative_path='Train/D01016.obj', before_vertices=7754, after_vertices=7754)
+ResamplingRecord(relative_path='Train/D01047.obj', before_vertices=5450, after_vertices=5450)
+ResamplingRecord(relative_path='Train/D01059.obj', before_vertices=7243, after_vertices=7243)
+ResamplingRecord(relative_path='Train/D01061.obj', before_vertices=6494, after_vertices=6494)
+ResamplingRecord(relative_path='Train/D01064.obj', before_vertices=5037, after_vertices=5037)
+ResamplingRecord(relative_path='Train/D01095.obj', before_vertices=6385, after_vertices=6385)
+ResamplingRecord(relative_path='Train/D01134.obj', before_vertices=8721, after_vertices=8721)
+ResamplingRecord(relative_path='Train/D01137.obj', before_vertices=6422, after_vertices=6422)
+ResamplingRecord(relative_path='Train/D01149.obj', before_vertices=8616, after_vertices=8616)
+ResamplingRecord(relative_path='Train/m1582.obj', before_vertices=8239, after_vertices=8239)
+ResamplingRecord(relative_path='Train/m1585.obj', before_vertices=5303, after_vertices=5303)
+ResamplingRecord(relative_path='Train/m1586.obj', before_vertices=5520, after_vertices=5520)
+ResamplingRecord(relative_path='Tree/m1050.obj', before_vertices=5410, after_vertices=5410)
+ResamplingRecord(relative_path='Tree/m1086.obj', before_vertices=6247, after_vertices=6247)
+ResamplingRecord(relative_path='Tree/m1090.obj', before_vertices=5482, after_vertices=5482)
+ResamplingRecord(relative_path='Truck/D00003.obj', before_vertices=6683, after_vertices=6683)
+ResamplingRecord(relative_path='Truck/D00010.obj', before_vertices=6939, after_vertices=6939)
+ResamplingRecord(relative_path='Truck/D00029.obj', before_vertices=5209, after_vertices=5209)
+ResamplingRecord(relative_path='Truck/D00112.obj', before_vertices=7853, after_vertices=7853)
+ResamplingRecord(relative_path='Truck/D00158.obj', before_vertices=8315, after_vertices=8315)
+ResamplingRecord(relative_path='Truck/D00287.obj', before_vertices=5290, after_vertices=5290)
+ResamplingRecord(relative_path='Truck/D00303.obj', before_vertices=8955, after_vertices=8955)
+ResamplingRecord(relative_path='Truck/D00518.obj', before_vertices=5427, after_vertices=5427)
+ResamplingRecord(relative_path='Truck/D00804.obj', before_vertices=6576, after_vertices=6576)
+ResamplingRecord(relative_path='Truck/D00926.obj', before_vertices=5602, after_vertices=5602)
+ResamplingRecord(relative_path='Truck/m1572.obj', before_vertices=9614, after_vertices=9614)
+ResamplingRecord(relative_path='TruckNonContainer/D00055.obj', before_vertices=7636, after_vertices=7636)
+ResamplingRecord(relative_path='TruckNonContainer/D00266.obj', before_vertices=6898, after_vertices=6898)
+ResamplingRecord(relative_path='TruckNonContainer/D00267.obj', before_vertices=6035, after_vertices=6035)
+ResamplingRecord(relative_path='TruckNonContainer/D00275.obj', before_vertices=5510, after_vertices=5510)
+ResamplingRecord(relative_path='TruckNonContainer/D00283.obj', before_vertices=6979, after_vertices=6979)
+ResamplingRecord(relative_path='TruckNonContainer/D00553.obj', before_vertices=7248, after_vertices=7248)
+ResamplingRecord(relative_path='TruckNonContainer/D00608.obj', before_vertices=7112, after_vertices=7112)
+ResamplingRecord(relative_path='TruckNonContainer/D00619.obj', before_vertices=5231, after_vertices=5231)
+ResamplingRecord(relative_path='TruckNonContainer/D00699.obj', before_vertices=5071, after_vertices=5071)
+ResamplingRecord(relative_path='TruckNonContainer/D00783.obj', before_vertices=5246, after_vertices=5246)
+ResamplingRecord(relative_path='TruckNonContainer/D00943.obj', before_vertices=8852, after_vertices=8852)
+ResamplingRecord(relative_path='Violin/D00358.obj', before_vertices=7592, after_vertices=7592)
+ResamplingRecord(relative_path='Violin/D00598.obj', before_vertices=6831, after_vertices=6831)
+ResamplingRecord(relative_path='Violin/D00898.obj', before_vertices=7672, after_vertices=7672)
+ResamplingRecord(relative_path='Violin/D00993.obj', before_vertices=7350, after_vertices=7350)
+ResamplingRecord(relative_path='WheelChair/D00070.obj', before_vertices=8476, after_vertices=8476)
+ResamplingRecord(relative_path='WheelChair/D00290.obj', before_vertices=5009, after_vertices=5009)
+ResamplingRecord(relative_path='WheelChair/D00365.obj', before_vertices=7244, after_vertices=7244)
+ResamplingRecord(relative_path='WheelChair/D00687.obj', before_vertices=8188, after_vertices=8188)
+ResamplingRecord(relative_path='WheelChair/D00821.obj', before_vertices=8188, after_vertices=8188)
+ResamplingRecord(relative_path='WheelChair/D00846.obj', before_vertices=8834, after_vertices=8834)
+
+FAILED MODELS DECIMATION (0 total)
+================
+
+FAILED MODELS SUBDIVSION (0 total)
+================

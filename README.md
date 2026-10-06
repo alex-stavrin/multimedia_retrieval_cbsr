@@ -1,19 +1,19 @@
 # Multimedia Retrieval CBSR
 
-## 1. About
+## About
 
 Assignement for Multimedia Retrieval  
 Website : https://webspace.science.uu.nl/~telea001/MR/Assignment  
 
-## 2. Report
+## Report
 
 Report : https://www.overleaf.com/project/6aa7ba137686e3f065d4cd14  
 
-## 3. Programming Language
+## Programming Language
 
 Python 3.14.7
 
-## 4. How to Setup
+## How to Setup
 
 ### Windows
 - Install python
@@ -30,14 +30,18 @@ You can download the 3d models locally by doing :
 ```git pull```  
 ```git submodule update --init --recursive```
 
-## 5. How to Develop
+## How to Develop
 
 ### Adding Libraries
 If you add a new library do  
 ```py -m pip freeze > requirements.txt```  
 So others can install the library too
 
-## 6. Libraries
+## Libraries
 
 - vedo
 - PySide6
+
+## Source Code
+
+Source code is inside the ```./src``` folder. The source is divided into steps from the assignment. Each folder has inside a readme that explains the script used for that step and how to run it.
