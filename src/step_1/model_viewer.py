@@ -8,6 +8,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QCheckBox,
     QComboBox,
+    QGroupBox,
+    QSlider,
 )
 from PySide6.QtGui import QIcon
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
@@ -17,6 +19,7 @@ import sys
 import os
 from pathlib import Path
 import numpy
+from PySide6.QtCore import Qt
 
 
 class ModelViewer(QMainWindow):
@@ -32,14 +35,6 @@ class ModelViewer(QMainWindow):
 
         super().__init__()
 
-        # Give the viewer its own Windows taskbar identity.
-        if sys.platform == "win32":
-            ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
-                ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
-            )
-        else:
-            os.environ["QT_QPA_PLATFORM"] = "xcb"
-
         # Make the Application
         self.app = qt_app
 
@@ -49,6 +44,14 @@ class ModelViewer(QMainWindow):
 
         self.setWindowTitle(window_title)
         self.resize(*window_size)
+
+        # Give the viewer its own Windows taskbar identity.
+        if sys.platform == "win32":
+            ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+                ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+            )
+        else:
+            os.environ["QT_QPA_PLATFORM"] = "xcb"
 
         # pass meshes and points and store them
         self.meshes = meshes
@@ -112,18 +115,56 @@ class ModelViewer(QMainWindow):
         controls.setContentsMargins(16, 16, 16, 16)
         controls.setSpacing(12)
 
-        # checkbox to toggle edges
-        self.edges_checkbox = QCheckBox("Show Edges")
-        self.edges_checkbox.setChecked(True)
-        controls.addWidget(self.edges_checkbox)
+        # World group. Options for the world
+        world_group = QGroupBox("World")
+        world_layout = QVBoxLayout(world_group)
 
-        # checkbox to toggle vertices
-        self.vertices_checkbox = QCheckBox("Show Vertices")
-        self.vertices_checkbox.setChecked(True)
-        controls.addWidget(self.vertices_checkbox)
+        # checkbox for global origin
+        self.global_origin_checkbox = QCheckBox("Show Global Origin")
+        self.global_origin_checkbox.setChecked(True)
+        world_layout.addWidget(self.global_origin_checkbox)
+
+        self.world_axes_checkbox = QCheckBox("Show World Axes")
+        self.world_axes_checkbox.setChecked(True)
+        world_layout.addWidget(self.world_axes_checkbox)
+
+        controls.addWidget(world_group)
+
+        # Edges group. Options for edges visualization
+        edges_group = QGroupBox("Edges")
+        edges_layout = QVBoxLayout(edges_group)
+
+        # slider to change line-width of edges
+        EDGE_STARTING_VALUE = 3
+        self.edge_width_label = QLabel(f"Width = {EDGE_STARTING_VALUE}")
+        edges_layout.addWidget(self.edge_width_label)
+
+        self.edge_width_slider = QSlider(Qt.Orientation.Horizontal)
+        self.edge_width_slider.setRange(0, 15)
+        self.edge_width_slider.setValue(3)
+        edges_layout.addWidget(self.edge_width_slider)
+
+        controls.addWidget(edges_group)
+
+        # Vertices group. Options for vertices visualization
+        vertices_group = QGroupBox("Vertices")
+        vertices_layout = QVBoxLayout(vertices_group)
+
+        VERTEX_STARTING_VALUE = 10
+        self.vertex_radius_label = QLabel(f"Point size = {VERTEX_STARTING_VALUE}")
+        vertices_layout.addWidget(self.vertex_radius_label)
+
+        self.vertex_radius_slider = QSlider(Qt.Orientation.Horizontal)
+        self.vertex_radius_slider.setRange(0, 20)
+        self.vertex_radius_slider.setValue(VERTEX_STARTING_VALUE)
+        vertices_layout.addWidget(self.vertex_radius_slider)
+
+        controls.addWidget(vertices_group)
+
+        shading_group = QGroupBox("Shading")
+        shading_layout = QVBoxLayout(shading_group)
 
         # input dropdown for selecting shading
-        controls.addWidget(QLabel("Shading"))
         self.shading_dropdown = QComboBox()
         self.shading_dropdown.addItems(
             [
@@ -132,7 +173,9 @@ class ModelViewer(QMainWindow):
             ]
         )
         self.shading_dropdown.currentTextChanged.connect(self.on_shading_option_changed)
-        controls.addWidget(self.shading_dropdown)
+        shading_layout.addWidget(self.shading_dropdown)
+
+        controls.addWidget(shading_group)
 
         # Add empty space to keep all controls at the top
         controls.addStretch()
@@ -149,8 +192,31 @@ class ModelViewer(QMainWindow):
         self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
         self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
 
-        self.edges_checkbox.toggled.connect(self.set_edges_visible)
-        self.vertices_checkbox.toggled.connect(self.set_vertices_visible)
+        self.global_origin_checkbox.toggled.connect(self.set_global_origin_visible)
+        self.world_axes_checkbox.toggled.connect(self.set_world_axes_visible)
+        self.edge_width_slider.valueChanged.connect(self.on_edge_width_changed)
+        self.vertex_radius_slider.valueChanged.connect(self.on_vertex_radius_changed)
+
+    def on_vertex_radius_changed(self, radius: int) -> None:
+        self.vertex_radius_label.setText(f"Size = {radius}")
+        visible = radius > 0
+        for points in self.points:
+            points.actor.SetVisibility(visible)
+            if radius > 0:
+                points.properties.SetPointSize(radius)
+
+        self.viewer.render()
+
+    def on_edge_width_changed(self, line_width: int) -> None:
+        for mesh in self.meshes:
+            self.edge_width_label.setText(f"Width = {line_width}")
+            if line_width == 0:
+                mesh.properties.SetEdgeVisibility(False)
+            else:
+                mesh.properties.SetEdgeVisibility(True)
+                mesh.properties.SetLineWidth(line_width)
+
+        self.viewer.render()
 
     def on_scroll(self, interactor, event) -> None:
         factor = 1.15 if event == "MouseWheelForwardEvent" else 1 / 1.15
@@ -163,18 +229,13 @@ class ModelViewer(QMainWindow):
 
         self.viewer.render()
 
-    def set_edges_visible(self, visible: bool) -> None:
-
-        for mesh in self.meshes:
-            mesh.properties.SetEdgeVisibility(visible)
-
+    def set_global_origin_visible(self, visible: bool) -> None:
+        self.world_origin.SetVisibility(visible)
         self.viewer.render()
 
-    def set_vertices_visible(self, visible: bool) -> None:
-
-        for points in self.points:
-            points.actor.SetVisibility(visible)
-
+    def set_world_axes_visible(self, visible: bool) -> None:
+        for axis in self.world_axes:
+            axis.actor.SetVisibility(visible)
         self.viewer.render()
 
     def closeEvent(self, event) -> None:
@@ -203,7 +264,7 @@ class ModelViewer(QMainWindow):
             *self.world_axes,
             self.world_origin,
             mode=8,
-            interactive=False
+            interactive=False,
         )
 
         camera = self.viewer.camera
