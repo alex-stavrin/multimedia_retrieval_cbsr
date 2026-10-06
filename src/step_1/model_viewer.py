@@ -16,6 +16,7 @@ import ctypes
 import sys
 import os
 from pathlib import Path
+import numpy
 
 
 class ModelViewer(QMainWindow):
@@ -26,6 +27,7 @@ class ModelViewer(QMainWindow):
         window_size: tuple[int, int] = (1000, 1000),
         background_color: str = "#FFFFFF",
         meshes: list[Mesh] = None,
+        models_delta: numpy.array = numpy.zeros(3),
     ):
 
         super().__init__()
@@ -52,6 +54,7 @@ class ModelViewer(QMainWindow):
         self.meshes = meshes
         self.points = []
 
+        shift_amount: numpy.array = numpy.zeros(3)
         for mesh in self.meshes:
             # add shading and lighting to meshes
             mesh.compute_normals(points=True, cells=True)
@@ -62,6 +65,9 @@ class ModelViewer(QMainWindow):
             # make edges of mesh stand out
             mesh.linewidth(3)
             mesh.linecolor("#000000")
+
+            mesh.shift(*shift_amount)
+            shift_amount = numpy.add(shift_amount, models_delta)
 
             # make vertices of mesh stand out
             points: Points = Points(mesh.vertices, r=10, c="#000000")

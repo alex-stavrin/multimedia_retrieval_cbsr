@@ -3,22 +3,28 @@ from vedo import Mesh
 import sys
 from pathlib import Path
 from PySide6.QtWidgets import QApplication
+import numpy
 
 
 def main():
 
-    # Look if the mesh path we were given as command line arguement actually exists
-    mesh_path_name: str = sys.argv[1]
-    mesh_path: Path = Path(mesh_path_name).resolve()
-    if not mesh_path.is_file():
-        raise FileNotFoundError(f"Mesh file not found : {mesh_path}")
+    mesh_path_names: list[str] = sys.argv[1:]
 
-    meshes: list[Mesh] = [Mesh(mesh_path)]
+    if not mesh_path_names:
+        raise ValueError("Please provide at least one 3d shape")
+
+    meshes: list[Mesh] = []
+    for mesh_path_name in mesh_path_names:
+        mesh_path = Path(mesh_path_name).resolve()
+
+        if not mesh_path.is_file():
+            raise FileNotFoundError(f"File {mesh_path} not found")
+
+        meshes.append(Mesh(mesh_path))
 
     app = QApplication(sys.argv)
     model_viewer: ModelViewer = ModelViewer(
-        qt_app=app,
-        meshes=meshes,
+        qt_app=app, meshes=meshes, models_delta=numpy.array([0.5, 0, 0])
     )
 
     return model_viewer.exec()
