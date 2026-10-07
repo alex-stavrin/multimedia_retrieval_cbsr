@@ -197,8 +197,6 @@ def visualize_analyses(
     for analysis, shape_path in zip(analyses, shape_paths):
         bounds = analysis.bounding_box
 
-        # vedo.Box accepts a 6-tuple of bounds through `size`
-        print("Bounds for box:", bounds)
         bounding_box = (
             vedo.Box(
                 size=(
