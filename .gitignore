@@ -20,3 +20,5 @@ __pycache__/
 3d_models_normalized/
 3d_models_reduced/
 3d_models_reduced_normalized/
+
+resampled_models

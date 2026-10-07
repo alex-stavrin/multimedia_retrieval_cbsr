@@ -1,4 +1,4 @@
-from model_viewer import ModelViewer
+from src.step_1.model_viewer import ModelViewer
 from vedo import Mesh
 import sys
 from pathlib import Path
@@ -9,7 +9,7 @@ def main():
 
     # Look if the mesh path we were given as command line arguement actually exists
     mesh_path_name: str = sys.argv[1]
-    mesh_path: Path = Path(__file__).resolve().parent / mesh_path_name
+    mesh_path: Path = Path(mesh_path_name).resolve()
     if not mesh_path.is_file():
         raise FileNotFoundError(f"Mesh file not found : {mesh_path}")
 

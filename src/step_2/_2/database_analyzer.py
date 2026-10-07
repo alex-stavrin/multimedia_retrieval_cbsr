@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from matplotlib import rc
+from matplotlib.ticker import AutoMinorLocator
 
 # Set up global Matplotlib variables
 FONT = {"weight": "bold", "size": 20}
@@ -46,6 +47,9 @@ def _set_ticks_to_ax(ax: Axes, target_ticks, min_val, max_val):
         [f"{x:g}" for x in tick_positions],
         fontsize=16,
     )
+
+    ax.xaxis.set_minor_locator(AutoMinorLocator(5))
+    ax.tick_params(axis="x", which="minor", length=4)
 
     return ax
 
@@ -148,7 +152,7 @@ def find_outliers(
     column: str,
     interquartile_strictness: float = 1.5,
     percentile: float = 0.05,
-) -> pd.DataFrame:
+) -> Tuple[pd.DataFrame, float, float]:
     """
     Find outliers using both the IQR and percentile methods.
 
@@ -181,7 +185,11 @@ def find_outliers(
         subset="relative_file_path"
     )
 
-    return outliers
+    return (
+        outliers,
+        float(max(lower_iqr, lower_percentile)),
+        float(min(upper_iqr, upper_percentile)),
+    )
 
 
 def plot_histogram(
