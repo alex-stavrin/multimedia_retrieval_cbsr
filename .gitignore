@@ -1,11 +1,23 @@
-# Prevents database from being uploaded
-**/ShapeDatabase_INFOMR**
+# Ignore my (david) database download
+ShapeData
+**ShapeData**/**
 
-**.obj
+
+**.pdf
+
+# UV ignore
+pyproject.toml
+uv.lock
+
 3d_models**
-
-*venv
-**pycache**
-__pycache__
-
 test**
+
+.venv/
+__pycache__/
+*.py[cod]
+
+3d_models_normalized/
+3d_models_reduced/
+3d_models_reduced_normalized/
+
+resampled_models
