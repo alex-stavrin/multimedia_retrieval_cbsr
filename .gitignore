@@ -1,3 +1,11 @@
 # Prevents database from being uploaded
 **/ShapeDatabase_INFOMR**
 
+**.obj
+3d_models**
+
+*venv
+**pycache**
+__pycache__
+
+test**
