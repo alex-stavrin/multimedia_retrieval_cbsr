@@ -1,0 +1,1 @@
+Descriptor calculation complete.\nTotal meshes: 23\nSuccessful: 23\nErrors: 0\nVTK warnings/errors captured: 0\nOutput CSV: shape_descriptors.csv\nWarnings CSV: shape_descriptors_warnings.csv\n

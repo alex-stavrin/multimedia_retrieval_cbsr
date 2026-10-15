@@ -6,9 +6,16 @@ import pandas as pd
 
 import vedo
 
-from src.helper.mesh_types import FaceType
+from dataclasses import dataclass
 
 DATABASE: pd.DataFrame | None = None
+
+
+@dataclass
+class PCA:
+    center: np.ndarray
+    eigenvalues: np.ndarray
+    eigenvectors: np.ndarray
 
 
 def __prepare_and_check_file_path(shape: str) -> vedo.Mesh:
@@ -30,50 +37,7 @@ def __prepare_and_check_file_path(shape: str) -> vedo.Mesh:
     return shape
 
 
-def __get_data_from_database(
-    file_path: str, database_path: str
-) -> pd.DataFrame:
-    if file_path is None:
-        raise TypeError(f"File path is None: {file_path}")
-
-    if database_path is None:
-        raise TypeError(f"Database path is None: {database_path}")
-
-    if not file_path.endswith(".obj"):
-        raise ValueError(f"File must be of .obj type: {file_path}")
-
-    if not os.path.exists(file_path):
-        raise ValueError(f"File does not exist: {file_path}")
-
-    if not database_path.endswith(".csv"):
-        raise ValueError(f"Database file must be csv: {database_path}")
-
-    if not os.path.exists(database_path):
-        raise ValueError(f"Database file does not exist: {database_path}")
-
-    split_path = file_path.split("/")
-
-    if len(split_path) < 2:
-        raise ValueError(
-            "File path must contain shape class"
-            f" superdirectory: {file_path}"
-        )
-
-    # Retrieve shape class and name
-    relative_path_split = split_path[-2:]
-    relative_joined = "/".join(relative_path_split)
-
-    # Get analysis data
-    global DATABASE
-    if DATABASE is None:
-        DATABASE = pd.read_csv(database_path)
-
-    matching_rows = DATABASE[DATABASE["relative_file_path"] == relative_joined]
-
-    return matching_rows
-
-
-def _approx_volume(shape: vedo.Mesh) -> float:
+def __approx_volume(shape: vedo.Mesh) -> float:
     vertices = np.asarray(shape.vertices, dtype=np.float64)
     vertices = vertices - vertices.mean(axis=0)
     cells = np.asarray(shape.cells, dtype=np.int64)
@@ -86,43 +50,92 @@ def _approx_volume(shape: vedo.Mesh) -> float:
     return abs(np.einsum("ij,ij->i", v0, np.cross(v1, v2)).sum() / 6)
 
 
-def _oriented_bounding_box(shape: vedo.Mesh, visualise: bool = False):
+def __calculate_pca(shape: vedo.Mesh) -> PCA:
+    """
+    Computes principal component analysis for a 3D point cloud.
+
+    Args:
+        points: (N, 3) array of points.
+
+    Returns:
+        PCA object containing the center, eigenvalues, and eigenvectors.
+    """
+    points = np.asarray(shape.points)
+
+    if points.ndim != 2 or points.shape[1] != 3:
+        raise ValueError(
+            f"Expected points with shape (N, 3), got {points.shape}"
+        )
+
+    if len(points) < 2:
+        raise ValueError("PCA requires at least two points")
+
+    if not np.isfinite(points).all():
+        raise ValueError("Points must contain only finite values")
+
+    center = points.mean(axis=0)
+    centered = points - center
+
+    covariance = np.cov(centered, rowvar=False)
+    eigenvalues, eigenvectors = np.linalg.eigh(covariance)
+
+    # Sort eigenvalues and eigenvectors by descending variance.
+    order = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[order]
+    eigenvectors = eigenvectors[:, order]
+
+    # Ensure a right-handed coordinate system.
+    if np.linalg.det(eigenvectors) < 0:
+        eigenvectors[:, 2] *= -1
+
+    return PCA(
+        center=center,
+        eigenvalues=eigenvalues,
+        eigenvectors=eigenvectors,
+    )
+
+
+def __oriented_bounding_box(
+    shape: vedo.Mesh,
+    visualise: bool = False,
+    pca: PCA | None = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Computes an oriented bounding box (OBB) of a mesh using PCA.
 
-    The box axes are the principal axes of the vertex cloud, and the box is
-    the tightest box around the vertices along those axes. This is close to
-    the minimum-volume OBB but not guaranteed to be minimal (see Notes).
+    The box axes are the principal axes of the vertex cloud, and the
+    box tightly bounds the vertices along those axes.
 
     Args:
         shape: The mesh to bound.
-        visualise: If True, opens a vedo window showing the mesh and its
-            box. This blocks until the window is closed.
+        visualise: If True, displays the mesh and its bounding box.
+        pca: Optional precomputed PCA result. If omitted, PCA is computed
+            from the mesh vertices.
 
     Returns:
-        box_center: (3,) array, the center of the box in world space.
-        axes: (3, 3) array, the box axes as columns (right-handed,
-            orthonormal). Column i is the direction of side i.
-        extents: (3,) array, the side lengths along each axis.
-            The box volume is extents.prod().
+        A tuple containing:
+            box_center: (3,) array, the center of the box in world space.
+            axes: (3, 3) array, the box axes as columns.
+            extents: (3,) array, the side lengths along each axis.
     """
-    pts = np.asarray(shape.vertices, dtype=np.float64)
-    center = pts.mean(axis=0)
+    if pca is None:
+        pca = __calculate_pca(shape)
 
-    # Principal axes of the point cloud (columns of `axes`)
-    _, axes = np.linalg.eigh(np.cov((pts - center).T))
-    if np.linalg.det(axes) < 0:  # make it a proper rotation, not a mirror
-        axes[:, 2] *= -1
+    points = np.asarray(shape.points)
 
-    # Express the points in the box frame and take the axis-aligned extent
-    local = (pts - center) @ axes
-    lo, hi = local.min(axis=0), local.max(axis=0)
+    # Use the PCA instance consistently.
+    center = pca.center
+    axes = pca.eigenvectors
+
+    # Express the points in the PCA coordinate frame.
+    local = (points - center) @ axes
+    lo = local.min(axis=0)
+    hi = local.max(axis=0)
 
     extents = hi - lo
     box_center = center + axes @ ((lo + hi) / 2)
 
     if visualise:
-        # 8 corners in the box frame (index = 4*x + 2*y + z, 0=lo / 1=hi)
         corners_local = np.array(
             [
                 [x, y, z]
@@ -131,13 +144,15 @@ def _oriented_bounding_box(shape: vedo.Mesh, visualise: bool = False):
                 for z in (lo[2], hi[2])
             ]
         )
-        # Back to world space (inverse of `local = (pts - center) @ axes`)
+
+        # Transform the corners back into world coordinates.
         corners = center + corners_local @ axes.T
 
-        # An edge connects two corners whose indices differ in exactly one bit
+        # Connect corners differing in exactly one bit.
         edges = [
             (i, i | bit) for i in range(8) for bit in (1, 2, 4) if not i & bit
         ]
+
         starts = corners[[i for i, _ in edges]]
         ends = corners[[j for _, j in edges]]
 
@@ -149,9 +164,7 @@ def _oriented_bounding_box(shape: vedo.Mesh, visualise: bool = False):
 
 def calculate_surface_area(
     file_path: str,
-    database_path: str,
     shape: vedo.Mesh | None = None,
-    row_entry: pd.DataFrame | None = None,
 ) -> float:
     """
     Calculates the provided shapes's surface area.
@@ -168,21 +181,14 @@ def calculate_surface_area(
     if shape is None:
         shape = __prepare_and_check_file_path(file_path)
 
-    data_entry = row_entry
-    if data_entry is None:
-        data_entry = __get_data_from_database(file_path, database_path)
-
-    # Triangulate mesh before calculating the area
-    face_type = data_entry["face_type"]
-    if face_type is not FaceType.TRIANGLES:
-        shape = shape.triangulate(verts=True, lines=True)
-
     return shape.area()
 
 
 def calculate_compactness(
     file_path: str,
     shape: vedo.Mesh | None = None,
+    volume: float | None = None,
+    area: float | None = None,
 ) -> float:
 
     # Check if not None, it is correct class
@@ -196,19 +202,19 @@ def calculate_compactness(
     if shape_object is None:
         shape_object: vedo.Mesh = __prepare_and_check_file_path(file_path)
 
-    volume = _approx_volume(shape_object)
-    area = shape_object.area()
-
-    print(
-        f"area: {area}, volume: {volume}, volume vedo: {shape_object.volume()}"
-    )
+    if volume is None:
+        volume = __approx_volume(shape_object)
+    if area is None:
+        area = shape_object.area()
 
     return (36 * math.pi * volume**2) / area**3
 
 
 # MAYBE TRY SUBSAMPLING FOR APPROX VOLUME AND OOBB LATER
 def calculate_rectangularity(
-    file_path: str, shape: vedo.Mesh | None = None
+    file_path: str,
+    shape: vedo.Mesh | None = None,
+    shape_volume: float | None = None,
 ) -> float:
     """
     Rectangularity = mesh volume / volume of its oriented bounding box.
@@ -219,9 +225,10 @@ def calculate_rectangularity(
     if shape is None:
         shape = __prepare_and_check_file_path(file_path)
 
-    shape_volume = _approx_volume(shape)
+    if shape_volume is None:
+        shape_volume = __approx_volume(shape)
 
-    _, _, extents = _oriented_bounding_box(shape)
+    _, _, extents = __oriented_bounding_box(shape)
     box_volume = float(np.prod(extents))
 
     if box_volume <= 0:
@@ -230,6 +237,74 @@ def calculate_rectangularity(
     rectangularity = shape_volume / box_volume
 
     return rectangularity
+
+
+def calculate_diameter(
+    file_path: str,
+    shape: vedo.Mesh | None = None,
+    convex_hull: vedo.ConvexHull | None = None,
+) -> float:
+    """
+    Calculates the diameter of the given shape, which is the maximum euclidean
+    distance between two points.
+
+    Uses the convex hull for optimization.
+    """
+    if shape is None:
+        shape = __prepare_and_check_file_path(file_path)
+
+    if convex_hull is None:
+        convex_hull = vedo.ConvexHull(shape)
+    points = convex_hull.points
+
+    max_squared_distance = 0.0
+
+    for i in range(len(points) - 1):
+        differences = points[i + 1 :] - points[i]
+        squared_distances = np.einsum("ij,ij->i", differences, differences)
+
+        max_squared_distance = max(
+            max_squared_distance,
+            float(squared_distances.max()),
+        )
+
+    return math.sqrt(max_squared_distance)
+
+
+def calculate_convexity(
+    file_path: str,
+    shape: vedo.Mesh | None = None,
+    volume: float | None = None,
+    convex_hull: vedo.ConvexHull | None = None,
+) -> float:
+    if shape is None:
+        shape = vedo.Mesh(file_path)
+
+    if volume is None:
+        volume = __approx_volume(shape)
+
+    if convex_hull is None:
+        convex_hull = vedo.ConvexHull(shape)
+
+    convexity = volume / convex_hull.volume()
+
+    return float(convexity)
+
+
+def calculate_eccentricity(
+    file_path: str,
+    shape: vedo.Mesh | None = None,
+    pca: PCA | None = None,
+) -> float:
+    if shape is None:
+        shape = vedo.Mesh(file_path)
+
+    if pca is None:
+        pca = __calculate_pca(shape)
+
+    eccentricity = pca.eigenvalues[0] / pca.eigenvalues[2]
+
+    return float(eccentricity)
 
 
 def main():
@@ -263,18 +338,25 @@ def main():
                 f"Visualising only works for directories: {args.input}"
             )
 
-        _oriented_bounding_box(vedo.Mesh(args.input), visualize)
+        __oriented_bounding_box(vedo.Mesh(args.input), visualize)
     else:
         # CHECK IF CORRECT
+        shape = __prepare_and_check_file_path(args.input)
         area = calculate_surface_area(args.input, args.database_path)
-        compactness = calculate_compactness(args.input)
-        rectangularity = calculate_rectangularity(args.input)
+        compactness = calculate_compactness(args.input, shape)
+        rectangularity = calculate_rectangularity(args.input, shape)
+        diameter = calculate_diameter(args.input, shape)
+        convexity = calculate_convexity(args.input, shape)
+        eccentricity = calculate_eccentricity(args.input, shape)
 
         print(
             f"Was closed: {vedo.Mesh(args.input).is_closed()}\n"
             f"Area: {round(area, 3)}\n"
             f"Compactness: {round(compactness, 3)}\n"
             f"Rectangularity: {round(rectangularity, 3)}\n"
+            f"Diameter: {round(diameter, 3)}\n"
+            f"Convexity: {round(convexity, 3)}\n"
+            f"Eccentricity: {round(eccentricity, 3)}\n"
         )
 
 

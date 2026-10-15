@@ -127,7 +127,40 @@ def show_histogram_from_csv(
     )
 
     plot_combined_histogram(
-        df,
+        dfne horizontal boxplot per feature, with one box per class."""
+    class_names = sorted(df[CLASS_COLUMN].dropna().unique())
+
+    n_rows, n_cols = grid_shape(len(feature_names))
+    height = max(3.5, 0.3 * len(class_names)) * n_rows
+
+    fig, axes = plt.subplots(
+        n_rows,
+        n_cols,
+        figsize=(5 * n_cols, height),
+        squeeze=False,
+    )
+
+    for ax, feature in zip(axes.ravel(), feature_names):
+        groups = []
+
+        for name in class_names:
+            values = df.loc[df[CLASS_COLUMN] == name, feature]
+            groups.append(values[np.isfinite(values)].to_numpy())
+
+        if any(len(group) for group in groups):
+            ax.boxplot(
+                groups,
+                "vertical",
+                tick_labels=class_names,
+            )
+
+        ax.set_title(feature)
+
+    for ax in axes.ravel()[len(feature_names) :]:
+        ax.axis("off")
+
+    fig.tight_layout()
+    return fig,
         outliers,
         column,
         n_bins,

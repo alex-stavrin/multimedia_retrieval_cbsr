@@ -1,269 +1,286 @@
-import argparse
-import csv
 import os
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
+import csv
+import argparse
 import vedo
+from tqdm import tqdm
+import vtk
 
-from src.helper.database_functions import (
-    map_by_relative_path,
+from src.step_3._2.descriptor_extracting import (
+    calculate_surface_area,
+    calculate_compactness,
+    calculate_rectangularity,
+    calculate_diameter,
+    calculate_convexity,
+    calculate_eccentricity,
+    __prepare_and_check_file_path,
+    __approx_volume,
+    __calculate_pca,
 )
 
+DESCRIPTOR_FIELDS = [
+    "file_path",
+    "was_closed",
+    "surface_area",
+    "compactness",
+    "rectangularity",
+    "diameter",
+    "convexity",
+    "eccentricity",
+    "reason",
+]
 
-def compare_hole_fill_stats(
-    original_database_path: str,
-    filled_database_path: str,
+
+#   FIX LATER                
+class VTKWarningCapture(vtk.vtkOutputWindow):
+    """Capture VTK warning messages for the current mesh."""
+
+    def __init__(self):
+        super().__init__()
+        self.warnings = []
+
+    def DisplayWarningText(self, text):
+        message = text.strip()
+        if message:
+            self.warnings.append(message)
+
+    def DisplayErrorText(self, text):
+        message = text.strip()
+        if message:
+            self.warnings.append(f"VTK ERROR: {message}")
+
+    def DisplayGenericWarningText(self, text):
+        message = text.strip()
+        if message:
+            self.warnings.append(message)
+
+
+def retrieve_all_shape_files(input_dir_path: str) -> list[str]:
+    """Find every OBJ file recursively under the input directory."""
+    shape_files = []
+
+    for root, _, files in os.walk(input_dir_path):
+        for filename in files:
+            if filename.lower().endswith(".obj"):
+                shape_files.append(os.path.join(root, filename))
+
+    return sorted(shape_files)
+
+
+def calculate_file_descriptors(
+    file_path: str,
+) -> dict:
+    """Calculate all descriptors for one mesh."""
+
+    shape = __prepare_and_check_file_path(file_path)
+
+    # Calculate shared quantities once.
+    volume = __approx_volume(shape)
+    area = calculate_surface_area(
+        file_path,
+        shape=shape,
+    )
+    pca = __calculate_pca(shape)
+    convex_hull = vedo.ConvexHull(shape)
+
+    # Reuse the precomputed values when possible.
+    compactness = calculate_compactness(
+        file_path,
+        shape=shape,
+        volume=volume,
+        area=area,
+    )
+
+    rectangularity = calculate_rectangularity(
+        file_path,
+        shape=shape,
+        shape_volume=volume,
+    )
+
+    diameter = calculate_diameter(
+        file_path,
+        shape=shape,
+        convex_hull=convex_hull,
+    )
+
+    convexity = calculate_convexity(
+        file_path,
+        shape=shape,
+        volume=volume,
+        convex_hull=convex_hull,
+    )
+
+    eccentricity = calculate_eccentricity(
+        file_path,
+        shape=shape,
+        pca=pca,
+    )
+
+    return {
+        "was_closed": bool(shape.is_closed()),
+        "surface_area": float(area),
+        "compactness": float(compactness),
+        "rectangularity": float(rectangularity),
+        "diameter": float(diameter),
+        "convexity": float(convexity),
+        "eccentricity": float(eccentricity),
+        "reason": "",
+    }
+
+
+def calculate_database(
+    input_dir_path: str,
+    database_path: str,
     output_path: str,
-):
-    if not isinstance(original_database_path, str):
-        raise TypeError(
-            f"Database path must be string: {original_database_path}"
-        )
-
-    if not isinstance(filled_database_path, str):
-        raise TypeError(
-            f"Database path must be string: {filled_database_path}"
-        )
-
-    original_files = map_by_relative_path(original_database_path)
-    filled_files = map_by_relative_path(filled_database_path)
-
-    # Report files that exist in only one database
-    only_original = sorted(original_files.keys() - filled_files.keys())
-    only_filled = sorted(filled_files.keys() - original_files.keys())
-
-    if only_original or only_filled:
-        raise ValueError(
-            "The databases do not contain the same files.\n"
-            f"Only in original ({len(only_original)}): {only_original[:10]}\n"
-            f"Only in filled ({len(only_filled)}): {only_filled[:10]}"
-        )
-
-    with open(output_path, "w", newline="") as f:
-        field_names = [
-            "file_path",
-            "original_n_points",
-            "filled_n_points",
-            "original_n_faces",
-            "filled_n_faces",
-        ]
-
-        writer = csv.DictWriter(f, fieldnames=field_names)
-        writer.writeheader()
-
-        # Sorted so the CSV output is deterministic
-        for relative_path in sorted(original_files):
-            original_shape = vedo.Mesh(original_files[relative_path])
-            filled_shape = vedo.Mesh(filled_files[relative_path])
-
-            writer.writerow(
-                {
-                    "file_path": relative_path,
-                    "original_n_points": len(original_shape.points),
-                    "filled_n_points": len(filled_shape.points),
-                    "original_n_faces": len(original_shape.cells),
-                    "filled_n_faces": len(filled_shape.cells),
-                }
-            )
-
-
-def plot_differences(
-    csv_path: str,
-    figure_path: str | None = None,
-    top_n_classes: int = 15,
 ) -> None:
     """
-    Visualises the CSV written by compare_hole_fill_stats.
-    Shows what changed, how much it changed, and where (per class).
+    Calculate all descriptors for every OBJ file in a directory.
+
+    The input directory structure is preserved in the CSV through the
+    relative file_path column. The input meshes are not modified.
     """
-    df = pd.read_csv(csv_path)
 
-    df["delta_points"] = df["filled_n_points"] - df["original_n_points"]
-    df["delta_faces"] = df["filled_n_faces"] - df["original_n_faces"]
-    df["rel_faces_pct"] = (
-        100 * df["delta_faces"] / df["original_n_faces"].replace(0, np.nan)
-    )
-    df["changed"] = (df["delta_points"] != 0) | (df["delta_faces"] != 0)
+    if not os.path.isdir(input_dir_path):
+        raise ValueError(f"Input directory does not exist: {input_dir_path}")
 
-    # Class = first directory of the relative path (e.g. "Chair/m123.obj")
-    def get_class(path: str) -> str:
-        parts = os.path.normpath(path).split(os.sep)
-        return parts[0] if len(parts) > 1 else "(root)"
+    if not os.path.isfile(database_path):
+        raise ValueError(f"Database file does not exist: {database_path}")
 
-    df["shape_class"] = df["file_path"].map(get_class)
+    if not database_path.lower().endswith(".csv"):
+        raise ValueError("Database file must be a CSV file")
 
-    changed = df[df["changed"]]
-    unchanged = df[~df["changed"]]
+    shape_files = retrieve_all_shape_files(input_dir_path)
 
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
-    fig.suptitle("Effect of hole filling / standardisation", fontsize=15)
+    if not shape_files:
+        raise ValueError(f"No OBJ files found in {input_dir_path}")
 
-    # 1. Original vs. filled face count (log-log). Off the diagonal = changed.
-    ax = axes[0, 0]
-    ax.scatter(
-        unchanged["original_n_faces"],
-        unchanged["filled_n_faces"],
-        s=8,
-        c="lightgray",
-        label=f"unchanged ({len(unchanged)})",
-    )
-    ax.scatter(
-        changed["original_n_faces"],
-        changed["filled_n_faces"],
-        s=10,
-        c="tab:red",
-        alpha=0.6,
-        label=f"changed ({len(changed)})",
-    )
-    lims = [
-        max(1, df[["original_n_faces", "filled_n_faces"]].min().min()),
-        df[["original_n_faces", "filled_n_faces"]].max().max(),
-    ]
-    ax.plot(lims, lims, "k--", lw=1, label="y = x")
-    ax.set_xscale("log")
-    ax.set_yscale("log")
-    ax.set_xlabel("Original faces")
-    ax.set_ylabel("Filled faces")
-    ax.set_title("Face count before vs. after")
-    ax.legend()
+    root_abs = os.path.abspath(input_dir_path)
+    output_dir = os.path.dirname(os.path.abspath(output_path))
+    os.makedirs(output_dir, exist_ok=True)
 
-    # 2. Distribution of relative face change (changed meshes only)
-    ax = axes[0, 1]
-    rel = changed["rel_faces_pct"].dropna()
-    if len(rel) > 0:
-        lo, hi = np.percentile(rel, [1, 99])
-        ax.hist(rel.clip(lo, hi), bins=50, color="tab:blue")
-        ax.set_yscale("log")
-        ax.axvline(0, color="k", lw=1)
-    ax.set_xlabel("Face count change (%), clipped to 1st-99th percentile")
-    ax.set_ylabel("Number of meshes (log)")
-    ax.set_title("Relative face change (changed meshes)")
+    warnings_path = os.path.splitext(output_path)[0] + "_warnings.csv"
 
-    # 3. ECDF of absolute relative change, all meshes
-    ax = axes[0, 2]
-    abs_rel = np.sort(df["rel_faces_pct"].abs().dropna().to_numpy())
-    if len(abs_rel) > 0:
-        ax.plot(abs_rel, np.arange(1, len(abs_rel) + 1) / len(abs_rel))
-        ax.set_xscale("symlog", linthresh=0.1)
-    ax.set_xlabel("|Face count change| (%)")
-    ax.set_ylabel("Fraction of meshes")
-    ax.set_title("Cumulative distribution of change")
-    ax.grid(alpha=0.3)
+    n_success = 0
+    n_errors = 0
+    n_warnings = 0
 
-    # 4. Delta points vs. delta faces (both can be negative due to clean())
-    ax = axes[1, 0]
-    ax.scatter(
-        df["delta_points"],
-        df["delta_faces"],
-        s=10,
-        c=df["changed"].map({True: "tab:red", False: "lightgray"}),
-        alpha=0.6,
-    )
-    ax.set_xscale("symlog")
-    ax.set_yscale("symlog")
-    ax.axhline(0, color="k", lw=0.5)
-    ax.axvline(0, color="k", lw=0.5)
-    ax.set_xlabel("Change in points")
-    ax.set_ylabel("Change in faces")
-    ax.set_title("Points vs. faces change")
+    warning_capture = VTKWarningCapture()
+    previous_output_window = vtk.vtkOutputWindow.GetInstance()
+    #           FIX LATER               
+    vtk.vtkOutputWindow.SetInstance(warning_capture)
 
-    # 5. Per-class share of changed meshes
-    ax = axes[1, 1]
-    per_class = (
-        df.groupby("shape_class")["changed"]
-        .agg(["sum", "count"])
-        .assign(pct=lambda d: 100 * d["sum"] / d["count"])
-        .sort_values("sum", ascending=False)
-        .head(top_n_classes)
-        .iloc[::-1]
-    )
-    ax.barh(per_class.index, per_class["pct"], color="tab:orange")
-    for y, (n_changed, n_total) in enumerate(
-        zip(per_class["sum"], per_class["count"])
-    ):
-        ax.text(1, y, f"{n_changed}/{n_total}", va="center", fontsize=8)
-    ax.set_xlim(0, 100)
-    ax.set_xlabel("% of meshes changed")
-    ax.set_title(f"Top {len(per_class)} classes by number of changed meshes")
+    try:
+        with (
+            open(output_path, "w", newline="", encoding="utf-8") as f,
+            open(warnings_path, "w", newline="", encoding="utf-8") as wf,
+        ):
+            writer = csv.DictWriter(
+                f,
+                fieldnames=DESCRIPTOR_FIELDS,
+            )
+            writer.writeheader()
 
-    # 6. Text summary
-    ax = axes[1, 2]
-    ax.axis("off")
+            warning_writer = csv.DictWriter(
+                wf,
+                fieldnames=["file_path", "warning"],
+            )
+            warning_writer.writeheader()
+
+            for shape_file in tqdm(
+                shape_files,
+                desc="Calculating descriptors",
+            ):
+                relative_path = os.path.relpath(shape_file, root_abs)
+                row = {"file_path": relative_path}
+
+                # Clear warnings from the previous mesh.
+                warning_capture.warnings.clear()
+
+                try:
+                    descriptors = calculate_file_descriptors(
+                        shape_file,
+                    )
+                    row.update(descriptors)
+                    n_success += 1
+
+                except Exception as e:
+                    row.update({
+                        "was_closed": "",
+                        "surface_area": "",
+                        "compactness": "",
+                        "rectangularity": "",
+                        "diameter": "",
+                        "convexity": "",
+                        "eccentricity": "",
+                        "reason": f"{type(e).__name__}: {e}",
+                    })
+                    n_errors += 1
+
+                finally:
+                    # Associate each captured warning with this mesh.
+                    for warning in warning_capture.warnings:
+                        warning_writer.writerow({
+                            "file_path": relative_path,
+                            "warning": warning,
+                        })
+                        n_warnings += 1
+
+                writer.writerow(row)
+
+    finally:
+        # Restore the original VTK output window.
+        vtk.vtkOutputWindow.SetInstance(previous_output_window)
+
     summary = (
-        f"Total meshes:        {len(df)}\n"
-        f"Changed:             {len(changed)} "
-        f"({100 * len(changed) / max(len(df), 1):.1f}%)\n"
-        f"Faces added (total): {int(df['delta_faces'].clip(lower=0).sum())}\n"
-        f"Faces removed:       {int((-df['delta_faces']).clip(lower=0).sum())}\n"
-        f"Points added:        {int(df['delta_points'].clip(lower=0).sum())}\n"
-        f"Points removed:      {int((-df['delta_points']).clip(lower=0).sum())}\n"
-        f"Median |rel. face change| (changed): "
-        f"{changed['rel_faces_pct'].abs().median():.2f}%\n"
-        f"Max rel. face change: {df['rel_faces_pct'].abs().max():.1f}%"
+        f"Descriptor calculation complete.\\n"
+        f"Total meshes: {len(shape_files)}\\n"
+        f"Successful: {n_success}\\n"
+        f"Errors: {n_errors}\\n"
+        f"VTK warnings/errors captured: {n_warnings}\\n"
+        f"Output CSV: {output_path}\\n"
+        f"Warnings CSV: {warnings_path}\\n"
     )
-    ax.text(0, 1, summary, va="top", family="monospace", fontsize=11)
 
-    fig.tight_layout()
+    summary_path = os.path.splitext(output_path)[0] + "_conclusion.txt"
 
-    if figure_path is not None:
-        fig.savefig(figure_path, dpi=150)
-        print(f"Figure saved to {figure_path}")
-    else:
-        plt.show()
+    with open(summary_path, "w", encoding="utf-8") as f:
+        f.write(summary)
 
-    # Largest changes, useful for manual inspection
-    print("\nTop 10 largest relative face changes:")
-    print(
-        df.reindex(
-            df["rel_faces_pct"].abs().sort_values(ascending=False).index
-        )
-        .head(10)[
-            [
-                "file_path",
-                "original_n_faces",
-                "filled_n_faces",
-                "rel_faces_pct",
-            ]
-        ]
-        .to_string(index=False)
-    )
+    print(summary)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Compare mesh statistics before and after hole filling."
+        description="Calculate 3D shape descriptors for an OBJ database."
     )
-    parser.add_argument("-d", "--original_database", type=str)
-    parser.add_argument("-p", "--processed_database", type=str)
+
+    parser.add_argument(
+        "-i",
+        "--input",
+        required=True,
+        help="Root directory containing OBJ meshes.",
+    )
+
+    parser.add_argument(
+        "-d",
+        "--database_path",
+        required=True,
+        help="CSV database containing relative_file_path and face_type.",
+    )
+
     parser.add_argument(
         "-o",
         "--output",
-        type=str,
-        help="CSV path: written when comparing, read when using --plot.",
+        default="shape_descriptors.csv",
+        help="Output CSV path (default: shape_descriptors.csv).",
     )
-    parser.add_argument(
-        "--plot",
-        action="store_true",
-        help="Plot an existing CSV (given by --output) "
-        "instead of calculating.",
-    )
-    parser.add_argument(
-        "--figure",
-        type=str,
-        default=None,
-        help="Optional path to save the figure instead of showing it.",
-    )
+
     args = parser.parse_args()
 
-    if args.plot:
-        plot_differences(args.output, args.figure)
-    else:
-        compare_hole_fill_stats(
-            original_database_path=args.original_database,
-            filled_database_path=args.processed_database,
-            output_path=args.output,
-        )
+    calculate_database(
+        input_dir_path=args.input,
+        database_path=args.database_path,
+        output_path=args.output,
+    )
 
 
 if __name__ == "__main__":
