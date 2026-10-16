@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 import vedo
 
-from mesh_types import Box
+from src.step_2.mesh_types import Box
 
 
 @dataclass
@@ -30,7 +30,9 @@ def normalize_mesh(mesh: vedo.Mesh) -> NormalizationReport:
     extents = (bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
     max_extent = max(extents)
     if max_extent <= 0:
-        raise ValueError("Mesh has zero extent on every axis, cannot scale to a unit cube.")
+        raise ValueError(
+            "Mesh has zero extent on every axis, cannot scale to a unit cube."
+        )
 
     scale_factor = 1.0 / max_extent
     # origin=False scales about world (0,0,0), i.e. the barycenter we just
@@ -105,8 +107,12 @@ def summarize_reports(reports: list[NormalizationReport]) -> None:
     ]
 
     print(f"Normalized {len(reports)} shapes")
-    print(f"Barycenter distance from origin: mean={np.mean(barycenter_distances):.2e}, max={np.max(barycenter_distances):.2e}")
-    print(f"Largest bounding-box dimension:  mean={np.mean(max_extents):.6f}, max={np.max(max_extents):.6f}")
+    print(
+        f"Barycenter distance from origin: mean={np.mean(barycenter_distances):.2e}, max={np.max(barycenter_distances):.2e}"
+    )
+    print(
+        f"Largest bounding-box dimension:  mean={np.mean(max_extents):.6f}, max={np.max(max_extents):.6f}"
+    )
 
 
 def main():
@@ -115,8 +121,20 @@ def main():
     parser = argparse.ArgumentParser(
         description="Normalize 3D shapes: center each barycenter at the origin and scale to fit a unit cube."
     )
-    parser.add_argument("-i", "--input", type=str, required=True, help="Path to an OBJ file, or a database root directory")
-    parser.add_argument("-o", "--output", type=str, required=True, help="Path to write the normalized OBJ file, or output root directory")
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        required=True,
+        help="Path to an OBJ file, or a database root directory",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        required=True,
+        help="Path to write the normalized OBJ file, or output root directory",
+    )
     args = parser.parse_args()
 
     if os.path.isdir(args.input):
