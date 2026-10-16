@@ -16,10 +16,14 @@ fonttools==4.65.0
     # via
     #   matplotlib
     #   multimedia-retrieval-cbsr
+jinja2==3.1.6
+    # via multimedia-retrieval-cbsr
 kiwisolver==1.5.1
     # via
     #   matplotlib
     #   multimedia-retrieval-cbsr
+markupsafe==3.0.4
+    # via jinja2
 matplotlib==3.11.1
     # via
     #   multimedia-retrieval-cbsr
@@ -34,6 +38,7 @@ numpy==2.5.3
     #   multimedia-retrieval-cbsr
     #   pandas
     #   pymeshfix
+    #   scipy
     #   trimesh
     #   vedo
 packaging==26.3
@@ -72,6 +77,8 @@ python-dateutil==2.9.0.post0
     #   matplotlib
     #   multimedia-retrieval-cbsr
     #   pandas
+scipy==1.18.1
+    # via multimedia-retrieval-cbsr
 shiboken6==6.11.2
     # via
     #   multimedia-retrieval-cbsr
