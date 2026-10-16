@@ -6,14 +6,27 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from matplotlib import rc
-from matplotlib.ticker import AutoMinorLocator
+from pathlib import Path
 
 # Set up global Matplotlib variables
-FONT = {"weight": "bold", "size": 20}
+FONT = {"size": 20}
 FIGURE_SIZE = (25, 7)
 RWIDTH = 0.8
 rc("font", **FONT)
 rc("xtick", labelsize=7)
+
+
+def _save_figure(fig: Figure, output: str, column: str) -> None:
+    """Save a figure to `output`, or to a default name if none is given.
+
+    The file format is inferred from the extension (.png, .pdf, ...).
+    Falls back to PDF if there is no extension.
+    """
+    path = Path(output) if output else Path(f"histogram_plot_{column}.pdf")
+    if path.suffix == "":
+        path = path.with_suffix(".pdf")
+
+    fig.savefig(path, bbox_inches="tight")
 
 
 def _set_ticks_to_ax(ax: Axes, target_ticks, min_val, max_val):
@@ -48,9 +61,6 @@ def _set_ticks_to_ax(ax: Axes, target_ticks, min_val, max_val):
         fontsize=16,
     )
 
-    ax.xaxis.set_minor_locator(AutoMinorLocator(5))
-    ax.tick_params(axis="x", which="minor", length=4)
-
     return ax
 
 
@@ -59,8 +69,12 @@ def show_histogram_from_csv(
     n_bins: int,
     column: str = "",
     save=False,
-) -> None:
-    """Load a CSV file and display its distribution and detected outliers."""
+    output: str = "",
+) -> pd.DataFrame | None:
+    """Load a CSV file and display its distribution and detected outliers.
+
+    Returns the outliers DataFrame for numeric columns, otherwise None.
+    """
     if not csv_path.endswith(".csv"):
         raise ValueError("Input file must end on .csv")
 
@@ -92,15 +106,11 @@ def show_histogram_from_csv(
     # Quit early, do not calculate outliers
     if not numeric:
         if save:
-            fig.savefig(
-                fname=f"histogram_plot_{column}.pdf",
-                format="pdf",
-                bbox_inches="tight",
-            )
+            _save_figure(fig, output, column)
         else:
             plt.show()
 
-        return
+        return None
 
     iqr_strictness = 1.5
     percentile = 0.05
@@ -127,40 +137,7 @@ def show_histogram_from_csv(
     )
 
     plot_combined_histogram(
-        dfne horizontal boxplot per feature, with one box per class."""
-    class_names = sorted(df[CLASS_COLUMN].dropna().unique())
-
-    n_rows, n_cols = grid_shape(len(feature_names))
-    height = max(3.5, 0.3 * len(class_names)) * n_rows
-
-    fig, axes = plt.subplots(
-        n_rows,
-        n_cols,
-        figsize=(5 * n_cols, height),
-        squeeze=False,
-    )
-
-    for ax, feature in zip(axes.ravel(), feature_names):
-        groups = []
-
-        for name in class_names:
-            values = df.loc[df[CLASS_COLUMN] == name, feature]
-            groups.append(values[np.isfinite(values)].to_numpy())
-
-        if any(len(group) for group in groups):
-            ax.boxplot(
-                groups,
-                "vertical",
-                tick_labels=class_names,
-            )
-
-        ax.set_title(feature)
-
-    for ax in axes.ravel()[len(feature_names) :]:
-        ax.axis("off")
-
-    fig.tight_layout()
-    return fig,
+        df,
         outliers,
         column,
         n_bins,
@@ -170,14 +147,11 @@ def show_histogram_from_csv(
     )
 
     if save:
-        fig.savefig(
-            fname=f"histogram_plot_{column}.pdf",
-            format="pdf",
-            bbox_inches="tight",
-        )
-
-    if not save:
+        _save_figure(fig, output, column)
+    else:
         plt.show()
+
+    return outliers
 
 
 def find_outliers(
@@ -185,7 +159,7 @@ def find_outliers(
     column: str,
     interquartile_strictness: float = 1.5,
     percentile: float = 0.05,
-) -> Tuple[pd.DataFrame, float, float]:
+) -> pd.DataFrame:
     """
     Find outliers using both the IQR and percentile methods.
 
@@ -218,11 +192,25 @@ def find_outliers(
         subset="relative_file_path"
     )
 
-    return (
-        outliers,
-        float(max(lower_iqr, lower_percentile)),
-        float(min(upper_iqr, upper_percentile)),
-    )
+    return outliers
+
+
+def export_sorted_csv(df: pd.DataFrame, column: str, output: str) -> None:
+    """Write a DataFrame to a CSV file sorted by the specified column."""
+    if not output.endswith(".csv"):
+        raise ValueError("Export file must end in .csv")
+
+    if column not in df.columns:
+        raise ValueError(f"Column '{column}' does not exist in the DataFrame.")
+
+    # Make sorted property first
+    columns_order = [column] + [col for col in df.columns if col != column]
+    df = df.loc[:, columns_order]
+
+    # Sort on values1
+    df = df.sort_values(by=column, ascending=False)
+
+    df.to_csv(output, index=False)
 
 
 def plot_histogram(
@@ -449,9 +437,36 @@ def main():
         action="store_true",
         help="If given, save image to file",
     )
+    parser.add_argument(
+        "--export",
+        action="store_true",
+        help="If active, export found outliers to CSV, output argument "
+        "needed too",
+    )
+    parser.add_argument(
+        "-o", "--output", help="Output for either saved png or exported CSV"
+    )
+
     args = parser.parse_args()
 
-    show_histogram_from_csv(args.input, args.bins, args.property, args.save)
+    if args.export and not args.output:
+        parser.error("--export requires --output to be set")
+
+    image_output = "" if args.export else args.output
+
+    outliers = show_histogram_from_csv(
+        args.input,
+        args.bins,
+        args.property,
+        args.save,
+        image_output,
+    )
+
+    if args.export:
+        if outliers is None:
+            parser.error("Cannot export outliers for a non-numeric column")
+        print(f"Exporting outliers to {args.output}")
+        export_sorted_csv(outliers, args.property, args.output)
 
 
 if __name__ == "__main__":

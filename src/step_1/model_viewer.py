@@ -130,6 +130,35 @@ class ModelViewer(QMainWindow):
 
         controls.addWidget(world_group)
 
+        # Camera Group. Options for camera
+        camera_group = QGroupBox("Camera")
+        camera_layout = QVBoxLayout(camera_group)
+
+        # input selector for camera mode
+        self.camera_type_dropdown = QComboBox()
+        self.camera_type_dropdown.addItems(
+            [
+                "TrackballCamera",
+                "TrackballActor",
+                "JoystickCamera",
+                "JoystickActor",
+                "Flight",
+                "RubberBand2D",
+                "RubberBand3D",
+                "RubberBandZoom",
+                "Terrain",
+                "Unicam",
+                "Image",
+            ]
+        )
+        self.camera_type_dropdown.setCurrentText("Terrain")
+        self.camera_type_dropdown.currentTextChanged.connect(
+            self.on_camera_type_changed
+        )
+        camera_layout.addWidget(self.camera_type_dropdown)
+
+        controls.addWidget(camera_group)
+
         # Edges group. Options for edges visualization
         edges_group = QGroupBox("Edges")
         edges_layout = QVBoxLayout(edges_group)
@@ -254,6 +283,12 @@ class ModelViewer(QMainWindow):
                 mesh.phong()
         self.viewer.render()
 
+    def on_camera_type_changed(self, camera_type_selection_text: str) -> None:
+        self.viewer.user_mode(camera_type_selection_text)
+        style = self.viewer.interactor.GetInteractorStyle()
+        style.AutoAdjustCameraClippingRangeOff()
+        self.viewer.render()
+
     def exec(self):
         self.show()
         self.vtk_widget.Initialize()
@@ -263,7 +298,7 @@ class ModelViewer(QMainWindow):
             *self.points,
             *self.world_axes,
             self.world_origin,
-            mode=8,
+            mode=self.camera_type_dropdown.currentText(),
             interactive=False,
         )
 

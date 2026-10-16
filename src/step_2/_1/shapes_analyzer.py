@@ -197,17 +197,18 @@ def visualize_analyses(
     for analysis, shape_path in zip(analyses, shape_paths):
         bounds = analysis.bounding_box
 
-        # vedo.Box accepts a 6-tuple of bounds through `size`
         bounding_box = (
             vedo.Box(
                 size=(
-                    bounds.x_min,
-                    bounds.x_max,
-                    bounds.y_min,
-                    bounds.y_max,
-                    bounds.z_min,
-                    bounds.z_max,
-                )
+                    bounds.x_max - bounds.x_min,
+                    bounds.y_max - bounds.y_min,
+                    bounds.z_max - bounds.z_min,
+                ),
+                pos=(
+                    (bounds.x_min + bounds.x_max) / 2,
+                    (bounds.y_min + bounds.y_max) / 2,
+                    (bounds.z_min + bounds.z_max) / 2,
+                ),
             )
             .wireframe()
             .color("black")
