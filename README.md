@@ -41,3 +41,15 @@ So others can install the library too
 
 - vedo
 - PySide6
+
+## 7. How to Run the Steps
+
+Every command is run from the project root (the folder that contains `src`)
+with the virtual environment activated. Each step has its own instructions:
+
+- Step 1 (viewer): [src/step_1/README.md](src/step_1/README.md)
+- Steps 2.1, 2.2, 2.3, the reduced database and 2.5: [src/step_2/README.md](src/step_2/README.md)
+- Step 3.1: [src/step_3/README.md](src/step_3/README.md)
+
+For quick tests, first create the reduced database (about 276 shapes), then run
+the steps on it instead of the full `3d_models` folder.
