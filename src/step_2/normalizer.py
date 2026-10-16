@@ -174,10 +174,12 @@ def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
     """Re-read every normalized .obj file under `root` and recompute, from
     the saved vertices alone, the quantities normalization is meant to fix:
     barycenter at the origin, largest bounding-box dimension equal to 1 and,
-    if `check_alignment`, coordinate variance ordered x >= y >= z (PCA
-    alignment, Step 3.1). Returns True only if every shape passes every
-    check."""
+    if `check_alignment` (Step 3.1): the covariance matrix of the vertices is
+    diagonal with entries ordered x >= y >= z (PCA alignment) and the moment
+    test sum(sign(v) * v^2) is non-negative on every axis (flipping). Returns
+    True only if every shape passes every check."""
     barycenter_distances, max_extents, ordered = [], [], []
+    off_diagonal, flipped_ok = [], []
 
     for dirpath, _, filenames in os.walk(root):
         for filename in filenames:
@@ -192,6 +194,17 @@ def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
             ordered.append(
                 variance[0] >= variance[1] - 1e-5 and variance[1] >= variance[2] - 1e-5
             )
+            # Off-diagonal covariance relative to the largest variance: zero
+            # exactly when the coordinate axes are the principal axes.
+            covariance = np.cov(vertices, rowvar=False)
+            off_diagonal.append(
+                max(abs(covariance[0, 1]), abs(covariance[0, 2]), abs(covariance[1, 2]))
+                / max(covariance[0, 0], 1e-300)
+            )
+            # Moment test per axis, relative to the total second moment so the
+            # check is independent of how the shape happens to be sized.
+            moments = np.sum(np.sign(vertices) * vertices**2, axis=0)
+            flipped_ok.append(bool(np.all(moments >= -TOLERANCE * np.sum(vertices**2))))
 
     n = len(barycenter_distances)
     if n == 0:
@@ -215,9 +228,17 @@ def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
     all_ok = barycenter_ok == n and extent_ok == n
 
     if check_alignment:
+        off_diagonal = np.array(off_diagonal)
+        diagonal_ok = int(np.sum(off_diagonal < TOLERANCE))
         ordered_ok = int(np.sum(ordered))
+        flip_ok = int(np.sum(flipped_ok))
+        print(
+            f"  off-diagonal covariance / largest variance: max={off_diagonal.max():.2e}, "
+            f"within {TOLERANCE:g}: {diagonal_ok}/{n}"
+        )
         print(f"  variance ordered x>=y>=z: {ordered_ok}/{n}")
-        all_ok = all_ok and ordered_ok == n
+        print(f"  moment test non-negative on all axes: {flip_ok}/{n}")
+        all_ok = all_ok and diagonal_ok == n and ordered_ok == n and flip_ok == n
 
     return all_ok
 

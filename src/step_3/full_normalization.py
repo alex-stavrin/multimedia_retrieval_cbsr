@@ -67,6 +67,12 @@ def flip_mesh(mesh: vedo.Mesh) -> np.ndarray:
 
     mesh.vertices = vertices * flip_signs
 
+    # An odd number of flips is a mirror image, which reverses the corner
+    # order of every triangle and turns the surface inside-out (negative
+    # volume, inward normals). Reversing the faces restores the orientation.
+    if np.prod(flip_signs) < 0:
+        mesh.reverse()
+
     return flip_signs
 
 
