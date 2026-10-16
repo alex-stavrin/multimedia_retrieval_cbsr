@@ -45,3 +45,5 @@ So others can install the library too
 ## Source Code
 
 Source code is inside the ```./src``` folder. The source is divided into steps from the assignment. Each folder has inside a readme that explains the script used for that step and how to run it.
+
+Every command is run from the project root (the folder that contains `src`) with the virtual environment activated. For quick tests, first create the reduced database (about 276 shapes, see [src/step_2/README.md](src/step_2/README.md)) and run the steps on it instead of the full `3d_models` folder.
