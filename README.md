@@ -46,4 +46,26 @@ So others can install the library too
 
 Source code is inside the ```./src``` folder. The source is divided into steps from the assignment. Each folder has inside a readme that explains the script used for that step and how to run it.
 
-Every command is run from the project root (the folder that contains `src`) with the virtual environment activated. For quick tests, first create the reduced database (about 276 shapes, see [src/step_2/README.md](src/step_2/README.md)) and run the steps on it instead of the full `3d_models` folder.
+### Quick start for 2.5 and 3.1
+
+Run these from the project root (the folder that contains `src`) with the virtual environment activated.
+
+1. Make a small test database (276 shapes):
+
+   ```
+   python -m src.step_2.reduced_database -i ./3d_models -o ./3d_models_reduced
+   ```
+
+2. Step 2.5, center and scale every shape:
+
+   ```
+   python -m src.step_2._5.normalizer -i ./3d_models_reduced -o ./3d_models_normalized
+   ```
+
+3. Step 3.1, the full normalization (center, align, flip, scale):
+
+   ```
+   python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
+   ```
+
+At the end each command prints checks like `276/276`, which means all shapes passed. More details are in the readme of each step's folder.
