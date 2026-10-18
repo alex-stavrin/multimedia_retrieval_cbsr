@@ -8,8 +8,11 @@ from PySide6.QtWidgets import (
     QLabel,
     QCheckBox,
     QComboBox,
+    QDockWidget,
+    QFileSystemModel,
     QGroupBox,
     QSlider,
+    QTreeView,
 )
 from PySide6.QtGui import QIcon
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
@@ -17,9 +20,12 @@ from vedo import Plotter, Mesh, Points, Line
 import ctypes
 import sys
 import os
+import time
 from pathlib import Path
 import numpy
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
+
+DEFAULT_FOV = 90
 
 
 class ModelViewer(QMainWindow):
@@ -29,8 +35,9 @@ class ModelViewer(QMainWindow):
         window_title: str = "Multimedia Retrieval CBSR",
         window_size: tuple[int, int] = (1000, 1000),
         background_color: str = "#FFFFFF",
-        meshes: list[Mesh] = None,
+        meshes: list[Mesh] | None = None,
         models_delta: numpy.array = numpy.zeros(3),
+        browse_root: str | Path | None = None,
     ):
 
         super().__init__()
@@ -38,10 +45,11 @@ class ModelViewer(QMainWindow):
         # Make the Application
         self.app = qt_app
 
-        # Add an application icon
-        app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
+        # Add an application icon (the icon lives in the project's assets folder)
+        app_icon_path = Path(__file__).resolve().parents[2] / "assets" / "icon.png"
         self.app.setWindowIcon(QIcon(str(app_icon_path)))
 
+        self.base_title = window_title
         self.setWindowTitle(window_title)
         self.resize(*window_size)
 
@@ -53,28 +61,11 @@ class ModelViewer(QMainWindow):
         else:
             os.environ["QT_QPA_PLATFORM"] = "xcb"
 
-        # pass meshes and points and store them
-        self.meshes = meshes
-        self.points = []
-
-        shift_amount: numpy.array = numpy.zeros(3)
-        for mesh in self.meshes:
-            # add shading and lighting to meshes
-            mesh.compute_normals(points=True, cells=True)
-            mesh.phong()
-            mesh.c("#A0A0A0")
-            mesh.lighting("plastic")
-
-            # make edges of mesh stand out
-            mesh.linewidth(3)
-            mesh.linecolor("#000000")
-
-            mesh.shift(*shift_amount)
-            shift_amount = numpy.add(shift_amount, models_delta)
-
-            # make vertices of mesh stand out
-            points: Points = Points(mesh.vertices, r=10, c="#000000")
-            self.points.append(points)
+        # style the meshes and build their vertex points
+        self.models_delta = models_delta
+        self.meshes: list[Mesh] = []
+        self.points: list[Points] = []
+        self._prepare_meshes(meshes or [])
 
         self.world_origin = Points([(0, 0, 0)], r=12, c="red").clone2d(size=1)
         position = self.world_origin.GetPositionCoordinate()
@@ -157,6 +148,15 @@ class ModelViewer(QMainWindow):
         )
         camera_layout.addWidget(self.camera_type_dropdown)
 
+        # slider for the field of view (the vertical view angle, in degrees)
+        self.fov_label = QLabel(f"FOV = {DEFAULT_FOV}°")
+        camera_layout.addWidget(self.fov_label)
+
+        self.fov_slider = QSlider(Qt.Orientation.Horizontal)
+        self.fov_slider.setRange(10, 120)
+        self.fov_slider.setValue(DEFAULT_FOV)
+        camera_layout.addWidget(self.fov_slider)
+
         controls.addWidget(camera_group)
 
         # Edges group. Options for edges visualization
@@ -225,9 +225,137 @@ class ModelViewer(QMainWindow):
         self.world_axes_checkbox.toggled.connect(self.set_world_axes_visible)
         self.edge_width_slider.valueChanged.connect(self.on_edge_width_changed)
         self.vertex_radius_slider.valueChanged.connect(self.on_vertex_radius_changed)
+        self.fov_slider.valueChanged.connect(self.on_fov_changed)
+
+        # FPS counter in the status bar: count the finished renders and show
+        # the rate twice a second (it reads "idle" while nothing is moving)
+        self.fps_label = QLabel("FPS: --")
+        self.statusBar().addPermanentWidget(self.fps_label)
+        self._frame_count = 0
+        self._fps_clock = time.perf_counter()
+        self.viewer.window.AddObserver("EndEvent", self.count_frame)
+        self.fps_timer = QTimer(self)
+        self.fps_timer.setInterval(500)
+        self.fps_timer.timeout.connect(self.update_fps)
+        self.fps_timer.start()
+
+        if browse_root is not None:
+            self._build_content_browser(Path(browse_root))
+
+    def _prepare_meshes(self, meshes: list[Mesh]) -> None:
+        """Style the meshes the way the viewer shows them and build the points
+        that mark their vertices."""
+        self.meshes = meshes
+        self.points = []
+
+        shift_amount: numpy.array = numpy.zeros(3)
+        for mesh in self.meshes:
+            # add shading and lighting to meshes
+            mesh.compute_normals(points=True, cells=True)
+            mesh.phong()
+            mesh.c("#A0A0A0")
+            mesh.lighting("plastic")
+
+            # make edges of mesh stand out
+            mesh.linewidth(3)
+            mesh.linecolor("#000000")
+
+            mesh.shift(*shift_amount)
+            shift_amount = numpy.add(shift_amount, self.models_delta)
+
+            # make vertices of mesh stand out
+            points: Points = Points(mesh.vertices, r=10, c="#000000")
+            self.points.append(points)
+
+    def _apply_display_settings(self) -> None:
+        """Give newly loaded meshes the current state of the sidebar controls."""
+        self.on_edge_width_changed(self.edge_width_slider.value())
+        self.on_vertex_radius_changed(self.vertex_radius_slider.value())
+        self.on_shading_option_changed(self.shading_dropdown.currentText())
+
+    def load_shapes(self, paths: list[str | Path]) -> None:
+        """Replace the shapes on screen by the shapes in `paths`."""
+        names = ", ".join(Path(str(path)).name for path in paths)
+
+        if not all(Path(str(path)).is_file() for path in paths):
+            self.statusBar().showMessage(f"File not found: {names}", 5000)
+            return
+
+        try:
+            meshes = [Mesh(str(path)) for path in paths]
+        except Exception as error:
+            self.statusBar().showMessage(f"Could not load {names}: {error}", 5000)
+            return
+
+        if any(mesh.npoints == 0 for mesh in meshes):
+            self.statusBar().showMessage(f"No shape found in {names}", 5000)
+            return
+
+        self.viewer.remove(*self.meshes, *self.points)
+        self._prepare_meshes(meshes)
+        self.viewer.add(*self.meshes, *self.points)
+        self._apply_display_settings()
+
+        # resetting the camera also resets its view angle, so set the angle of
+        # the FOV slider again
+        self.viewer.reset_camera()
+        camera = self.viewer.camera
+        camera.SetViewAngle(self.fov_slider.value())
+        camera.SetClippingRange(0.01, 10000)
+
+        self.setWindowTitle(f"{self.base_title} - {names}")
+        self.viewer.render()
+
+    def _build_content_browser(self, root: Path) -> None:
+        """A tree of the .obj files under `root`. Enter or a double click
+        loads the selected shape."""
+        self.file_model = QFileSystemModel(self)
+        self.file_model.setRootPath(str(root))
+        self.file_model.setNameFilters(["*.obj"])
+        # hide the other files instead of graying them out
+        self.file_model.setNameFilterDisables(False)
+
+        self.file_tree = QTreeView()
+        self.file_tree.setModel(self.file_model)
+        self.file_tree.setRootIndex(self.file_model.index(str(root)))
+        self.file_tree.setHeaderHidden(True)
+        for column in (1, 2, 3):  # size, type, date modified
+            self.file_tree.hideColumn(column)
+        self.file_tree.activated.connect(self.on_file_activated)
+
+        dock = QDockWidget("Content browser", self)
+        dock.setMinimumWidth(220)
+        dock.setWidget(self.file_tree)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
+
+    def on_file_activated(self, index) -> None:
+        path = Path(self.file_model.filePath(index))
+        if path.is_file() and path.suffix.lower() == ".obj":
+            self.load_shapes([path])
+
+    def on_fov_changed(self, degrees: int) -> None:
+        self.fov_label.setText(f"FOV = {degrees}°")
+        camera = self.viewer.camera
+        # the view angle has no effect in a parallel projection
+        if not camera.GetParallelProjection():
+            camera.SetViewAngle(degrees)
+        self.viewer.render()
+
+    def count_frame(self, *_) -> None:
+        self._frame_count += 1
+
+    def update_fps(self) -> None:
+        now = time.perf_counter()
+        fps = self._frame_count / max(now - self._fps_clock, 1e-6)
+        self._frame_count = 0
+        self._fps_clock = now
+
+        frame_ms = self.viewer.renderer.GetLastRenderTimeInSeconds() * 1000
+        rate = f"{fps:.0f}" if fps >= 0.5 else "idle"
+        self.fps_label.setText(f"FPS: {rate}  |  last frame: {frame_ms:.1f} ms")
 
     def on_vertex_radius_changed(self, radius: int) -> None:
-        self.vertex_radius_label.setText(f"Size = {radius}")
+        self.vertex_radius_label.setText(f"Point size = {radius}")
         visible = radius > 0
         for points in self.points:
             points.actor.SetVisibility(visible)
@@ -237,8 +365,8 @@ class ModelViewer(QMainWindow):
         self.viewer.render()
 
     def on_edge_width_changed(self, line_width: int) -> None:
+        self.edge_width_label.setText(f"Width = {line_width}")
         for mesh in self.meshes:
-            self.edge_width_label.setText(f"Width = {line_width}")
             if line_width == 0:
                 mesh.properties.SetEdgeVisibility(False)
             else:
@@ -268,6 +396,7 @@ class ModelViewer(QMainWindow):
         self.viewer.render()
 
     def closeEvent(self, event) -> None:
+        self.fps_timer.stop()
 
         # clean up vtk widget
         self.vtk_widget.Disable()
@@ -305,8 +434,8 @@ class ModelViewer(QMainWindow):
         camera = self.viewer.camera
 
         camera.ParallelProjectionOff()
-        # Set fov to 90
-        camera.SetViewAngle(90)
+        # Start with the field of view of the slider
+        camera.SetViewAngle(self.fov_slider.value())
         # Set near plane to 0.01 and far plane to 10.000
         camera.SetClippingRange(0.01, 10000)
 
