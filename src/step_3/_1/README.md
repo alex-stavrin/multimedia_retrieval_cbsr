@@ -21,9 +21,9 @@ python -m src.step_3._1.full_normalization -i ./3d_models_reduced -o ./3d_models
 
 - `-i` is a folder of .obj files (or a single .obj file), `-o` is where the
   result is written.
-- The last lines re-check every saved shape (barycenter, size, axes, flip).
-  Each line ends with a count like `276/276`, which should equal the number of
-  shapes.
+- Add `--verify` (`-v`) to re-check every saved shape afterwards (barycenter,
+  size, axes, flip). Each line ends with a count like `276/276`, which should
+  equal the number of shapes.
 - The shapes are processed in parallel, one process per CPU core, so the whole
   database (2,483 shapes) takes about 30 seconds and the reduced one under 10.
   `-j 1` turns this off, `-j 4` uses 4 processes.

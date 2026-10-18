@@ -235,8 +235,8 @@ def run_cli(
     extra_summary: Callable[[list], None] | None = None,
 ) -> None:
     """Command line shared by the normalization scripts: `-i` and `-o` are
-    either a single .obj file or a whole database folder. For a folder it also
-    prints a summary and re-checks the saved files."""
+    either a single .obj file or a whole database folder. With `--verify` it
+    also prints a summary and re-checks the saved files of a folder."""
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         "-i",
@@ -260,6 +260,13 @@ def run_cli(
         help="Number of parallel processes for a database folder "
         "(default: one per CPU core, 1 = no parallelism)",
     )
+    parser.add_argument(
+        "-v",
+        "--verify",
+        action="store_true",
+        help="After a database folder is done, print a summary and re-read "
+        "every saved shape to check the result (slower)",
+    )
     args = parser.parse_args()
 
     if not os.path.isdir(args.input):
@@ -267,6 +274,10 @@ def run_cli(
         return
 
     reports = process_database(args.input, args.output, process_file, args.workers)
+    if not args.verify:
+        print(f"{action} {len(reports)} shapes (use --verify to check the result)")
+        return
+
     summarize_normalization(reports, action)
     if reports and extra_summary is not None:
         extra_summary(reports)

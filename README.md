@@ -118,7 +118,7 @@ python -m src.step_2._5.normalizer -i ./3d_models_reduced -o ./3d_models_normali
 python -m src.step_3._1.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
 ```
 
-For 2.5 and 3.1 the last lines of the output re-check every saved shape.
+For 2.5 and 3.1 add `--verify` to also re-check every saved shape.
 `276/276` means all 276 shapes passed. For the final results use
 `./resampled_models` (the result of 2.3) as `-i`.
 
