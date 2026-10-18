@@ -8,6 +8,7 @@ import re
 from typing import Callable
 
 import numpy as np
+from tqdm import tqdm
 
 from src.helper.mesh_types import Box
 
@@ -32,21 +33,21 @@ def process_database(
     `input_root`, mirroring the class sub-folders into `output_root`. A shape
     that fails is reported and skipped instead of stopping the whole run.
     Returns what `process_file` returned for the shapes that worked."""
+    input_paths = [
+        os.path.join(dirpath, filename)
+        for dirpath, _, filenames in os.walk(input_root)
+        for filename in filenames
+        if filename.endswith(".obj")
+    ]
+
     results = []
-
-    for dirpath, _, filenames in os.walk(input_root):
-        for filename in filenames:
-            if not filename.endswith(".obj"):
-                continue
-
-            input_path = os.path.join(dirpath, filename)
-            output_path = os.path.join(
-                output_root, os.path.relpath(input_path, input_root)
-            )
-            try:
-                results.append(process_file(input_path, output_path))
-            except Exception as e:
-                print(f"Skipping {input_path}: {e}")
+    for input_path in tqdm(input_paths, desc="Normalizing", unit="shape"):
+        output_path = os.path.join(output_root, os.path.relpath(input_path, input_root))
+        try:
+            results.append(process_file(input_path, output_path))
+        except Exception as e:
+            # tqdm.write prints above the progress bar without breaking it
+            tqdm.write(f"Skipping {input_path}: {e}")
 
     return results
 
@@ -121,7 +122,10 @@ def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
         print(f"No .obj files found under {root}")
         return False
 
-    measured = [measure(read_obj_vertices(path)) for path in paths]
+    measured = [
+        measure(read_obj_vertices(path))
+        for path in tqdm(paths, desc="Checking saved shapes", unit="shape")
+    ]
     n = len(measured)
 
     def column(key: str) -> np.ndarray:
