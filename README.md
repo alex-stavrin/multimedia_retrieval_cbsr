@@ -46,26 +46,82 @@ So others can install the library too
 
 Source code is inside the ```./src``` folder. The source is divided into steps from the assignment. Each folder has inside a readme that explains the script used for that step and how to run it.
 
-### Quick start for 2.5 and 3.1
+## How to Run
 
-Run these from the project root (the folder that contains `src`) with the virtual environment activated.
+Every command is run from the project root (the folder that contains `src`)
+with the virtual environment activated. Each step is separate, so you can run
+only the one you need. The readme in each step's folder has more details.
 
-1. Make a small test database (276 shapes):
+### Step 1: view a shape
 
-   ```
-   python -m src.step_2.reduced_database -i ./3d_models -o ./3d_models_reduced
-   ```
+```
+python -m src.step_1.viewer_runner ./3d_models/Bird/D00089.obj
+```
 
-2. Step 2.5, center and scale every shape:
+In the viewer the content browser on the right lists all shapes (a double
+click or Enter opens one), the sidebar has the FOV slider and the edge, vertex
+and shading options, and the status bar shows the FPS. You can also start
+without a shape (`python -m src.step_1.viewer_runner`) and pick one in the
+browser. Give several files to see them next to each other, for example
+`... a.obj b.obj -d 0.0 0.5 0` (`-d` is the distance between them).
 
-   ```
-   python -m src.step_2._5.normalizer -i ./3d_models_reduced -o ./3d_models_normalized
-   ```
+### Step 2.1: analyse the shapes (bounding box, number of faces, ...)
 
-3. Step 3.1, the full normalization (center, align, flip, scale):
+```
+python -m src.step_2._1.shapes_analyzer -i ./3d_models -o ./analysis_output/my_analysis.csv
+```
 
-   ```
-   python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
-   ```
+Writes one row per shape to a csv file. `-i` can be shapes and/or folders. The
+result for the whole database is already in the repo:
+`./analysis_output/output.csv`.
 
-At the end each command prints checks like `276/276`, which means all shapes passed. More details are in the readme of each step's folder.
+### Step 2.2: statistics of one column of that csv
+
+```
+python -m src.step_2._2.database_analyzer -i ./analysis_output/output.csv -p n_points
+```
+
+Shows a histogram and the outliers of the column given with `-p`.
+
+### Step 2.3: resample the outliers
+
+```
+python -m src.step_2._3.resampling -icsv ./analysis_output/output.csv -m ./3d_models -o ./resampled_models
+```
+
+It uses one process per CPU core. If it stops with
+`OpenBLAS error: Memory allocation failed`, limit numpy to one thread first
+(PowerShell: `$env:OPENBLAS_NUM_THREADS = 1`) and run it again.
+
+### Step 2.4: check the resampling
+
+Not finished yet.
+
+### Test database (optional, for quick tests)
+
+```
+python -m src.step_2.reduced_database -i ./3d_models -o ./3d_models_reduced
+```
+
+A small copy of the database (276 shapes, 4 per class). Use it as `-i` in the
+steps below to save time.
+
+### Step 2.5: center and scale
+
+```
+python -m src.step_2._5.normalizer -i ./3d_models_reduced -o ./3d_models_normalized
+```
+
+### Step 3.1: full normalization (center, align, flip, scale)
+
+```
+python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
+```
+
+For 2.5 and 3.1 the last lines of the output re-check every saved shape.
+`276/276` means all 276 shapes passed. For the final results use
+`./resampled_models` (the result of 2.3) as `-i`.
+
+### Step 3.2: descriptors
+
+Not finished yet.
