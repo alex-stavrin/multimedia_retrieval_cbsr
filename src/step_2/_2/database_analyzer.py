@@ -30,6 +30,19 @@ def _save_figure(fig: Figure, output: str, column: str) -> None:
 
 
 def _set_ticks_to_ax(ax: Axes, target_ticks, min_val, max_val):
+    # Nothing to tick when there are no values (e.g. no outliers).
+    if not (np.isfinite(min_val) and np.isfinite(max_val)):
+        return ax
+
+    # A practically constant column (e.g. the largest bounding-box side after
+    # normalization) has no range to divide into ticks: the spacing would be
+    # so small that np.arange cannot build it.
+    if max_val - min_val <= 1e-6 * max(abs(min_val), abs(max_val), 1.0):
+        middle = (min_val + max_val) / 2
+        ax.set_xticks([middle])
+        ax.set_xticklabels([f"{middle:.6g}"], fontsize=16)
+        return ax
+
     raw_interval = (max_val - min_val) / target_ticks
 
     magnitude = 10 ** np.floor(np.log10(raw_interval))
