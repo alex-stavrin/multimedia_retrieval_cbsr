@@ -24,8 +24,10 @@ python -m src.step_3._1.full_normalization -i ./3d_models_reduced -o ./3d_models
 - The last lines re-check every saved shape (barycenter, size, axes, flip).
   Each line ends with a count like `276/276`, which should equal the number of
   shapes.
-- The reduced database takes about 30 seconds. Use `./resampled_models` (the
-  result of 2.3) for the final results.
+- The shapes are processed in parallel, one process per CPU core, so the whole
+  database (2,483 shapes) takes about 30 seconds and the reduced one under 10.
+  `-j 1` turns this off, `-j 4` uses 4 processes.
+- Use `./resampled_models` (the result of 2.3) for the final results.
 
 One shape:
 

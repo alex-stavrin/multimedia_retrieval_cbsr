@@ -5,6 +5,7 @@ the saved files."""
 import argparse
 import os
 import re
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Callable
 
 import numpy as np
@@ -26,28 +27,74 @@ def largest_side(box: Box) -> float:
     return max(box.x_max - box.x_min, box.y_max - box.y_min, box.z_max - box.z_min)
 
 
+def _run_one(process_file: Callable, input_path: str, output_path: str):
+    """Run in a worker process. A failure is returned, not raised, so one bad
+    shape cannot stop the others."""
+    try:
+        return process_file(input_path, output_path), None
+    except Exception as e:
+        return None, e
+
+
+def _pool(workers: int) -> ProcessPoolExecutor:
+    # One BLAS thread per process: many processes each starting a thread per
+    # core run out of memory on some machines (OpenBLAS allocation errors).
+    # Worker processes inherit this when they start.
+    os.environ["OPENBLAS_NUM_THREADS"] = "1"
+    return ProcessPoolExecutor(max_workers=workers)
+
+
 def process_database(
-    input_root: str, output_root: str, process_file: Callable[[str, str], object]
+    input_root: str,
+    output_root: str,
+    process_file: Callable[[str, str], object],
+    workers: int | None = None,
 ) -> list:
     """Call `process_file(input_path, output_path)` for every .obj file under
-    `input_root`, mirroring the class sub-folders into `output_root`. A shape
-    that fails is reported and skipped instead of stopping the whole run.
-    Returns what `process_file` returned for the shapes that worked."""
+    `input_root`, mirroring the class sub-folders into `output_root`. The shapes
+    are processed in `workers` parallel processes (default: one per CPU core,
+    1 = no parallelism). A shape that fails is reported and skipped instead of
+    stopping the whole run. Returns what `process_file` returned for the shapes
+    that worked, in no particular order."""
     input_paths = [
         os.path.join(dirpath, filename)
         for dirpath, _, filenames in os.walk(input_root)
         for filename in filenames
         if filename.endswith(".obj")
     ]
+    workers = max(1, min(workers or os.cpu_count() or 1, len(input_paths)))
 
     results = []
-    for input_path in tqdm(input_paths, desc="Normalizing", unit="shape"):
-        output_path = os.path.join(output_root, os.path.relpath(input_path, input_root))
-        try:
-            results.append(process_file(input_path, output_path))
-        except Exception as e:
+
+    def collect(input_path: str, result, error) -> None:
+        if error is None:
+            results.append(result)
+        else:
             # tqdm.write prints above the progress bar without breaking it
-            tqdm.write(f"Skipping {input_path}: {e}")
+            tqdm.write(f"Skipping {input_path}: {error}")
+
+    def output_for(input_path: str) -> str:
+        return os.path.join(output_root, os.path.relpath(input_path, input_root))
+
+    progress = tqdm(total=len(input_paths), desc="Normalizing", unit="shape")
+    if workers == 1:
+        for input_path in input_paths:
+            collect(
+                input_path, *_run_one(process_file, input_path, output_for(input_path))
+            )
+            progress.update()
+    else:
+        with _pool(workers) as executor:
+            futures = {
+                executor.submit(
+                    _run_one, process_file, input_path, output_for(input_path)
+                ): input_path
+                for input_path in input_paths
+            }
+            for future in as_completed(futures):
+                collect(futures[future], *future.result())
+                progress.update()
+    progress.close()
 
     return results
 
@@ -105,7 +152,13 @@ def measure(vertices: np.ndarray) -> dict:
     }
 
 
-def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
+def _measure_file(path: str) -> dict:
+    return measure(read_obj_vertices(path))
+
+
+def verify_saved_database(
+    root: str, check_alignment: bool = False, workers: int | None = None
+) -> bool:
     """Re-read every normalized .obj file under `root` and recompute, from the
     saved vertices alone, that the barycenter is at the origin and the largest
     bounding-box side is 1. With `check_alignment` (Step 3.1) also that the
@@ -122,10 +175,22 @@ def verify_saved_database(root: str, check_alignment: bool = False) -> bool:
         print(f"No .obj files found under {root}")
         return False
 
-    measured = [
-        measure(read_obj_vertices(path))
-        for path in tqdm(paths, desc="Checking saved shapes", unit="shape")
-    ]
+    workers = max(1, min(workers or os.cpu_count() or 1, len(paths)))
+    if workers == 1:
+        measured = [
+            _measure_file(path)
+            for path in tqdm(paths, desc="Checking saved shapes", unit="shape")
+        ]
+    else:
+        with _pool(workers) as executor:
+            measured = list(
+                tqdm(
+                    executor.map(_measure_file, paths, chunksize=16),
+                    total=len(paths),
+                    desc="Checking saved shapes",
+                    unit="shape",
+                )
+            )
     n = len(measured)
 
     def column(key: str) -> np.ndarray:
@@ -187,14 +252,22 @@ def run_cli(
         required=True,
         help="Path to write the result, or output root directory",
     )
+    parser.add_argument(
+        "-j",
+        "--workers",
+        type=int,
+        default=None,
+        help="Number of parallel processes for a database folder "
+        "(default: one per CPU core, 1 = no parallelism)",
+    )
     args = parser.parse_args()
 
     if not os.path.isdir(args.input):
         print(process_file(args.input, args.output))
         return
 
-    reports = process_database(args.input, args.output, process_file)
+    reports = process_database(args.input, args.output, process_file, args.workers)
     summarize_normalization(reports, action)
     if reports and extra_summary is not None:
         extra_summary(reports)
-    verify_saved_database(args.output, check_alignment)
+    verify_saved_database(args.output, check_alignment, args.workers)
