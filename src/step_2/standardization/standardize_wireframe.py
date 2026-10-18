@@ -110,7 +110,9 @@ STEPS: dict[str, Callable[[vedo.Mesh], vedo.Mesh]] = {
 DEFAULT_STEPS = ["preprocess", "close_holes", "correct_winding"]
 
 
-def run_steps(shape: vedo.Mesh, steps: list[str]) -> tuple[vedo.Mesh, str]:
+def run_steps(
+    shape: vedo.Mesh, steps: dict[str, Callable]
+) -> tuple[vedo.Mesh, str]:
     """
     Applies the named steps in the given order. Returns the mesh and a
     trace of the mesh being closed after each step, e.g.
@@ -140,7 +142,7 @@ REPORT_FIELDS = [
 
 
 def standardize_file(
-    input_path: str, output_path: str, steps: list[str]
+    input_path: str, output_path: str, steps: dict[str, Callable]
 ) -> dict:
     """Loads one .obj, applies the steps, writes it. Returns a report row."""
     raw = load_mesh(input_path)
@@ -167,7 +169,9 @@ def standardize_file(
 
 
 def standardize_directory(
-    input_dir_path: str, output_dir_path: str, steps: list[str]
+    input_dir_path: str,
+    output_dir_path: str,
+    steps: dict[str, Callable] = STEPS,
 ) -> None:
     """Processes every shape under input_dir_path, mirroring the folders."""
     all_shape_files = retrieve_all_shape_files(input_dir_path)
