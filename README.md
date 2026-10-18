@@ -115,7 +115,7 @@ python -m src.step_2._5.normalizer -i ./3d_models_reduced -o ./3d_models_normali
 ### Step 3.1: full normalization (center, align, flip, scale)
 
 ```
-python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
+python -m src.step_3._1.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
 ```
 
 For 2.5 and 3.1 the last lines of the output re-check every saved shape.
@@ -124,4 +124,17 @@ For 2.5 and 3.1 the last lines of the output re-check every saved shape.
 
 ### Step 3.2: descriptors
 
-Not finished yet.
+Histogram descriptors (A3, D1, D2, D3, D4), shown as histograms per class:
+
+```
+python -m src.step_3._2.histogram_descriptors.analyzer -i ./3d_models_reduced -o ./analysis_output -d A3
+```
+
+`-d` picks the descriptor, `-cl` the number of classes shown and `-s` the number
+of samples. The readme in `src/step_3/_2/histogram_descriptors` has the details.
+The elementary descriptors (area, compactness, ...) in
+`src/step_3/_2/elementary_descriptors` are not finished yet.
+
+## Pipeline
+
+3d_models -> (resampled) -> 3d_models_resampled -> (normalization) -> 3d_models_resampled_normalized

@@ -16,7 +16,7 @@ this order:
 From the project root:
 
 ```
-python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
+python -m src.step_3._1.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized
 ```
 
 - `-i` is a folder of .obj files (or a single .obj file), `-o` is where the
@@ -30,5 +30,5 @@ python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_fu
 One shape:
 
 ```
-python -m src.step_3.full_normalization -i ./3d_models/Hand/D01193.obj -o ./3d_models_full_normalized/Hand/D01193.obj
+python -m src.step_3._1.full_normalization -i ./3d_models/Hand/D01193.obj -o ./3d_models_full_normalized/Hand/D01193.obj
 ```

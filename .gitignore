@@ -7,9 +7,11 @@ ShapeData
 
 # UV ignore
 pyproject.toml
+.python-version
 uv.lock
 
 3d_models**
+**.obj
 test**
 
 .venv/

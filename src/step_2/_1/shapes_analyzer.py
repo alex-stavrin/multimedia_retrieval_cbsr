@@ -57,7 +57,7 @@ class ShapeAnalysis:
                         "y_max": shape.bounding_box.y_max,
                         "z_min": shape.bounding_box.z_min,
                         "z_max": shape.bounding_box.z_max,
-                        "face_type": shape.face_type.value,
+                        "face_type": shape.face_type.name,
                     }
                 )
 

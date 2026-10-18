@@ -226,7 +226,6 @@ def export_sorted_csv(df: pd.DataFrame, column: str, output: str) -> None:
     df.to_csv(output, index=False)
 
 
-
 def plot_histogram(
     df,
     column: str,
