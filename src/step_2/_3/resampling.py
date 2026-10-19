@@ -62,12 +62,12 @@ def resample_one_mesh(
 
 
 def resample_meshes(
+    models_path: Path,
+    input_csv_path: Path,
+    output_path: Path,
     print_outlier_stats=False,
     print_decimating_logs=False,
     print_subdivision_logs=False,
-    models_path=Path,
-    input_csv_path=Path,
-    output_path=Path,
 ) -> None:
     data_frame = pandas.read_csv(input_csv_path)
 

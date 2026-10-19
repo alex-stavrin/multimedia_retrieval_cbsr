@@ -129,7 +129,6 @@ def calculate_file_descriptors(
 
 def calculate_database(
     input_dir_path: str,
-    database_path: str,
     output_path: str,
 ) -> None:
     """
@@ -141,12 +140,6 @@ def calculate_database(
 
     if not os.path.isdir(input_dir_path):
         raise ValueError(f"Input directory does not exist: {input_dir_path}")
-
-    if not os.path.isfile(database_path):
-        raise ValueError(f"Database file does not exist: {database_path}")
-
-    if not database_path.lower().endswith(".csv"):
-        raise ValueError("Database file must be a CSV file")
 
     shape_files = retrieve_all_shape_files(input_dir_path)
 
@@ -265,13 +258,6 @@ def main():
     )
 
     parser.add_argument(
-        "-d",
-        "--database_path",
-        required=True,
-        help="CSV database containing relative_file_path and face_type.",
-    )
-
-    parser.add_argument(
         "-o",
         "--output",
         default="shape_descriptors.csv",
@@ -282,7 +268,6 @@ def main():
 
     calculate_database(
         input_dir_path=args.input,
-        database_path=args.database_path,
         output_path=args.output,
     )
 

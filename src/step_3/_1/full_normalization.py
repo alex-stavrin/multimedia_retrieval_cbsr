@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import vedo
 
-from src.helper.mesh_types import Box
+from src.types.mesh_types import Box
 from src.step_2._5.normalizer import (
     TOLERANCE,
     center,
