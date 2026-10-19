@@ -21,7 +21,7 @@ import src.step_2._5.normalizer as normalizer
 import step_2.repairment.repair_wireframe as reparation
 import step_2.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
-import src.step_3._2.descriptor_analyzer as descriptor_analyzer
+import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 
 CHECKPOINT_VERSION = 1
 
