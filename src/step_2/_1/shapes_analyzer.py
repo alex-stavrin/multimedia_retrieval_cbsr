@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from PySide6.QtWidgets import QApplication
 
 from src.helper.database_functions import retrieve_all_shape_files
-from src.helper.mesh_types import Box, FaceType
+from src.types.mesh_types import Box, FaceType
 from src.step_1.model_viewer import ModelViewer
 
 

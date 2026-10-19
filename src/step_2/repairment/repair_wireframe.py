@@ -141,7 +141,7 @@ REPORT_FIELDS = [
 ]
 
 
-def standardize_file(
+def repair_file(
     input_path: str, output_path: str, steps: dict[str, Callable]
 ) -> dict:
     """Loads one .obj, applies the steps, writes it. Returns a report row."""
@@ -168,7 +168,7 @@ def standardize_file(
     }
 
 
-def standardize_directory(
+def repair_directory(
     input_dir_path: str,
     output_dir_path: str,
     steps: dict[str, Callable] = STEPS,
@@ -192,7 +192,7 @@ def standardize_directory(
             row = {"file_path": relative_path}
 
             try:
-                row.update(standardize_file(shape_file, new_path, steps))
+                row.update(repair_file(shape_file, new_path, steps))
             except Exception as e:
                 row["reason"] = f"error: {type(e).__name__}: {e}"
                 n_errors += 1
@@ -220,7 +220,7 @@ def standardize_directory(
     print(summary + f"Report written to {report_path}")
 
 
-def standardize_path(
+def repair_from_path(
     input_path: str, output_path: str, steps: list[str] | None = None
 ) -> None:
     """
@@ -237,7 +237,7 @@ def standardize_path(
         raise ValueError(f"Unknown steps {unknown}. Available: {list(STEPS)}")
 
     if os.path.isdir(input_path):
-        standardize_directory(input_path, output_path, steps)
+        repair_directory(input_path, output_path, steps)
 
     elif os.path.isfile(input_path):
         if os.path.isdir(output_path) or not output_path.endswith(".obj"):
@@ -245,7 +245,7 @@ def standardize_path(
                 output_path, os.path.basename(input_path)
             )
 
-        single_stats_row = standardize_file(input_path, output_path, steps)
+        single_stats_row = repair_file(input_path, output_path, steps)
         print(f"Wrote {output_path}: {single_stats_row}")
 
     else:
@@ -283,7 +283,7 @@ def main():
         help="Steps to apply, in order (default: %(default)s)",
     )
     args = parser.parse_args()
-    standardize_path(args.input, args.output, args.steps)
+    repair_from_path(args.input, args.output, args.steps)
 
 
 if __name__ == "__main__":

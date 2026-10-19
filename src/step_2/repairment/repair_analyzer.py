@@ -223,19 +223,22 @@ def main():
     parser.add_argument(
         "-b",
         "--before",
+        required=True,
         type=str,
-        help="The before csv analysis, "
+        help="The before datbase, "
         "or before property of analysis when using --plot",
     )
     parser.add_argument(
         "-a",
         "--after",
+        required=True,
         type=str,
-        help="The before csv analysis, "
+        help="The before database, "
         "or before property of analysis when using --plot",
     )
     parser.add_argument(
         "--csv_path",
+        required=True,
         type=str,
         help="CSV path: written when comparing, read when using --plot.",
     )
