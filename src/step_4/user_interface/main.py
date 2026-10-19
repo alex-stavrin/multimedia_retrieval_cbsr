@@ -7,8 +7,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QFileDialog,
-    QScrollArea,
-    QGridLayout,
+    QListWidget,
+    QListWidgetItem,
 )
 from PySide6.QtCore import Qt
 import sys
@@ -83,23 +83,14 @@ class MainWindow(QMainWindow):
         self.left_viewer = EmbeddedViewer(left_panel)
         left_layout.addWidget(self.left_viewer, stretch=1)
 
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
-
-        self.right_panel = QWidget()
-        self.right_layout = QGridLayout(self.right_panel)
-        self.right_layout.setAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        )
-
-        right_placeholder = QLabel("Matched models will appear here")
-        right_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.right_layout.addWidget(right_placeholder, 0, 0)
-
-        self.scroll_area.setWidget(self.right_panel)
-
+        self.results_list = QListWidget()
+        self.results_list.setViewMode(QListWidget.ViewMode.IconMode)
+        self.results_list.setResizeMode(QListWidget.ResizeMode.Adjust)
+        self.results_list.setMovement(QListWidget.Movement.Static)
+        self.results_list.setSelectionMode(QListWidget.SelectionMode.NoSelection)
+        self.results_list.setSpacing(10)
         main_layout.addWidget(left_panel, stretch=1)
-        main_layout.addWidget(self.scroll_area, stretch=2)
+        main_layout.addWidget(self.results_list, stretch=2)
 
     def open_file_picker(self) -> None:
         file_path, _ = QFileDialog.getOpenFileName(self, filter="(*.obj)")
@@ -123,38 +114,25 @@ class MainWindow(QMainWindow):
         for viewer in self.result_viewers:
             viewer.cleanup()
         self.result_viewers.clear()
-        while self.right_layout.count():
-            item = self.right_layout.takeAt(0)
-            if item is not None:
-                widget = item.widget()
-                if widget is not None:
-                    widget.deleteLater()
-
-        columns: int = 4
+        self.results_list.clear()
         viewer_width = 300
         viewer_height = 300
-
-        for index, (shape_path, distance) in enumerate(matches):
-
-            row, col = divmod(index, columns)
-
-            card = QWidget(self.right_panel)
+        for shape_path, distance in matches:
+            card = QWidget()
             card.setFixedWidth(viewer_width)
             card_layout = QVBoxLayout(card)
             card_layout.setContentsMargins(0, 0, 0, 0)
-
             label = QLabel(f"{os.path.basename(shape_path)}\ndist: {distance:.3f}")
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             card_layout.addWidget(label)
-
             viewer = EmbeddedViewer(card)
             viewer.setFixedSize(viewer_width, viewer_height)
             viewer.load_mesh(shape_path)
             card_layout.addWidget(viewer, alignment=Qt.AlignmentFlag.AlignCenter)
-
-            self.right_layout.addWidget(
-                card, row, col, alignment=Qt.AlignmentFlag.AlignCenter
-            )
+            item = QListWidgetItem(self.results_list)
+            item.setSizeHint(card.sizeHint())
+            self.results_list.addItem(item)
+            self.results_list.setItemWidget(item, card)
             self.result_viewers.append(viewer)
 
 
