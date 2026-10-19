@@ -5,7 +5,7 @@ import vedo
 from tqdm import tqdm
 import vtk
 
-from src.step_3._2.descriptor_extracting import (
+from src.step_3._2.elementary_descriptors.descriptor_extracting import (
     calculate_surface_area,
     calculate_compactness,
     calculate_rectangularity,
@@ -30,7 +30,7 @@ DESCRIPTOR_FIELDS = [
 ]
 
 
-#   FIX LATER                
+#   FIX LATER
 class VTKWarningCapture(vtk.vtkOutputWindow):
     """Capture VTK warning messages for the current mesh."""
 
@@ -158,7 +158,7 @@ def calculate_database(
 
     warning_capture = VTKWarningCapture()
     previous_output_window = vtk.vtkOutputWindow.GetInstance()
-    #           FIX LATER               
+    #           FIX LATER
     vtk.vtkOutputWindow.SetInstance(warning_capture)
 
     try:
@@ -196,25 +196,29 @@ def calculate_database(
                     n_success += 1
 
                 except Exception as e:
-                    row.update({
-                        "was_closed": "",
-                        "surface_area": "",
-                        "compactness": "",
-                        "rectangularity": "",
-                        "diameter": "",
-                        "convexity": "",
-                        "eccentricity": "",
-                        "reason": f"{type(e).__name__}: {e}",
-                    })
+                    row.update(
+                        {
+                            "was_closed": "",
+                            "surface_area": "",
+                            "compactness": "",
+                            "rectangularity": "",
+                            "diameter": "",
+                            "convexity": "",
+                            "eccentricity": "",
+                            "reason": f"{type(e).__name__}: {e}",
+                        }
+                    )
                     n_errors += 1
 
                 finally:
                     # Associate each captured warning with this mesh.
                     for warning in warning_capture.warnings:
-                        warning_writer.writerow({
-                            "file_path": relative_path,
-                            "warning": warning,
-                        })
+                        warning_writer.writerow(
+                            {
+                                "file_path": relative_path,
+                                "warning": warning,
+                            }
+                        )
                         n_warnings += 1
 
                 writer.writerow(row)

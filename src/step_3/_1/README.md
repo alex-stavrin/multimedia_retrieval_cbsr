@@ -1,16 +1,3 @@
-# 3.2
-
-File is `descriptor_extracting.py`
-
-## How to run
-
-You run it from project root directory. Example:
-`python -m src.step_2._1.shapes_analyzer -i ./3d_models/Bed/D00031.obj ./3d_models/Bus/ ./3d_models/AquaticAnimals/ -s True -o ./analysis_output/output.csv -v`
-
-This would compute and write analysis of the _folders_ 3d*models/Bus/,
-3d_models/AquaticAnimals and the single *.obj file* ./3d_models/Bed/D00031.obj
-to the single \_output file* ./analysis_output/output.csv.
-
 # 3.1
 
 The python file for this is `full_normalization.py`
@@ -33,10 +20,10 @@ rotated differently different sizes.
 You run it from project root directory. Examples:
 
 One shape:
-`python -m src.step_3.full_normalization -i ./3d_models/Hand/D01193.obj -o ./3d_models_full_normalized/Hand/D01193.obj`
+`python -m src.step_3._1.full_normalization -i ./3d_models/Hand/D01193.obj -o ./3d_models_full_normalized/Hand/D01193.obj`
 
 A whole folder (the class sub-folders are kept in the output):
-`python -m src.step_3.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized`
+`python -m src.step_3._1.full_normalization -i ./3d_models_reduced -o ./3d_models_full_normalized`
 
 The -i flag is a single _.obj file_ or a _folder_, the -o flag is where the
 result is written. For a folder it prints a summary and then re-reads the saved

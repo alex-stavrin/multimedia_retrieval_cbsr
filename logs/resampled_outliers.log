@@ -10,7 +10,9 @@ AircraftBuoyant/m1342.obj had 1252 and now has 7528 vertices
 AircraftBuoyant/m1347.obj had 3055 and now has 9320 vertices
 AircraftBuoyant/m1349.obj had 432 and now has 8752 vertices
 AircraftBuoyant/m1350.obj had 1097 and now has 9001 vertices
+AircraftBuoyant/m1350.obj had 1097 and now has 9001 vertices
 AircraftBuoyant/m1341.obj had 425 and now has 7503 vertices
+AircraftBuoyant/m1352.obj had 3298 and now has 9584 vertices
 AircraftBuoyant/m1352.obj had 3298 and now has 9584 vertices
 Apartment/D00348.obj had 2006 and now has 5014 vertices
 Apartment/D00639.obj had 4849 and now has 7613 vertices
@@ -47,6 +49,7 @@ Bed/D00110.obj had 1926 and now has 5570 vertices
 AquaticAnimal/m76.obj had 1583 and now has 7500 vertices
 Bed/D00213.obj had 2277 and now has 6813 vertices
 Bed/D00307.obj had 2644 and now has 7903 vertices
+Bed/D00307.obj had 2644 and now has 7903 vertices
 Bed/D00217.obj had 3238 and now has 9510 vertices
 AquaticAnimal/m68.obj had 553 and now has 7501 vertices
 Bed/D00565.obj had 826 and now has 7338 vertices
@@ -62,6 +65,7 @@ Bed/m951.obj had 363 and now has 7793 vertices
 Bed/m949.obj had 706 and now has 6258 vertices
 Bicycle/D00016.obj had 2769 and now has 7818 vertices
 Bed/m948.obj had 4597 and now has 7535 vertices
+Bed/D00836.obj had 1563 and now has 7493 vertices
 AquaticAnimal/m74.obj had 162 and now has 7497 vertices
 Bicycle/D00033.obj had 2192 and now has 6640 vertices
 Bicycle/D00621.obj had 2769 and now has 7818 vertices
@@ -102,6 +106,7 @@ Biplane/m1146.obj had 1700 and now has 7585 vertices
 Bird/D00386.obj had 1751 and now has 5249 vertices
 Biplane/m1135.obj had 264 and now has 7541 vertices
 Bird/D00234.obj had 1247 and now has 7504 vertices
+Bird/D00386.obj had 1751 and now has 5249 vertices
 Bird/D00438.obj had 1824 and now has 5533 vertices
 Bird/D00599.obj had 1792 and now has 5418 vertices
 Bird/D00625.obj had 1091 and now has 6683 vertices
@@ -157,6 +162,7 @@ Bookset/D01135.obj had 1645 and now has 7578 vertices
 Bottle/D00208.obj had 2000 and now has 5464 vertices
 Bottle/D00281.obj had 1304 and now has 7953 vertices
 Bottle/D00311.obj had 829 and now has 6520 vertices
+Bottle/D00311.obj had 829 and now has 6520 vertices
 Bottle/D00347.obj had 2426 and now has 6461 vertices
 Bookset/D01030.obj had 208 and now has 7498 vertices
 Bookset/D01190.obj had 2417 and now has 7747 vertices
@@ -170,6 +176,7 @@ Bottle/m483.obj had 371 and now has 8431 vertices
 Bottle/D00716.obj had 446 and now has 7503 vertices
 Bottle/m486.obj had 2101 and now has 5995 vertices
 Bottle/m482.obj had 542 and now has 7524 vertices
+Bottle/m484.obj had 460 and now has 7506 vertices
 Bottle/m485.obj had 526 and now has 7519 vertices
 Bottle/m484.obj had 460 and now has 7506 vertices
 Bottle/D00959.obj had 479 and now has 7512 vertices
@@ -211,6 +218,7 @@ BuildingNonResidential/m475.obj had 112 and now has 7232 vertices
 BuildingNonResidential/m477.obj had 1047 and now has 7879 vertices
 BuildingNonResidential/m415.obj had 508 and now has 7518 vertices
 BuildingNonResidential/m474.obj had 1361 and now has 7509 vertices
+BuildingNonResidential/m474.obj had 1361 and now has 7509 vertices
 BuildingNonResidential/m471.obj had 118 and now has 7498 vertices
 BuildingNonResidential/m481.obj had 473 and now has 7525 vertices
 BuildingNonResidential/m418.obj had 1576 and now has 7566 vertices
@@ -218,6 +226,7 @@ BuildingNonResidential/m478.obj had 1750 and now has 7617 vertices
 BuildingNonResidential/m479.obj had 648 and now has 7557 vertices
 Car/D00168.obj had 4999 and now has 7608 vertices
 Car/D00265.obj had 4960 and now has 7677 vertices
+Bus/D00516.obj had 4096 and now has 8022 vertices
 Bus/D00516.obj had 4096 and now has 8022 vertices
 Bus/D00832.obj had 3155 and now has 7873 vertices
 Bus/D00446.obj had 4915 and now has 8422 vertices
@@ -238,6 +247,7 @@ Car/m1515.obj had 250 and now has 5333 vertices
 Car/m1508.obj had 4336 and now has 7818 vertices
 Car/m1521.obj had 308 and now has 7848 vertices
 Car/m1517.obj had 3956 and now has 7554 vertices
+Car/m1523.obj had 1830 and now has 5470 vertices
 Car/m1519.obj had 4275 and now has 7532 vertices
 Car/m1523.obj had 1830 and now has 5470 vertices
 Car/m1526.obj had 320 and now has 7600 vertices
@@ -260,7 +270,9 @@ Cellphone/D00312.obj had 1012 and now has 8720 vertices
 Cellphone/D00192.obj had 1230 and now has 7512 vertices
 Cellphone/D00369.obj had 926 and now has 7865 vertices
 Cellphone/D00440.obj had 763 and now has 6430 vertices
+Cellphone/D00440.obj had 763 and now has 6430 vertices
 Cellphone/D00559.obj had 3120 and now has 8483 vertices
+Cellphone/D00902.obj had 2408 and now has 6868 vertices
 Cellphone/D00902.obj had 2408 and now has 6868 vertices
 Cellphone/D00979.obj had 3120 and now has 8480 vertices
 Cellphone/D00997.obj had 4796 and now has 7502 vertices
@@ -278,9 +290,11 @@ Chess/D01112.obj had 1182 and now has 7500 vertices
 Chess/D01126.obj had 802 and now has 7202 vertices
 Chess/D01130.obj had 1282 and now has 7493 vertices
 Chess/D01123.obj had 390 and now has 7500 vertices
+Chess/D01123.obj had 390 and now has 7500 vertices
 Chess/D01171.obj had 4002 and now has 7500 vertices
 Chess/D01145.obj had 390 and now has 7500 vertices
 Chess/D01138.obj had 416 and now has 7500 vertices
+Chess/m1589.obj had 3782 and now has 7555 vertices
 Chess/m1599.obj had 250 and now has 6698 vertices
 Chess/D01188.obj had 242 and now has 6482 vertices
 Chess/m1589.obj had 3782 and now has 7555 vertices
@@ -323,7 +337,9 @@ ClassicPiano/D00967.obj had 4279 and now has 9811 vertices
 ClassicPiano/D00789.obj had 3136 and now has 7852 vertices
 Computer/D01028.obj had 2503 and now has 6720 vertices
 Computer/D01026.obj had 396 and now has 7504 vertices
+Computer/D01026.obj had 396 and now has 7504 vertices
 Computer/D01037.obj had 135 and now has 5335 vertices
+Computer/D01033.obj had 2986 and now has 8652 vertices
 Computer/D01071.obj had 29 and now has 5232 vertices
 ClassicPiano/D00845.obj had 750 and now has 7491 vertices
 Computer/D01033.obj had 2986 and now has 8652 vertices
@@ -343,6 +359,7 @@ Computer/m1767.obj had 2591 and now has 7700 vertices
 Computer/m1764.obj had 668 and now has 5036 vertices
 Computer/m1769.obj had 46 and now has 9242 vertices
 Computer/m1770.obj had 2986 and now has 8652 vertices
+Computer/m1769.obj had 46 and now has 9242 vertices
 Computer/m1773.obj had 2503 and now has 6720 vertices
 Computer/m1774.obj had 284 and now has 9904 vertices
 Computer/m1777.obj had 325 and now has 8359 vertices
@@ -368,6 +385,7 @@ Cup/D00214.obj had 395 and now has 7500 vertices
 Cup/D00463.obj had 4710 and now has 7500 vertices
 ComputerKeyboard/D00673.obj had 1002 and now has 7277 vertices
 Cup/D00035.obj had 235 and now has 7430 vertices
+Cup/D00463.obj had 4710 and now has 7500 vertices
 Cup/D00874.obj had 2296 and now has 5643 vertices
 Cup/D00519.obj had 856 and now has 7504 vertices
 Cup/m494.obj had 770 and now has 6914 vertices
@@ -393,12 +411,14 @@ ComputerKeyboard/D00692.obj had 4176 and now has 7844 vertices
 DeskLamp/D00686.obj had 3558 and now has 7514 vertices
 DeskLamp/D00715.obj had 1964 and now has 5880 vertices
 DeskLamp/D00776.obj had 1001 and now has 8849 vertices
+ComputerKeyboard/D00692.obj had 4176 and now has 7844 vertices
 DeskLamp/m605.obj had 531 and now has 5731 vertices
-DeskLamp/m606.obj had 87 and now has 5887 vertices
 DeskLamp/m608.obj had 699 and now has 5955 vertices
+DeskLamp/m606.obj had 87 and now has 5887 vertices
 DeskLamp/m604.obj had 1316 and now has 7544 vertices
 DeskLamp/m613.obj had 136 and now has 8136 vertices
 DeskLamp/m609.obj had 1137 and now has 7505 vertices
+DeskLamp/m614.obj had 336 and now has 9228 vertices
 DeskLamp/m614.obj had 336 and now has 9228 vertices
 DeskLamp/m615.obj had 2689 and now has 8095 vertices
 DeskLamp/m611.obj had 87 and now has 8087 vertices
@@ -439,8 +459,9 @@ Door/D01167.obj had 124 and now has 7499 vertices
 Door/m1707.obj had 456 and now has 7503 vertices
 Door/m1717.obj had 858 and now has 7326 vertices
 Door/m1718.obj had 2695 and now has 7029 vertices
-Door/m1720.obj had 716 and now has 6028 vertices
+Door/m1707.obj had 456 and now has 7503 vertices
 Door/m1710.obj had 522 and now has 7512 vertices
+Door/m1720.obj had 716 and now has 6028 vertices
 Door/m1721.obj had 716 and now has 6500 vertices
 Door/m1725.obj had 3232 and now has 9604 vertices
 Door/m1722.obj had 1336 and now has 7509 vertices
@@ -457,7 +478,6 @@ Drum/D00063.obj had 1800 and now has 8952 vertices
 Door/m1727.obj had 3724 and now has 7518 vertices
 Drum/D00115.obj had 36 and now has 8196 vertices
 Drum/D00383.obj had 360 and now has 5640 vertices
-Drum/D00298.obj had 1609 and now has 7558 vertices
 Drum/D00404.obj had 1296 and now has 9540 vertices
 Door/D01139.obj had 31 and now has 7504 vertices
 Drum/D00193.obj had 1800 and now has 7537 vertices
@@ -477,7 +497,6 @@ Fish/D00251.obj had 4006 and now has 7703 vertices
 Fish/D00293.obj had 4072 and now has 7700 vertices
 Fish/D00351.obj had 3206 and now has 8755 vertices
 Fish/D00450.obj had 3784 and now has 7655 vertices
-Fish/D00535.obj had 3934 and now has 7677 vertices
 Fish/D00636.obj had 3374 and now has 9078 vertices
 Fish/D00643.obj had 3928 and now has 7687 vertices
 Fish/D00398.obj had 3820 and now has 7660 vertices
@@ -501,6 +520,7 @@ FloorLamp/D00447.obj had 4911 and now has 7505 vertices
 FloorLamp/m619.obj had 361 and now has 9409 vertices
 FloorLamp/m621.obj had 778 and now has 6890 vertices
 FloorLamp/m617.obj had 4440 and now has 7511 vertices
+FloorLamp/m619.obj had 361 and now has 9409 vertices
 FloorLamp/D00981.obj had 454 and now has 7510 vertices
 FloorLamp/m624.obj had 46 and now has 9242 vertices
 FloorLamp/m618.obj had 1622 and now has 7502 vertices
@@ -525,9 +545,11 @@ Guitar/D00124.obj had 2013 and now has 7579 vertices
 Glasses/D00937.obj had 312 and now has 7500 vertices
 Guitar/D00534.obj had 1864 and now has 5464 vertices
 Guitar/D00464.obj had 3016 and now has 8673 vertices
+Guitar/D00464.obj had 3016 and now has 8673 vertices
 Guitar/D00645.obj had 1033 and now has 8761 vertices
 Guitar/D00416.obj had 4694 and now has 7585 vertices
 Gun/D00103.obj had 1931 and now has 7449 vertices
+Glasses/D00656.obj had 220 and now has 7425 vertices
 Glasses/D00656.obj had 220 and now has 7425 vertices
 Gun/D00153.obj had 364 and now has 9516 vertices
 Gun/D00140.obj had 4462 and now has 7541 vertices
@@ -545,13 +567,14 @@ Gun/m649.obj had 1094 and now has 8874 vertices
 Gun/m651.obj had 91 and now has 5291 vertices
 Gun/m648.obj had 1238 and now has 7507 vertices
 Gun/m653.obj had 2162 and now has 6462 vertices
+Gun/m653.obj had 2162 and now has 6462 vertices
 Gun/m654.obj had 1064 and now has 9416 vertices
 Gun/m650.obj had 1460 and now has 7576 vertices
 Gun/m655.obj had 364 and now has 9516 vertices
 Gun/m658.obj had 293 and now has 7573 vertices
 Gun/m652.obj had 4950 and now has 7831 vertices
-Gun/m661.obj had 370 and now has 9054 vertices
 Gun/m659.obj had 1181 and now has 7509 vertices
+Gun/m661.obj had 370 and now has 9054 vertices
 Gun/m665.obj had 1847 and now has 5347 vertices
 Gun/m667.obj had 767 and now has 6767 vertices
 Gun/m662.obj had 460 and now has 7515 vertices
@@ -561,6 +584,7 @@ Gun/m669.obj had 1070 and now has 8398 vertices
 Gun/m663.obj had 502 and now has 7516 vertices
 Gun/m670.obj had 3285 and now has 9823 vertices
 Gun/m668.obj had 1414 and now has 7550 vertices
+Gun/m670.obj had 3285 and now has 9823 vertices
 Gun/m675.obj had 438 and now has 8758 vertices
 Gun/m679.obj had 2003 and now has 5777 vertices
 Gun/m681.obj had 630 and now has 5270 vertices
@@ -576,8 +600,10 @@ Gun/m672.obj had 140 and now has 7503 vertices
 Hand/D01024.obj had 114 and now has 8274 vertices
 Gun/m682.obj had 550 and now has 7535 vertices
 Hand/D01106.obj had 2248 and now has 6714 vertices
+Hand/D01106.obj had 2248 and now has 6714 vertices
 Gun/m683.obj had 502 and now has 7514 vertices
 Hand/D01041.obj had 1546 and now has 7545 vertices
+Hand/D01060.obj had 1521 and now has 7544 vertices
 Hand/D01074.obj had 421 and now has 7500 vertices
 Hand/D01162.obj had 1198 and now has 7500 vertices
 Hand/D01060.obj had 1521 and now has 7544 vertices
@@ -602,6 +628,7 @@ Hat/m1630.obj had 562 and now has 5042 vertices
 Hat/m1631.obj had 2064 and now has 5460 vertices
 Hand/m338.obj had 1547 and now has 7500 vertices
 Hand/m336.obj had 1557 and now has 7500 vertices
+Hat/m1639.obj had 2029 and now has 6029 vertices
 Hat/m1637.obj had 1002 and now has 9002 vertices
 Hat/m1639.obj had 2029 and now has 6029 vertices
 Hat/m1632.obj had 1264 and now has 7491 vertices
@@ -612,6 +639,7 @@ Hat/m1636.obj had 426 and now has 7500 vertices
 Hat/m1641.obj had 1256 and now has 7502 vertices
 Helicopter/D00191.obj had 4498 and now has 7616 vertices
 Helicopter/D00502.obj had 3716 and now has 7878 vertices
+Helicopter/D00658.obj had 2770 and now has 7434 vertices
 Helicopter/D00658.obj had 2770 and now has 7434 vertices
 Helicopter/D00423.obj had 1362 and now has 7510 vertices
 Helicopter/D00796.obj had 222 and now has 5006 vertices
@@ -668,6 +696,7 @@ House/m452.obj had 2557 and now has 7656 vertices
 House/m441.obj had 2086 and now has 7816 vertices
 House/m453.obj had 2385 and now has 7498 vertices
 House/m454.obj had 200 and now has 8840 vertices
+House/m457.obj had 284 and now has 5705 vertices
 House/m457.obj had 284 and now has 5705 vertices
 House/m456.obj had 607 and now has 9746 vertices
 House/m461.obj had 816 and now has 7137 vertices
@@ -768,6 +797,7 @@ Humanoid/m185.obj had 493 and now has 7513 vertices
 Humanoid/m197.obj had 2010 and now has 5022 vertices
 Humanoid/m196.obj had 4049 and now has 7561 vertices
 Humanoid/m202.obj had 148 and now has 9268 vertices
+Humanoid/m196.obj had 4049 and now has 7561 vertices
 Humanoid/m192.obj had 450 and now has 7510 vertices
 Humanoid/m205.obj had 662 and now has 5606 vertices
 Humanoid/m187.obj had 1618 and now has 7525 vertices
@@ -781,6 +811,7 @@ Humanoid/m214.obj had 1739 and now has 5159 vertices
 Humanoid/m215.obj had 689 and now has 5969 vertices
 Humanoid/m207.obj had 3238 and now has 9148 vertices
 Humanoid/m217.obj had 955 and now has 8295 vertices
+Humanoid/m218.obj had 947 and now has 8395 vertices
 Humanoid/m218.obj had 947 and now has 8395 vertices
 Humanoid/m213.obj had 409 and now has 7507 vertices
 Humanoid/m211.obj had 2640 and now has 8116 vertices
@@ -828,6 +859,7 @@ Insect/D00695.obj had 790 and now has 6790 vertices
 Insect/D00309.obj had 1551 and now has 7558 vertices
 Insect/D00713.obj had 1728 and now has 8536 vertices
 Insect/D00590.obj had 1430 and now has 7500 vertices
+Insect/D00590.obj had 1430 and now has 7500 vertices
 Insect/D00746.obj had 4250 and now has 7535 vertices
 Insect/D00786.obj had 2859 and now has 8188 vertices
 Insect/D00734.obj had 1588 and now has 7544 vertices
@@ -836,8 +868,8 @@ Insect/D00855.obj had 299 and now has 7501 vertices
 Insect/D00774.obj had 1548 and now has 7525 vertices
 Insect/D00787.obj had 562 and now has 7472 vertices
 Insect/m0.obj had 298 and now has 6694 vertices
-Insect/m1.obj had 255 and now has 5585 vertices
 Insect/D00989.obj had 313 and now has 7957 vertices
+Insect/m1.obj had 255 and now has 5585 vertices
 Insect/D00814.obj had 1362 and now has 7517 vertices
 Insect/m12.obj had 278 and now has 6778 vertices
 Insect/m14.obj had 891 and now has 7603 vertices
@@ -849,6 +881,7 @@ Insect/m18.obj had 4250 and now has 7535 vertices
 Insect/m10.obj had 1362 and now has 7517 vertices
 Insect/m2.obj had 3495 and now has 7542 vertices
 Insect/D00895.obj had 4173 and now has 7930 vertices
+Insect/m18.obj had 4250 and now has 7535 vertices
 Insect/m21.obj had 346 and now has 7574 vertices
 Insect/m22.obj had 333 and now has 8393 vertices
 Insect/m17.obj had 1548 and now has 7525 vertices
@@ -894,17 +927,21 @@ Jet/m1168.obj had 500 and now has 7478 vertices
 Jet/m1187.obj had 299 and now has 8047 vertices
 Jet/m1188.obj had 279 and now has 7273 vertices
 Jet/m1183.obj had 520 and now has 7538 vertices
+Jet/m1188.obj had 279 and now has 7273 vertices
 Jet/m1181.obj had 412 and now has 7500 vertices
 Jet/m1177.obj had 507 and now has 7501 vertices
 Jet/m1193.obj had 1020 and now has 9137 vertices
 Jet/m1194.obj had 757 and now has 5509 vertices
 Jet/m1195.obj had 340 and now has 6320 vertices
 Jet/m1180.obj had 531 and now has 7500 vertices
+Jet/m1180.obj had 531 and now has 7500 vertices
 Jet/m1191.obj had 1295 and now has 7523 vertices
 Jet/m1197.obj had 235 and now has 6527 vertices
 Jet/m1198.obj had 224 and now has 6229 vertices
 Jet/m1199.obj had 602 and now has 5146 vertices
+Jet/m1199.obj had 602 and now has 5146 vertices
 Jet/m1200.obj had 197 and now has 6047 vertices
+Jet/m1202.obj had 688 and now has 6012 vertices
 Jet/m1205.obj had 369 and now has 7597 vertices
 Jet/m1196.obj had 523 and now has 7538 vertices
 Jet/m1208.obj had 308 and now has 7055 vertices
@@ -918,8 +955,9 @@ Jet/m1210.obj had 577 and now has 5157 vertices
 Jet/m1182.obj had 179 and now has 7500 vertices
 Jet/m1216.obj had 879 and now has 7895 vertices
 Jet/m1217.obj had 305 and now has 8027 vertices
-Jet/m1218.obj had 274 and now has 5424 vertices
+Jet/m1182.obj had 179 and now has 7500 vertices
 Jet/m1212.obj had 1173 and now has 7505 vertices
+Jet/m1218.obj had 274 and now has 5424 vertices
 Jet/m1211.obj had 486 and now has 7521 vertices
 Jet/m1222.obj had 332 and now has 8288 vertices
 Jet/m1221.obj had 372 and now has 9316 vertices
@@ -927,6 +965,7 @@ Jet/m1185.obj had 152 and now has 7494 vertices
 Jet/m1223.obj had 1117 and now has 7500 vertices
 Jet/m1190.obj had 142 and now has 7494 vertices
 Jet/m1228.obj had 329 and now has 5113 vertices
+Jet/m1220.obj had 437 and now has 7502 vertices
 Jet/m1220.obj had 437 and now has 7502 vertices
 Jet/m1230.obj had 2360 and now has 6685 vertices
 Jet/m1229.obj had 3388 and now has 9810 vertices
@@ -959,6 +998,8 @@ Jet/m1252.obj had 3072 and now has 7906 vertices
 Jet/m1250.obj had 2539 and now has 7509 vertices
 Jet/m1255.obj had 3167 and now has 9608 vertices
 Jet/m1261.obj had 431 and now has 8907 vertices
+Jet/m1251.obj had 1198 and now has 7520 vertices
+Jet/m1246.obj had 366 and now has 7496 vertices
 Jet/m1263.obj had 1244 and now has 9612 vertices
 Jet/m1264.obj had 1144 and now has 9128 vertices
 Jet/m1266.obj had 3408 and now has 9216 vertices
@@ -973,7 +1014,9 @@ Jet/m1225.obj had 183 and now has 7522 vertices
 Jet/m1277.obj had 2239 and now has 6463 vertices
 Jet/m1278.obj had 2304 and now has 6648 vertices
 Jet/m1279.obj had 734 and now has 5550 vertices
+Jet/m1278.obj had 2304 and now has 6648 vertices
 Jet/m1269.obj had 230 and now has 7530 vertices
+Jet/m1276.obj had 236 and now has 7530 vertices
 Jet/m1283.obj had 275 and now has 5059 vertices
 Jet/m1281.obj had 415 and now has 9411 vertices
 Jet/m1282.obj had 368 and now has 8272 vertices
@@ -1008,6 +1051,7 @@ Jet/m1294.obj had 257 and now has 7538 vertices
 Knife/D01132.obj had 1058 and now has 6898 vertices
 Knife/D01150.obj had 287 and now has 7103 vertices
 Knife/D01160.obj had 270 and now has 7014 vertices
+Jet/m1294.obj had 257 and now has 7538 vertices
 Knife/D01174.obj had 808 and now has 5602 vertices
 Knife/D01119.obj had 113 and now has 8615 vertices
 Knife/D01187.obj had 422 and now has 8318 vertices
@@ -1020,6 +1064,7 @@ Knife/D01054.obj had 130 and now has 7471 vertices
 Knife/m727.obj had 681 and now has 6065 vertices
 MilitaryVehicle/D00051.obj had 855 and now has 7351 vertices
 Knife/m726.obj had 417 and now has 7502 vertices
+MilitaryVehicle/D00100.obj had 3225 and now has 8792 vertices
 Knife/m728.obj had 463 and now has 7517 vertices
 MilitaryVehicle/D00100.obj had 3225 and now has 8792 vertices
 Knife/D01057.obj had 184 and now has 7484 vertices
@@ -1053,6 +1098,7 @@ Monoplane/D00798.obj had 2337 and now has 6489 vertices
 Monoplane/D00304.obj had 1521 and now has 7566 vertices
 Monoplane/D00925.obj had 713 and now has 6089 vertices
 Monoplane/D00262.obj had 524 and now has 7532 vertices
+Monoplane/D00262.obj had 524 and now has 7532 vertices
 Monoplane/D00963.obj had 790 and now has 6102 vertices
 Motorcycle/D00269.obj had 3061 and now has 8605 vertices
 Monoplane/D00482.obj had 1672 and now has 7619 vertices
@@ -1081,6 +1127,7 @@ Mug/m508.obj had 998 and now has 8950 vertices
 Mug/m507.obj had 3330 and now has 9922 vertices
 Mug/D00923.obj had 738 and now has 7364 vertices
 MultiSeat/D00046.obj had 1191 and now has 7503 vertices
+MultiSeat/D00237.obj had 1940 and now has 5780 vertices
 MultiSeat/D00237.obj had 1940 and now has 5780 vertices
 MultiSeat/D00053.obj had 3214 and now has 7515 vertices
 MultiSeat/D00036.obj had 144 and now has 7503 vertices
@@ -1118,8 +1165,10 @@ Musical_Instrument/m632.obj had 1033 and now has 8761 vertices
 Musical_Instrument/m626.obj had 4500 and now has 7568 vertices
 Musical_Instrument/m634.obj had 1372 and now has 7567 vertices
 Musical_Instrument/m633.obj had 524 and now has 7436 vertices
+MultiSeat/m839.obj had 540 and now has 7503 vertices
 Musical_Instrument/m630.obj had 4694 and now has 7575 vertices
 Musical_Instrument/m638.obj had 3884 and now has 7531 vertices
+Musical_Instrument/m641.obj had 1864 and now has 5464 vertices
 Musical_Instrument/m641.obj had 1864 and now has 5464 vertices
 Musical_Instrument/m640.obj had 3712 and now has 7512 vertices
 Musical_Instrument/m643.obj had 1331 and now has 7542 vertices
@@ -1131,7 +1180,6 @@ NonWheelChair/D00185.obj had 261 and now has 5899 vertices
 MultiSeat/m784.obj had 24 and now has 7502 vertices
 NonWheelChair/D00445.obj had 1882 and now has 6142 vertices
 NonWheelChair/D00512.obj had 345 and now has 7439 vertices
-NonWheelChair/D00694.obj had 730 and now has 6378 vertices
 NonWheelChair/D00240.obj had 1474 and now has 7506 vertices
 NonWheelChair/D00741.obj had 4133 and now has 9327 vertices
 MultiSeat/m783.obj had 66 and now has 7502 vertices
@@ -1159,6 +1207,7 @@ NonWheelChair/m809.obj had 120 and now has 7320 vertices
 NonWheelChair/m800.obj had 116 and now has 7716 vertices
 NonWheelChair/D00481.obj had 932 and now has 7508 vertices
 NonWheelChair/m810.obj had 775 and now has 6751 vertices
+NonWheelChair/m809.obj had 120 and now has 7320 vertices
 NonWheelChair/m811.obj had 257 and now has 5899 vertices
 NonWheelChair/m813.obj had 257 and now has 5897 vertices
 NonWheelChair/m812.obj had 257 and now has 5899 vertices
@@ -1184,6 +1233,7 @@ PianoBoard/D00253.obj had 719 and now has 5057 vertices
 NonWheelChair/m793.obj had 81 and now has 7511 vertices
 PianoBoard/D00075.obj had 1309 and now has 9088 vertices
 PianoBoard/D00332.obj had 454 and now has 6726 vertices
+NonWheelChair/m823.obj had 440 and now has 7510 vertices
 PianoBoard/D00381.obj had 735 and now has 5931 vertices
 PianoBoard/D00460.obj had 754 and now has 5254 vertices
 PianoBoard/D00008.obj had 2078 and now has 7624 vertices
@@ -1211,12 +1261,13 @@ PlantIndoors/m1036.obj had 234 and now has 5447 vertices
 PlantIndoors/m1035.obj had 1787 and now has 5147 vertices
 PlantIndoors/m989.obj had 1027 and now has 5123 vertices
 PlantIndoors/m994.obj had 395 and now has 6297 vertices
+PlantIndoors/m990.obj had 491 and now has 8863 vertices
 PlantIndoors/m992.obj had 491 and now has 8863 vertices
 PlantIndoors/m1033.obj had 197 and now has 6437 vertices
 PlantIndoors/m996.obj had 623 and now has 5139 vertices
 PlantIndoors/m991.obj had 4867 and now has 8058 vertices
-PlantIndoors/m998.obj had 318 and now has 6532 vertices
 PlantIndoors/m999.obj had 1235 and now has 6343 vertices
+PlantIndoors/m998.obj had 318 and now has 6532 vertices
 PlantWildNonTree/m1052.obj had 342 and now has 7782 vertices
 PlantIndoors/m990.obj had 491 and now has 8863 vertices
 PlantIndoors/m997.obj had 695 and now has 7585 vertices
@@ -1250,6 +1301,7 @@ Quadruped/m101.obj had 1143 and now has 9863 vertices
 Quadruped/m107.obj had 3051 and now has 9103 vertices
 Quadruped/D00831.obj had 1614 and now has 7514 vertices
 Quadruped/m106.obj had 346 and now has 9316 vertices
+Quadruped/m107.obj had 3051 and now has 9103 vertices
 Quadruped/m109.obj had 1288 and now has 7509 vertices
 PianoBoard/D00212.obj had 3238 and now has 6883 vertices
 Quadruped/m276.obj had 2309 and now has 6896 vertices
@@ -1300,6 +1352,7 @@ RectangleTable/D00188.obj had 240 and now has 7509 vertices
 RectangleTable/m875.obj had 528 and now has 7541 vertices
 RectangleTable/m878.obj had 320 and now has 7262 vertices
 RectangleTable/m879.obj had 276 and now has 7504 vertices
+RectangleTable/D00188.obj had 240 and now has 7509 vertices
 RectangleTable/m883.obj had 96 and now has 6976 vertices
 RectangleTable/m877.obj had 56 and now has 7503 vertices
 RectangleTable/m882.obj had 598 and now has 7530 vertices
@@ -1310,6 +1363,7 @@ RectangleTable/D00714.obj had 672 and now has 7513 vertices
 RectangleTable/m874.obj had 68 and now has 7507 vertices
 RectangleTable/m870.obj had 48 and now has 7500 vertices
 RectangleTable/m886.obj had 996 and now has 7367 vertices
+RectangleTable/m888.obj had 36 and now has 7296 vertices
 RectangleTable/m889.obj had 511 and now has 7500 vertices
 RectangleTable/m896.obj had 144 and now has 6544 vertices
 RectangleTable/m897.obj had 128 and now has 6208 vertices
@@ -1349,21 +1403,19 @@ Rocket/D00697.obj had 217 and now has 5807 vertices
 Rocket/D00614.obj had 161 and now has 9121 vertices
 Rocket/D00528.obj had 204 and now has 5300 vertices
 Rocket/D00764.obj had 250 and now has 5418 vertices
+Rocket/D00614.obj had 161 and now has 9121 vertices
 Rocket/D00851.obj had 1175 and now has 9222 vertices
 RoundTable/D00083.obj had 1072 and now has 9200 vertices
 RoundTable/D00194.obj had 371 and now has 8223 vertices
-RoundTable/D00344.obj had 136 and now has 9576 vertices
 RoundTable/D00401.obj had 355 and now has 7518 vertices
 Rocket/D00433.obj had 170 and now has 7507 vertices
 RoundTable/D00407.obj had 215 and now has 5519 vertices
-RoundTable/D00501.obj had 744 and now has 6616 vertices
 RoundTable/D00503.obj had 1706 and now has 5022 vertices
 RoundTable/D00646.obj had 1921 and now has 5521 vertices
 RoundTable/D00581.obj had 4126 and now has 6876 vertices
 RoundTable/D00649.obj had 2136 and now has 6392 vertices
 RoundTable/D00827.obj had 1732 and now has 5168 vertices
 RoundTable/D00524.obj had 1141 and now has 7502 vertices
-RoundTable/D00866.obj had 288 and now has 8556 vertices
 RoundTable/D00948.obj had 1740 and now has 5204 vertices
 RoundTable/m921.obj had 1921 and now has 5521 vertices
 RoundTable/D00756.obj had 837 and now has 7436 vertices
@@ -1440,6 +1492,7 @@ Ship/m1433.obj had 926 and now has 5834 vertices
 Ship/m1432.obj had 573 and now has 7554 vertices
 Ship/m1435.obj had 4241 and now has 9087 vertices
 Ship/m1429.obj had 749 and now has 7608 vertices
+Ship/m1430.obj had 774 and now has 7621 vertices
 Ship/m1431.obj had 674 and now has 7583 vertices
 Ship/m1436.obj had 1704 and now has 5044 vertices
 Ship/m1430.obj had 774 and now has 7621 vertices
@@ -1474,6 +1527,7 @@ Sign/m1670.obj had 221 and now has 8901 vertices
 Ship/m1469.obj had 1724 and now has 7565 vertices
 Sign/m1680.obj had 360 and now has 9564 vertices
 Sign/m1676.obj had 4031 and now has 7505 vertices
+Sign/m1676.obj had 4031 and now has 7505 vertices
 Ship/m1470.obj had 145 and now has 7503 vertices
 Sign/m1679.obj had 417 and now has 7507 vertices
 Sign/m1684.obj had 44 and now has 9240 vertices
@@ -1487,6 +1541,7 @@ Sign/m1678.obj had 642 and now has 7552 vertices
 Sign/m1671.obj had 119 and now has 7528 vertices
 Skyscraper/D00641.obj had 3299 and now has 6698 vertices
 Skyscraper/D00872.obj had 365 and now has 9049 vertices
+Spoon/D00014.obj had 748 and now has 5233 vertices
 Skyscraper/D00998.obj had 4708 and now has 9807 vertices
 Spoon/D00144.obj had 243 and now has 5871 vertices
 Spoon/D00014.obj had 748 and now has 5233 vertices
@@ -1536,16 +1591,17 @@ SubmachineGun/D00613.obj had 1424 and now has 7493 vertices
 SubmachineGun/D00537.obj had 3629 and now has 7500 vertices
 SubmachineGun/D00733.obj had 4970 and now has 7743 vertices
 SubmachineGun/D00878.obj had 2027 and now has 7527 vertices
-SubmachineGun/D00970.obj had 451 and now has 7517 vertices
 SubmachineGun/D00893.obj had 170 and now has 7510 vertices
 Sword/D00162.obj had 1150 and now has 7500 vertices
 Sword/D00635.obj had 725 and now has 5573 vertices
 SubmachineGun/D00960.obj had 182 and now has 7513 vertices
 Sword/D00712.obj had 327 and now has 8153 vertices
+Sword/D00513.obj had 4136 and now has 7608 vertices
 Sword/D00807.obj had 176 and now has 8600 vertices
 Spoon/D00964.obj had 211 and now has 7395 vertices
 Sword/D00513.obj had 4136 and now has 7608 vertices
 Sword/m688.obj had 1977 and now has 5915 vertices
+Sword/m687.obj had 800 and now has 6816 vertices
 Sword/D00916.obj had 2993 and now has 7682 vertices
 Sword/D00808.obj had 1787 and now has 7485 vertices
 Sword/D00195.obj had 1429 and now has 7488 vertices
@@ -1578,7 +1634,7 @@ Tool/D01003.obj had 3963 and now has 7500 vertices
 Tool/D01086.obj had 3804 and now has 7500 vertices
 Tool/D01012.obj had 4463 and now has 7500 vertices
 Tool/D01040.obj had 4794 and now has 7500 vertices
-Tool/D01084.obj had 4491 and now has 7500 vertices
+Sword/m689.obj had 178 and now has 7499 vertices
 Tool/D01111.obj had 4284 and now has 7500 vertices
 Tool/D01113.obj had 4407 and now has 7500 vertices
 Tool/D01131.obj had 4487 and now has 7500 vertices
@@ -1594,6 +1650,7 @@ Tool/m1104.obj had 362 and now has 9566 vertices
 Tool/m1100.obj had 232 and now has 6108 vertices
 Tool/D01176.obj had 4298 and now has 7500 vertices
 Tool/m1108.obj had 2186 and now has 5942 vertices
+Tool/m1104.obj had 362 and now has 9566 vertices
 Tool/m1107.obj had 1116 and now has 9912 vertices
 Tool/m1110.obj had 850 and now has 7598 vertices
 Tool/m1113.obj had 2042 and now has 6118 vertices
@@ -1645,6 +1702,7 @@ Tree/m1082.obj had 82 and now has 5682 vertices
 Tree/m1078.obj had 724 and now has 9772 vertices
 Tree/m1091.obj had 2457 and now has 6271 vertices
 Tree/m1092.obj had 337 and now has 8631 vertices
+Tree/m1093.obj had 1197 and now has 9013 vertices
 Tree/m1095.obj had 1303 and now has 7083 vertices
 Tree/m1096.obj had 835 and now has 6339 vertices
 Tree/m1098.obj had 3441 and now has 7140 vertices
@@ -1654,12 +1712,13 @@ Truck/D00241.obj had 1162 and now has 8152 vertices
 Truck/D00002.obj had 482 and now has 7480 vertices
 Tree/m1079.obj had 155 and now has 7507 vertices
 Truck/D00406.obj had 1419 and now has 7535 vertices
-Truck/D00056.obj had 4148 and now has 8067 vertices
 Truck/D00047.obj had 3644 and now has 7954 vertices
+Truck/D00056.obj had 4148 and now has 8067 vertices
 Truck/D00947.obj had 2530 and now has 7668 vertices
 Tree/m1097.obj had 35 and now has 7506 vertices
 Truck/m1573.obj had 1461 and now has 7526 vertices
 Truck/m1574.obj had 3780 and now has 7526 vertices
+Tree/m1097.obj had 35 and now has 7506 vertices
 Truck/m1576.obj had 3519 and now has 7520 vertices
 Truck/m1570.obj had 1445 and now has 7581 vertices
 TruckNonContainer/D00252.obj had 2288 and now has 7662 vertices
@@ -1694,8 +1753,8 @@ Violin/D00349.obj had 1299 and now has 8709 vertices
 Violin/D00376.obj had 1069 and now has 7288 vertices
 TruckNonContainer/D00572.obj had 4657 and now has 7764 vertices
 Vase/m547.obj had 529 and now has 7512 vertices
-Violin/D00324.obj had 2454 and now has 7687 vertices
 TruckNonContainer/D00731.obj had 4918 and now has 7953 vertices
+Violin/D00324.obj had 2454 and now has 7687 vertices
 Violin/D00620.obj had 771 and now has 5424 vertices
 Violin/D00570.obj had 2297 and now has 7664 vertices
 Violin/D00506.obj had 2841 and now has 7867 vertices
@@ -1705,6 +1764,7 @@ Wheel/m733.obj had 648 and now has 5828 vertices
 Violin/D00340.obj had 4315 and now has 7897 vertices
 Violin/D00743.obj had 466 and now has 7453 vertices
 Wheel/m735.obj had 720 and now has 6320 vertices
+Violin/D00891.obj had 1959 and now has 7586 vertices
 Violin/D00602.obj had 3627 and now has 7777 vertices
 Wheel/m734.obj had 1396 and now has 8660 vertices
 Violin/D00891.obj had 1959 and now has 7586 vertices
@@ -1725,6 +1785,7 @@ Wheel/m736.obj had 504 and now has 7507 vertices
 Wheel/m748.obj had 1247 and now has 7500 vertices
 WheelChair/D00203.obj had 867 and now has 7743 vertices
 WheelChair/D00274.obj had 2012 and now has 5079 vertices
+WheelChair/D00203.obj had 867 and now has 7743 vertices
 Wheel/m743.obj had 512 and now has 7500 vertices
 WheelChair/D00499.obj had 2362 and now has 6439 vertices
 WheelChair/D00526.obj had 679 and now has 5607 vertices
@@ -1740,7 +1801,9 @@ Apartment/D00310.obj had 14464 and now has 5934 vertices
 Apartment/D00045.obj had 14865 and now has 8439 vertices
 Apartment/D00138.obj had 10827 and now has 7518 vertices
 AircraftBuoyant/m1351.obj had 12987 and now has 7735 vertices
+AircraftBuoyant/m1351.obj had 12987 and now has 7735 vertices
 Apartment/D00156.obj had 12732 and now has 7675 vertices
+Apartment/D00086.obj had 20493 and now has 7631 vertices
 Apartment/D00651.obj had 12732 and now has 7679 vertices
 Apartment/D00086.obj had 20493 and now has 7631 vertices
 Apartment/D00681.obj had 13823 and now has 8343 vertices
@@ -1769,6 +1832,7 @@ Bicycle/D00536.obj had 30832 and now has 7969 vertices
 Bicycle/D00838.obj had 23397 and now has 7773 vertices
 Bicycle/D00847.obj had 22672 and now has 7747 vertices
 Bicycle/D00930.obj had 29173 and now has 7904 vertices
+Bicycle/D00462.obj had 56754 and now has 7885 vertices
 Biplane/D00246.obj had 14082 and now has 5022 vertices
 Bicycle/D00931.obj had 32603 and now has 8035 vertices
 Biplane/D00178.obj had 10942 and now has 7794 vertices
@@ -1806,7 +1870,6 @@ Car/D00405.obj had 62279 and now has 7417 vertices
 Car/D00260.obj had 38335 and now has 8478 vertices
 Car/D00299.obj had 23527 and now has 7521 vertices
 Car/D00767.obj had 13728 and now has 7536 vertices
-Car/D00452.obj had 25495 and now has 7633 vertices
 Car/D00724.obj had 17676 and now has 8028 vertices
 Car/D00865.obj had 15085 and now has 7401 vertices
 Car/D00671.obj had 29817 and now has 7802 vertices
@@ -1819,8 +1882,10 @@ Car/m1513.obj had 13106 and now has 7205 vertices
 Car/m1516.obj had 12279 and now has 7439 vertices
 Car/m1503.obj had 24786 and now has 8008 vertices
 Car/m1514.obj had 18662 and now has 7619 vertices
+Car/m1516.obj had 12279 and now has 7439 vertices
 Car/m1525.obj had 10545 and now has 7473 vertices
 Car/m1528.obj had 18656 and now has 7829 vertices
+Car/m1509.obj had 47558 and now has 7604 vertices
 Car/m1535.obj had 15178 and now has 7503 vertices
 Car/m1509.obj had 47558 and now has 7604 vertices
 Car/m1555.obj had 16607 and now has 7453 vertices
@@ -1841,6 +1906,7 @@ Chess/m1596.obj had 16803 and now has 7600 vertices
 Chess/m1593.obj had 25650 and now has 7671 vertices
 City/D01195.obj had 16857 and now has 8094 vertices
 City/D01192.obj had 14752 and now has 8211 vertices
+City/D01192.obj had 14752 and now has 8211 vertices
 City/D01101.obj had 26070 and now has 8698 vertices
 Chess/m1595.obj had 60671 and now has 7608 vertices
 Computer/D01023.obj had 11463 and now has 7857 vertices
@@ -1856,8 +1922,10 @@ DeskLamp/D00912.obj had 10656 and now has 7525 vertices
 DeskLamp/D00797.obj had 14960 and now has 7583 vertices
 DeskLamp/D00547.obj had 22837 and now has 7525 vertices
 DeskLamp/D00744.obj had 21616 and now has 7270 vertices
+DeskLamp/D00912.obj had 10656 and now has 7525 vertices
 DeskPhone/D00118.obj had 12443 and now has 6881 vertices
 DeskPhone/D00154.obj had 17247 and now has 7537 vertices
+DeskLamp/m616.obj had 14129 and now has 7586 vertices
 DeskLamp/m616.obj had 14129 and now has 7586 vertices
 DeskPhone/D00576.obj had 13619 and now has 7530 vertices
 DeskPhone/D00403.obj had 27361 and now has 7572 vertices
@@ -1889,6 +1957,7 @@ Gun/D00826.obj had 11855 and now has 7498 vertices
 Guitar/D00849.obj had 29495 and now has 7948 vertices
 Gun/D00819.obj had 17257 and now has 7553 vertices
 Gun/D00972.obj had 28870 and now has 7546 vertices
+Gun/m656.obj had 15763 and now has 7499 vertices
 Gun/m657.obj had 18283 and now has 7513 vertices
 Gun/m656.obj had 15763 and now has 7499 vertices
 Gun/m666.obj had 13440 and now has 7471 vertices
@@ -1902,6 +1971,7 @@ Helicopter/D00471.obj had 10985 and now has 7568 vertices
 Helicopter/D00361.obj had 27062 and now has 7904 vertices
 Helicopter/D00751.obj had 17617 and now has 7568 vertices
 Helicopter/m1307.obj had 18454 and now has 7568 vertices
+Helicopter/D00644.obj had 35044 and now has 7494 vertices
 Helicopter/D00644.obj had 35044 and now has 7494 vertices
 House/D00044.obj had 10202 and now has 7556 vertices
 House/D00325.obj had 10373 and now has 8465 vertices
@@ -1923,6 +1993,7 @@ Humanoid/m139.obj had 12180 and now has 7530 vertices
 Humanoid/m145.obj had 12758 and now has 7499 vertices
 Humanoid/m152.obj had 10694 and now has 7555 vertices
 Humanoid/m153.obj had 10333 and now has 7360 vertices
+Humanoid/m153.obj had 10333 and now has 7360 vertices
 Humanoid/m149.obj had 17342 and now has 7501 vertices
 Humanoid/m156.obj had 16776 and now has 7471 vertices
 Humanoid/m170.obj had 16052 and now has 7516 vertices
@@ -1931,7 +2002,6 @@ Humanoid/m179.obj had 10735 and now has 7506 vertices
 Humanoid/m182.obj had 11090 and now has 7500 vertices
 Humanoid/m178.obj had 14603 and now has 7500 vertices
 Humanoid/m195.obj had 22608 and now has 7504 vertices
-Humanoid/m220.obj had 12911 and now has 7578 vertices
 Humanoid/m221.obj had 10576 and now has 7504 vertices
 Humanoid/m230.obj had 14796 and now has 7604 vertices
 Humanoid/m228.obj had 15201 and now has 7700 vertices
@@ -1939,6 +2009,7 @@ Humanoid/m223.obj had 10473 and now has 7477 vertices
 Humanoid/m222.obj had 17639 and now has 7492 vertices
 Humanoid/m229.obj had 18153 and now has 7541 vertices
 Humanoid/m231.obj had 13022 and now has 7480 vertices
+Humanoid/m229.obj had 18153 and now has 7541 vertices
 Humanoid/m250.obj had 10589 and now has 7345 vertices
 Humanoid/m253.obj had 11806 and now has 7561 vertices
 Humanoid/m254.obj had 16082 and now has 7438 vertices
@@ -1994,6 +2065,7 @@ MultiSeat/D00273.obj had 27775 and now has 7567 vertices
 MultiSeat/D00985.obj had 10614 and now has 7504 vertices
 MultiSeat/D00749.obj had 32736 and now has 7700 vertices
 MultiSeat/D00263.obj had 41265 and now has 7604 vertices
+MultiSeat/D00263.obj had 41265 and now has 7604 vertices
 MultiSeat/m837.obj had 15969 and now has 7646 vertices
 Musical_Instrument/m628.obj had 10314 and now has 7566 vertices
 Musical_Instrument/m635.obj had 13705 and now has 7528 vertices
@@ -2008,6 +2080,7 @@ NonWheelChair/m796.obj had 12172 and now has 7516 vertices
 PlantIndoors/D00073.obj had 49944 and now has 7811 vertices
 PlantIndoors/D00049.obj had 78288 and now has 7898 vertices
 PlantIndoors/D00128.obj had 64866 and now has 8495 vertices
+PlantIndoors/D00080.obj had 64127 and now has 7436 vertices
 PlantIndoors/D00080.obj had 64127 and now has 7436 vertices
 PlantIndoors/D00370.obj had 26784 and now has 7930 vertices
 PlantIndoors/D00280.obj had 32742 and now has 7888 vertices
@@ -2075,6 +2148,7 @@ Skyscraper/D00058.obj had 73697 and now has 7968 vertices
 Skyscraper/D00520.obj had 51730 and now has 9751 vertices
 Skyscraper/D00259.obj had 50449 and now has 7732 vertices
 Skyscraper/D00729.obj had 51011 and now has 8152 vertices
+Skyscraper/D00259.obj had 50449 and now has 7732 vertices
 Skyscraper/D00870.obj had 65343 and now has 7270 vertices
 Starship/m1362.obj had 13685 and now has 7798 vertices
 Starship/m1380.obj had 11926 and now has 7966 vertices
