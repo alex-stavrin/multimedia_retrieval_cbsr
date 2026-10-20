@@ -5,6 +5,8 @@ from pathlib import Path
 from shutil import copy2
 from dataclasses import dataclass
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from tqdm import tqdm
+import os
 
 MIN_VERTEX_COUNT: Final = 5_000
 TARGET_VERTEX_COUNT: Final = 7_500
@@ -83,7 +85,9 @@ def resample_meshes(
         "fine": fine_models,
     }
 
-    with ProcessPoolExecutor(max_workers=8) as executor:
+    with ProcessPoolExecutor() as executor:
+        n_workers = os.cpu_count() or 1
+        print(f"Using {n_workers} threads")
         futures = [
             executor.submit(
                 resample_one_mesh,
@@ -95,7 +99,11 @@ def resample_meshes(
             for row in data_frame.itertuples()
         ]
 
-        for future in as_completed(futures):
+        for future in tqdm(
+            as_completed(futures),
+            total=len(futures),
+            desc="Resampling meshes",
+        ):
             category, record = future.result()
             groups[category].append(record)
 
@@ -116,7 +124,7 @@ def resample_meshes(
             )
 
             if should_print:
-                print(
+                tqdm.write(
                     f"{record.relative_path}: {record.before_vertices} -> {record.after_vertices}"
                 )
 
@@ -209,12 +217,12 @@ def main() -> None:
     print("Starting resampling. This will take some time...")
 
     resample_meshes(
-        arguements.print_outliers_stats,
-        arguements.print_decimate_logs,
-        arguements.print_subdivision_logs,
-        arguements.models_path,
-        arguements.input_csv_path,
-        arguements.output_path,
+        models_path=arguements.models_path,
+        input_csv_path=arguements.input_csv_path,
+        output_path=arguements.output_path,
+        print_outlier_stats=arguements.print_outliers_stats,
+        print_decimating_logs=arguements.print_decimate_logs,
+        print_subdivision_logs=arguements.print_subdivision_logs,
     )
 
 

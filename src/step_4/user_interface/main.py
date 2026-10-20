@@ -11,12 +11,22 @@ from PySide6.QtWidgets import (
     QListWidgetItem,
 )
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+import ctypes
+from pathlib import Path
 import sys
 from src.step_4.user_interface.viewer import EmbeddedViewer
 from src.step_4.user_interface.class_colors import get_class_color, get_shape_class
 from src.helper.database_functions import retrieve_all_shape_files
 import random
 import os
+
+if sys.platform == "win32":
+    ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+        ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+    )
+else:
+    os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
 
 def query_random_shapes(
@@ -61,6 +71,13 @@ class MainWindow(QMainWindow):
         self,
     ):
         super().__init__()
+
+        app_icon_path = Path(__file__).resolve().parents[3] / "assets" / "icon.png"
+        app_icon = QIcon(str(app_icon_path))
+        self.setWindowIcon(app_icon)
+        app = QApplication.instance()
+        if app is not None:
+            app.setWindowIcon(app_icon)
 
         self.setWindowTitle("Multimedia Retrieval CBSR")
         self.resize(1000, 700)
