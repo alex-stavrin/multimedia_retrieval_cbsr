@@ -37,8 +37,8 @@ class ModelViewer(QMainWindow):
         window_title: str = "Multimedia Retrieval CBSR",
         window_size: tuple[int, int] = (1000, 1000),
         background_color: str = "#FFFFFF",
-        meshes: list[Mesh] = []],
-        models_delta: numpy.array = numpy.zeros(3), # type: ignore
+        meshes: list[Mesh] = [],  # wake up
+        models_delta: numpy.array = numpy.zeros(3),  # type: ignore
     ):
 
         super().__init__()
@@ -59,7 +59,7 @@ class ModelViewer(QMainWindow):
         self.meshes = meshes
         self.points = []
 
-        shift_amount: numpy.array = numpy.zeros(3) # type: ignore
+        shift_amount: numpy.array = numpy.zeros(3)  # type: ignore
         for mesh in self.meshes:
             # add shading and lighting to meshes
             mesh.compute_normals(points=True, cells=True)
@@ -218,7 +218,7 @@ class ModelViewer(QMainWindow):
         self.vtk_widget = QVTKRenderWindowInteractor(container)
         layout.addWidget(self.vtk_widget, 1)
 
-        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color) # type: ignore
+        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)  # type: ignore
 
         self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
         self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
