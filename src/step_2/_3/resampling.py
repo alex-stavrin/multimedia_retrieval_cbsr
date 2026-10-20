@@ -92,7 +92,7 @@ def resample_meshes(
             executor.submit(
                 resample_one_mesh,
                 str(row.relative_file_path),
-                int(row.n_points),
+                int(row.n_points),  # type: ignore
                 Path(models_path),
                 Path(output_path),
             )

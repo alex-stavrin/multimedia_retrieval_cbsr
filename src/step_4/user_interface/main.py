@@ -53,8 +53,7 @@ def style_class_pill(pill: QLabel, shape_path: str) -> None:
     pill_color = get_class_color(shape_class)
     pill.setText(shape_class)
     pill.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    pill.setStyleSheet(
-        f"""
+    pill.setStyleSheet(f"""
         QLabel {{
             background-color: {pill_color};
             color: #000000;
@@ -62,8 +61,7 @@ def style_class_pill(pill: QLabel, shape_path: str) -> None:
             padding: 2px 10px;
             font-weight: bold;
         }}
-        """
-    )
+        """)
 
 
 class MainWindow(QMainWindow):
@@ -77,7 +75,7 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(app_icon)
         app = QApplication.instance()
         if app is not None:
-            app.setWindowIcon(app_icon)
+            app.setWindowIcon(app_icon)  # type: ignore
 
         self.setWindowTitle("Multimedia Retrieval CBSR")
         self.resize(1000, 700)
