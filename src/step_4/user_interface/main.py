@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 import sys
 from src.step_4.user_interface.viewer import EmbeddedViewer
+from src.step_4.user_interface.class_colors import get_class_color, get_shape_class
 from src.helper.database_functions import retrieve_all_shape_files
 import random
 import os
@@ -37,6 +38,24 @@ def query_random_shapes(
     return results[:k]
 
 
+def style_class_pill(pill: QLabel, shape_path: str) -> None:
+    shape_class = get_shape_class(shape_path)
+    pill_color = get_class_color(shape_class)
+    pill.setText(shape_class)
+    pill.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    pill.setStyleSheet(
+        f"""
+        QLabel {{
+            background-color: {pill_color};
+            color: #000000;
+            border-radius: 10px;
+            padding: 2px 10px;
+            font-weight: bold;
+        }}
+        """
+    )
+
+
 class MainWindow(QMainWindow):
     def __init__(
         self,
@@ -56,6 +75,12 @@ class MainWindow(QMainWindow):
 
         left_panel = QWidget()
         left_layout = QVBoxLayout(left_panel)
+
+        self.selected_class_pill = QLabel()
+        self.selected_class_pill.hide()
+        left_layout.addWidget(
+            self.selected_class_pill, alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
         self.file_label = QLabel("No file selected")
         self.file_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -96,6 +121,8 @@ class MainWindow(QMainWindow):
         file_path, _ = QFileDialog.getOpenFileName(self, filter="(*.obj)")
         if file_path:
             self.selected_file = file_path
+            style_class_pill(self.selected_class_pill, file_path)
+            self.selected_class_pill.show()
             self.file_label.setText(file_path)
             self.left_viewer.load_mesh(file_path)
             self.query_button.setEnabled(True)
@@ -104,7 +131,7 @@ class MainWindow(QMainWindow):
         if not self.selected_file:
             return
 
-        k: int = 5
+        k: int = 6
         matches = query_random_shapes(
             query_shape_path=self.selected_file,
             database_directory="3d_models_full_normalized",
@@ -121,7 +148,12 @@ class MainWindow(QMainWindow):
             card = QWidget()
             card.setFixedWidth(viewer_width)
             card_layout = QVBoxLayout(card)
-            card_layout.setContentsMargins(0, 0, 0, 0)
+            card_layout.setContentsMargins(0, 8, 0, 0)
+
+            class_pill = QLabel()
+            style_class_pill(class_pill, shape_path)
+            card_layout.addWidget(class_pill, alignment=Qt.AlignmentFlag.AlignCenter)
+
             label = QLabel(f"{os.path.basename(shape_path)}\ndist: {distance:.3f}")
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             card_layout.addWidget(label)
@@ -129,6 +161,7 @@ class MainWindow(QMainWindow):
             viewer.setFixedSize(viewer_width, viewer_height)
             viewer.load_mesh(shape_path)
             card_layout.addWidget(viewer, alignment=Qt.AlignmentFlag.AlignCenter)
+            card_layout.activate()
             item = QListWidgetItem(self.results_list)
             item.setSizeHint(card.sizeHint())
             self.results_list.addItem(item)
