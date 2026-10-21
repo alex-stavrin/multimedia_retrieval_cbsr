@@ -21,6 +21,14 @@ from pathlib import Path
 import numpy
 from PySide6.QtCore import Qt
 
+# Configure platform taskbar/window icon support before QApplication is initialized.
+if sys.platform == "win32":
+    ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+        ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+    )
+else:
+    os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
+
 
 class ModelViewer(QMainWindow):
     def __init__(
@@ -29,8 +37,8 @@ class ModelViewer(QMainWindow):
         window_title: str = "Multimedia Retrieval CBSR",
         window_size: tuple[int, int] = (1000, 1000),
         background_color: str = "#FFFFFF",
-        meshes: list[Mesh] = None,
-        models_delta: numpy.array = numpy.zeros(3),
+        meshes: list[Mesh] = [],  # wake up
+        models_delta: numpy.array = numpy.zeros(3),  # type: ignore
     ):
 
         super().__init__()
@@ -38,26 +46,20 @@ class ModelViewer(QMainWindow):
         # Make the Application
         self.app = qt_app
 
-        # Add an application icon
-        app_icon_path = Path(__file__).resolve().parent / "assets/icon.png"
-        self.app.setWindowIcon(QIcon(str(app_icon_path)))
+        # Add an application icon (assets/icon.png is at the repository root)
+        app_icon_path = Path(__file__).resolve().parents[2] / "assets" / "icon.png"
+        app_icon = QIcon(str(app_icon_path))
+        self.app.setWindowIcon(app_icon)
+        self.setWindowIcon(app_icon)
 
         self.setWindowTitle(window_title)
         self.resize(*window_size)
-
-        # Give the viewer its own Windows taskbar identity.
-        if sys.platform == "win32":
-            ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
-                ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
-            )
-        else:
-            os.environ["QT_QPA_PLATFORM"] = "xcb"
 
         # pass meshes and points and store them
         self.meshes = meshes
         self.points = []
 
-        shift_amount: numpy.array = numpy.zeros(3)
+        shift_amount: numpy.array = numpy.zeros(3)  # type: ignore
         for mesh in self.meshes:
             # add shading and lighting to meshes
             mesh.compute_normals(points=True, cells=True)
@@ -216,7 +218,7 @@ class ModelViewer(QMainWindow):
         self.vtk_widget = QVTKRenderWindowInteractor(container)
         layout.addWidget(self.vtk_widget, 1)
 
-        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)
+        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)  # type: ignore
 
         self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
         self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
