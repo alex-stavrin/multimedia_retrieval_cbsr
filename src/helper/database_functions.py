@@ -2,13 +2,13 @@ import numpy as np
 import os
 
 
-def retrieve_all_shape_files(root_dir: str):
+def retrieve_all_shape_files(root_dir: str, verbose=False):
     resulting_shape_paths = []
 
     for dirpath, _, filenames in os.walk(root_dir):
         obj_files = [f for f in filenames if f.endswith(".obj")]
 
-        if not obj_files:
+        if not obj_files and verbose:
             print(f"No .obj files found in directory: {dirpath}")
             continue
 

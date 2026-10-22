@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 import vedo
 
-from src.helper.mesh_types import Box
+from src.types.mesh_types import Box
 from src.helper.normalization_utils import ORDER_SLACK, run_cli
 from src.step_2._5.normalizer import center, scale_to_unit_cube
 

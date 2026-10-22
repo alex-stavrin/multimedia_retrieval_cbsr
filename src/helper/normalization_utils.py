@@ -11,7 +11,7 @@ from typing import Callable
 import numpy as np
 from tqdm import tqdm
 
-from src.helper.mesh_types import Box
+from src.types.mesh_types import Box
 
 # A recomputed quantity counts as correct if it is within this distance of its
 # target. Far above the ~1e-7 rounding from single-precision/text storage,

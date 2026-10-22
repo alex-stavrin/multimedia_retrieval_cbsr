@@ -27,6 +27,14 @@ from PySide6.QtCore import Qt, QTimer
 
 DEFAULT_FOV = 90
 
+# Configure platform taskbar/window icon support before QApplication is initialized.
+if sys.platform == "win32":
+    ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
+        ctypes.c_wchar_p("MultimediaRetrieval.CBSR.Viewer")
+    )
+else:
+    os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
+
 
 class ModelViewer(QMainWindow):
     def __init__(
@@ -45,9 +53,11 @@ class ModelViewer(QMainWindow):
         # Make the Application
         self.app = qt_app
 
-        # Add an application icon (the icon lives in the project's assets folder)
+        # Add an application icon (assets/icon.png is at the repository root)
         app_icon_path = Path(__file__).resolve().parents[2] / "assets" / "icon.png"
-        self.app.setWindowIcon(QIcon(str(app_icon_path)))
+        app_icon = QIcon(str(app_icon_path))
+        self.app.setWindowIcon(app_icon)
+        self.setWindowIcon(app_icon)
 
         self.base_title = window_title
         self.setWindowTitle(window_title)
@@ -216,7 +226,7 @@ class ModelViewer(QMainWindow):
         self.vtk_widget = QVTKRenderWindowInteractor(container)
         layout.addWidget(self.vtk_widget, 1)
 
-        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)
+        self.viewer = Plotter(qt_widget=self.vtk_widget, bg=background_color)  # type: ignore
 
         self.viewer.interactor.AddObserver("MouseWheelForwardEvent", self.on_scroll)
         self.viewer.interactor.AddObserver("MouseWheelBackwardEvent", self.on_scroll)
