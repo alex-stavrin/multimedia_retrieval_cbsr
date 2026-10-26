@@ -3,11 +3,15 @@ from src.step_4.distance_calculations.distance_functions import (
     earth_movers_distance,
     cosine_distance,
 )
+from src.step_4.distance_calculations.visualisations import (
+    visualize_mesh_distances,
+)
 
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Callable
+from typing import Callable, Sequence, Any
+import json
 
 import pandas as pd
 import numpy as np
@@ -73,6 +77,8 @@ class ShapeDistanceCalculator:
         }
 
         self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
+
+        self.total_distances: dict[str, float] = {}
 
     def _find_database(self, descriptor: str, histogram: bool) -> Path:
         """Find the CSV containing the requested descriptor."""
@@ -172,13 +178,72 @@ class ShapeDistanceCalculator:
             Path(shape).as_posix().split("4_models_fully_normalized/", 1)[-1]
         )
 
+    @staticmethod
+    def _expand_mesh_paths(paths: Sequence[str | Path]) -> list[str]:
+        """
+        Expand explicit mesh files and directories into a list of
+        OBJ mesh paths.
+
+        Directories are searched recursively. Duplicate paths are removed.
+        The returned paths preserve their relative/absolute form as supplied.
+        """
+        mesh_paths: list[str] = []
+        seen_paths: set[Path] = set()
+
+        for item in paths:
+            path = Path(item)
+
+            if not path.exists():
+                raise FileNotFoundError(f"Mesh path does not exist: '{path}'")
+
+            if path.is_file():
+                if path.suffix.lower() != ".obj":
+                    raise ValueError(
+                        "Expected an OBJ mesh file or directory, got: "
+                        f"'{path}'"
+                    )
+                candidates = [path]
+
+            elif path.is_dir():
+                candidates = sorted(
+                    candidate
+                    for candidate in path.rglob("*")
+                    if candidate.is_file()
+                    and candidate.suffix.lower() == ".obj"
+                )
+
+                if not candidates:
+                    print(f"Warning: no OBJ meshes found in '{path}'")
+
+            else:
+                raise ValueError(f"Not a file or directory: '{path}'")
+
+            for candidate in candidates:
+                # Resolve only for duplicate detection.
+                resolved = candidate.resolve()
+
+                if resolved not in seen_paths:
+                    seen_paths.add(resolved)
+                    mesh_paths.append(candidate.as_posix())
+
+        if not mesh_paths:
+            raise ValueError("No OBJ meshes were found in the supplied paths.")
+
+        return mesh_paths
+
     def calculate_all_distances(
         self,
         query: str,
         shapes_to_compare: list[str],
     ) -> dict[str, dict[str, dict[str, float]]]:
-        """Calculate distances and store results using normalized shape paths."""
+        """Calculate distances and store results using normalized
+        shape paths."""
+
+        self.last_query = query
+
         all_distances = {}
+
+        shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
 
         for function_name, config in self.distance_config.items():
             all_distances[function_name] = {}
@@ -230,6 +295,10 @@ class ShapeDistanceCalculator:
         The results are sorted from smallest to largest total distance.
         Result keys use normalized mesh paths.
         """
+
+        self.last_query = query
+
+        shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
 
         self.calculate_all_distances(
             query=query,
@@ -287,12 +356,77 @@ class ShapeDistanceCalculator:
 
                     total_distances[normalized_shape] += weight * distance
 
-        return dict(
+        self.total_distances = dict(
             sorted(
                 total_distances.items(),
                 key=lambda item: item[1],
             )
         )
+
+        return self.total_distances
+
+    def _format_results(
+        self,
+        query: str,
+        total_distances: dict[str, float],
+        all_distances: dict[str, dict[str, dict[str, float]]],
+    ) -> dict[Any, Any]:
+        """
+        Combine total distances and individual descriptor distances
+        into a JSON-serializable results dictionary.
+        """
+
+        query_path = self._normalize_shape_path(query)
+        results = {}
+
+        for mesh_path, total_distance in total_distances.items():
+            descriptor_distances = {}
+
+            for descriptors in all_distances.values():
+                for descriptor, distances in descriptors.items():
+                    if mesh_path in distances:
+                        descriptor_distances[descriptor] = distances[mesh_path]
+
+            results[mesh_path] = {
+                "total_distance": total_distance,
+                "descriptor_distances": descriptor_distances,
+            }
+
+        return {
+            "query": query_path,
+            "results": results,
+        }
+
+    def save_results(
+        self,
+        output_path: str | Path,
+        query: str | None = None,
+        results: dict[Any, Any] | None = None,
+    ) -> None:
+
+        if not results:
+            if self.total_distances == {}:
+                raise ValueError(
+                    "Results not given, nor latest total distances saved."
+                )
+            if self.all_distances == {}:
+                raise ValueError(
+                    "Results not given, nor latest all distances saved."
+                )
+
+            if not query:
+                results = self._format_results(
+                    query=self.last_query,
+                    all_distances=self.all_distances,
+                    total_distances=self.total_distances,
+                )
+        """Save formatted distance results to a JSON file."""
+
+        output_path = Path(output_path)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with output_path.open("w", encoding="utf-8") as file:
+            json.dump(results, file, indent=4)
 
     def get_distances(
         self,
@@ -339,6 +473,20 @@ def main():
         help=("Comparison mesh identifiers, filenames, " "or relative paths."),
     )
 
+    parser.add_argument(
+        "--visualise",
+        action="store_true",
+        help="Visualises the distances between shapes in interacrtive 3D "
+        "renderder",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        help="Output file directory for json file storing calculation result",
+    )
+
     args = parser.parse_args()
 
     parser.add_argument
@@ -347,8 +495,24 @@ def main():
         distance_config=DISTANCE_CONFIG,
     )
 
+    args.shapes = ShapeDistanceCalculator._expand_mesh_paths(args.shapes)
+
     print(calculator.calculate_all_distances(args.query, args.shapes))
-    print(calculator.calculate_total_distance(args.query, args.shapes))
+    total_distances = calculator.calculate_total_distance(
+        args.query, args.shapes
+    )
+    print(total_distances)
+
+    if args.output:
+        calculator.save_results(args.output)
+
+    if args.visualise:
+        visualize_mesh_distances(
+            query=args.query,
+            shapes_to_compare=args.shapes,
+            descriptor="total distance",
+            distances=total_distances,
+        )
 
 
 if __name__ == "__main__":
