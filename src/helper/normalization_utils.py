@@ -1,284 +1,109 @@
-"""Pieces shared by the normalization scripts (steps 2.5 and 3.1): running a
-script on a file or a whole database, summarizing the result, and re-checking
-the saved files."""
-
 import argparse
 import os
-import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Callable
 
 import numpy as np
 from tqdm import tqdm
 
-from src.types.mesh_types import Box
-
-# A recomputed quantity counts as correct if it is within this distance of its
-# target. Far above the ~1e-7 rounding from single-precision/text storage,
-# far below any real normalization error.
 TOLERANCE = 1e-6
 
-# Near-equal variances (e.g. a table whose width is about its depth) can swap
-# by rounding noise, so the x >= y >= z check allows this much slack.
-ORDER_SLACK = 1e-5
+
+def find_obj_files(folder):
+    paths = []
+    for root, _, files in os.walk(folder):
+        for name in files:
+            if name.endswith(".obj"):
+                paths.append(os.path.join(root, name))
+    return paths
 
 
-def largest_side(box: Box) -> float:
-    return max(box.x_max - box.x_min, box.y_max - box.y_min, box.z_max - box.z_min)
+def run_on_database(input_folder, output_folder, process_file, workers=None):
+    paths = find_obj_files(input_folder)
 
-
-def _run_one(process_file: Callable, input_path: str, output_path: str):
-    """Run in a worker process. A failure is returned, not raised, so one bad
-    shape cannot stop the others."""
-    try:
-        return process_file(input_path, output_path), None
-    except Exception as e:
-        return None, e
-
-
-def _pool(workers: int) -> ProcessPoolExecutor:
-    # One BLAS thread per process: many processes each starting a thread per
-    # core run out of memory on some machines (OpenBLAS allocation errors).
-    # Worker processes inherit this when they start.
+    # numpy runs out of memory on some pcs if every process uses many threads
     os.environ["OPENBLAS_NUM_THREADS"] = "1"
-    return ProcessPoolExecutor(max_workers=workers)
 
-
-def process_database(
-    input_root: str,
-    output_root: str,
-    process_file: Callable[[str, str], object],
-    workers: int | None = None,
-) -> list:
-    """Call `process_file(input_path, output_path)` for every .obj file under
-    `input_root`, mirroring the class sub-folders into `output_root`. The shapes
-    are processed in `workers` parallel processes (default: one per CPU core,
-    1 = no parallelism). A shape that fails is reported and skipped instead of
-    stopping the whole run. Returns what `process_file` returned for the shapes
-    that worked, in no particular order."""
-    input_paths = [
-        os.path.join(dirpath, filename)
-        for dirpath, _, filenames in os.walk(input_root)
-        for filename in filenames
-        if filename.endswith(".obj")
-    ]
-    workers = max(1, min(workers or os.cpu_count() or 1, len(input_paths)))
-
-    results = []
-
-    def collect(input_path: str, result, error) -> None:
-        if error is None:
-            results.append(result)
-        else:
-            # tqdm.write prints above the progress bar without breaking it
-            tqdm.write(f"Skipping {input_path}: {error}")
-
-    def output_for(input_path: str) -> str:
-        return os.path.join(output_root, os.path.relpath(input_path, input_root))
-
-    progress = tqdm(total=len(input_paths), desc="Normalizing", unit="shape")
-    if workers == 1:
-        for input_path in input_paths:
-            collect(
-                input_path, *_run_one(process_file, input_path, output_for(input_path))
+    done = 0
+    with ProcessPoolExecutor(max_workers=workers) as executor:
+        futures = {}
+        for path in paths:
+            output_path = os.path.join(
+                output_folder, os.path.relpath(path, input_folder)
             )
-            progress.update()
-    else:
-        with _pool(workers) as executor:
-            futures = {
-                executor.submit(
-                    _run_one, process_file, input_path, output_for(input_path)
-                ): input_path
-                for input_path in input_paths
-            }
-            for future in as_completed(futures):
-                collect(futures[future], *future.result())
-                progress.update()
-    progress.close()
+            futures[executor.submit(process_file, path, output_path)] = path
 
-    return results
+        for future in tqdm(as_completed(futures), total=len(futures)):
+            try:
+                future.result()
+                done += 1
+            except Exception as error:
+                print(f"Skipping {futures[future]}: {error}")
+
+    print(f"Normalized {done} of {len(paths)} shapes")
 
 
-def summarize_normalization(reports: list, action: str) -> None:
-    """Print how close the barycenter of every processed shape landed to the
-    origin and its largest bounding-box side to 1."""
-    if not reports:
-        print("No shapes were processed.")
-        return
-
-    distances = np.array([np.linalg.norm(r.barycenter_after) for r in reports])
-    sides = np.array([largest_side(r.bounding_box_after) for r in reports])
-    n = len(reports)
-
-    print(f"{action} {n} shapes")
-    print(
-        f"Barycenter distance from origin: mean={distances.mean():.2e}, "
-        f"max={distances.max():.2e}, "
-        f"within {TOLERANCE:g}: {np.sum(distances < TOLERANCE)}/{n}"
-    )
-    print(
-        f"Largest bounding-box dimension:  min={sides.min():.9f}, "
-        f"max={sides.max():.9f}, "
-        f"within {TOLERANCE:g} of 1: {np.sum(np.abs(sides - 1) < TOLERANCE)}/{n}"
-    )
+def read_vertices(path):
+    # only reads the "v x y z" lines, so the check does not need vedo
+    vertices = []
+    with open(path) as file:
+        for line in file:
+            if line.startswith("v "):
+                vertices.append([float(value) for value in line.split()[1:4]])
+    return np.array(vertices)
 
 
-def read_obj_vertices(path: str) -> np.ndarray:
-    """Read only the vertex positions of an .obj file, with no mesh library,
-    so checks built on it share no code (or bugs) with the code they verify."""
-    with open(path, "rb") as f:
-        data = f.read()
-    rows = re.findall(rb"^v[ \t]+(\S+)[ \t]+(\S+)[ \t]+(\S+)", data, re.M)
-    return np.array(rows).astype(np.float64)
+def check_shapes(folder, aligned=False):
+    paths = find_obj_files(folder)
+    center_ok = size_ok = diagonal_ok = order_ok = flip_ok = 0
+
+    for path in tqdm(paths, desc="Checking"):
+        vertices = read_vertices(path)
+
+        if np.linalg.norm(vertices.mean(axis=0)) < TOLERANCE:
+            center_ok += 1
+
+        longest_side = (vertices.max(axis=0) - vertices.min(axis=0)).max()
+        if abs(longest_side - 1) < TOLERANCE:
+            size_ok += 1
+
+        if aligned:
+            cov = np.cov(vertices, rowvar=False)
+            off_diagonal = max(abs(cov[0, 1]), abs(cov[0, 2]), abs(cov[1, 2]))
+            if off_diagonal / cov[0, 0] < TOLERANCE:
+                diagonal_ok += 1
+
+            # small slack, because two variances can be almost equal
+            if cov[0, 0] >= cov[1, 1] - 1e-5 and cov[1, 1] >= cov[2, 2] - 1e-5:
+                order_ok += 1
+
+            moments = np.sum(np.sign(vertices) * vertices**2, axis=0)
+            if np.all(moments >= -TOLERANCE * np.sum(vertices**2)):
+                flip_ok += 1
+
+    n = len(paths)
+    print(f"Barycenter at the origin: {center_ok}/{n}")
+    print(f"Longest side is 1: {size_ok}/{n}")
+    if aligned:
+        print(f"Covariance is diagonal: {diagonal_ok}/{n}")
+        print(f"Variance ordered x >= y >= z: {order_ok}/{n}")
+        print(f"Moment test positive on all axes: {flip_ok}/{n}")
 
 
-def measure(vertices: np.ndarray) -> dict:
-    """Recompute, from the vertices alone, what normalization should fix."""
-    variance = vertices.var(axis=0)
-    covariance = np.cov(vertices, rowvar=False)
-    moments = np.sum(np.sign(vertices) * vertices**2, axis=0)
-    off_diagonal = max(
-        abs(covariance[0, 1]), abs(covariance[0, 2]), abs(covariance[1, 2])
-    )
-    return {
-        "barycenter": np.linalg.norm(vertices.mean(axis=0)),
-        "side": (vertices.max(axis=0) - vertices.min(axis=0)).max(),
-        # zero exactly when the coordinate axes are the principal axes
-        "off_diagonal": off_diagonal / max(covariance[0, 0], 1e-300),
-        "ordered": variance[0] >= variance[1] - ORDER_SLACK
-        and variance[1] >= variance[2] - ORDER_SLACK,
-        # relative to the total second moment, so it doesn't depend on size
-        "flipped": bool(np.all(moments >= -TOLERANCE * np.sum(vertices**2))),
-    }
-
-
-def _measure_file(path: str) -> dict:
-    return measure(read_obj_vertices(path))
-
-
-def verify_saved_database(
-    root: str, check_alignment: bool = False, workers: int | None = None
-) -> bool:
-    """Re-read every normalized .obj file under `root` and recompute, from the
-    saved vertices alone, that the barycenter is at the origin and the largest
-    bounding-box side is 1. With `check_alignment` (Step 3.1) also that the
-    covariance matrix is diagonal with entries ordered x >= y >= z (PCA
-    alignment) and that the moment test is non-negative on every axis
-    (flipping). Returns True only if every shape passes every check."""
-    paths = [
-        os.path.join(dirpath, f)
-        for dirpath, _, filenames in os.walk(root)
-        for f in filenames
-        if f.endswith(".obj")
-    ]
-    if not paths:
-        print(f"No .obj files found under {root}")
-        return False
-
-    workers = max(1, min(workers or os.cpu_count() or 1, len(paths)))
-    if workers == 1:
-        measured = [
-            _measure_file(path)
-            for path in tqdm(paths, desc="Checking saved shapes", unit="shape")
-        ]
-    else:
-        with _pool(workers) as executor:
-            measured = list(
-                tqdm(
-                    executor.map(_measure_file, paths, chunksize=16),
-                    total=len(paths),
-                    desc="Checking saved shapes",
-                    unit="shape",
-                )
-            )
-    n = len(measured)
-
-    def column(key: str) -> np.ndarray:
-        return np.array([m[key] for m in measured])
-
-    distances, sides = column("barycenter"), column("side")
-    barycenter_ok = int(np.sum(distances < TOLERANCE))
-    side_ok = int(np.sum(np.abs(sides - 1) < TOLERANCE))
-
-    print(f"Re-read {n} saved shapes and recomputed from the files alone:")
-    print(
-        f"  barycenter distance from origin: max={distances.max():.2e}, "
-        f"within {TOLERANCE:g}: {barycenter_ok}/{n}"
-    )
-    print(
-        f"  largest bounding-box dimension:  min={sides.min():.9f}, "
-        f"max={sides.max():.9f}, within {TOLERANCE:g} of 1: {side_ok}/{n}"
-    )
-    all_ok = barycenter_ok == n and side_ok == n
-
-    if check_alignment:
-        off_diagonal = column("off_diagonal")
-        diagonal_ok = int(np.sum(off_diagonal < TOLERANCE))
-        ordered_ok = int(np.sum(column("ordered")))
-        flipped_ok = int(np.sum(column("flipped")))
-        print(
-            f"  off-diagonal covariance / largest variance: "
-            f"max={off_diagonal.max():.2e}, within {TOLERANCE:g}: {diagonal_ok}/{n}"
-        )
-        print(f"  variance ordered x>=y>=z: {ordered_ok}/{n}")
-        print(f"  moment test non-negative on all axes: {flipped_ok}/{n}")
-        all_ok = all_ok and diagonal_ok == n and ordered_ok == n and flipped_ok == n
-
-    return all_ok
-
-
-def run_cli(
-    description: str,
-    process_file: Callable[[str, str], object],
-    action: str,
-    check_alignment: bool = False,
-    extra_summary: Callable[[list], None] | None = None,
-) -> None:
-    """Command line shared by the normalization scripts: `-i` and `-o` are
-    either a single .obj file or a whole database folder. With `--verify` it
-    also prints a summary and re-checks the saved files of a folder."""
+def run_cli(description, process_file, aligned=False):
     parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("-i", "--input", required=True, help="obj file or folder")
+    parser.add_argument("-o", "--output", required=True, help="where to save")
     parser.add_argument(
-        "-i",
-        "--input",
-        type=str,
-        required=True,
-        help="Path to an OBJ file, or a database root directory",
+        "-j", "--workers", type=int, default=None, help="number of processes"
     )
     parser.add_argument(
-        "-o",
-        "--output",
-        type=str,
-        required=True,
-        help="Path to write the result, or output root directory",
-    )
-    parser.add_argument(
-        "-j",
-        "--workers",
-        type=int,
-        default=None,
-        help="Number of parallel processes for a database folder "
-        "(default: one per CPU core, 1 = no parallelism)",
-    )
-    parser.add_argument(
-        "-v",
-        "--verify",
-        action="store_true",
-        help="After a database folder is done, print a summary and re-read "
-        "every saved shape to check the result (slower)",
+        "-v", "--verify", action="store_true", help="check the saved shapes"
     )
     args = parser.parse_args()
 
-    if not os.path.isdir(args.input):
-        print(process_file(args.input, args.output))
-        return
-
-    reports = process_database(args.input, args.output, process_file, args.workers)
-    if not args.verify:
-        print(f"{action} {len(reports)} shapes (use --verify to check the result)")
-        return
-
-    summarize_normalization(reports, action)
-    if reports and extra_summary is not None:
-        extra_summary(reports)
-    verify_saved_database(args.output, check_alignment, args.workers)
+    if os.path.isdir(args.input):
+        run_on_database(args.input, args.output, process_file, args.workers)
+        if args.verify:
+            check_shapes(args.output, aligned)
+    else:
+        process_file(args.input, args.output)
