@@ -4,6 +4,78 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# ---
+# Matplotlib configuration
+plt.rcParams.update(
+    {
+        # General font settings
+        "font.family": "sans-serif",
+        "font.size": 20,
+        # Titles
+        "axes.titlesize": 15,
+        "axes.titleweight": "normal",
+        "figure.titlesize": 17,
+        "figure.titleweight": "normal",
+        # Axis labels
+        "axes.labelsize": 15,
+        "axes.labelweight": "normal",
+        # Tick labels
+        "xtick.labelsize": 14,
+        "ytick.labelsize": 14,
+        # Legend
+        "legend.fontsize": 14,
+        "legend.title_fontsize": 15,
+        # Lines and markers
+        "lines.linewidth": 1.5,
+        "lines.markersize": 8,
+        # Histogram patches
+        "patch.linewidth": 0.8,
+        # Grid
+        "grid.linestyle": "--",
+        "grid.linewidth": 0.8,
+        "grid.alpha": 0.4,
+        # Figure defaults
+        "figure.dpi": 100,
+        "savefig.dpi": 200,
+        # Embed TrueType fonts in PDF output
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
+    }
+)
+
+
+# ---
+# Plot style and layout constants
+
+# Colors
+RAW_COLOR = "tab:blue"
+PROCESSED_COLOR = "tab:orange"
+HISTOGRAM_EDGE_COLOR = "black"
+
+# Range plot
+RANGE_LINEWIDTH = 6
+RANGE_LINESTYLE_RAW = "solid"
+RANGE_LINESTYLE_PROCESSED = "dashed"
+RANGE_ENDPOINT_MARKER = "|"
+RANGE_PADDING_FRACTION = 0.08
+ZERO_RANGE_PADDING_FRACTION = 0.05
+ZERO_RANGE_MIN_PADDING = 1.0
+
+# Range plot layout
+RANGE_FIGURE_WIDTH = 13
+RANGE_FIGURE_MIN_HEIGHT = 4.5
+RANGE_ROW_HEIGHT = 0.85
+
+# Histogram layout
+HISTOGRAM_FIGURE_WIDTH = 12
+HISTOGRAM_FIGURE_HEIGHT = 4.5
+DEFAULT_HISTOGRAM_BINS = 50
+
+# Figure layout
+FIGURE_LAYOUT = "tight"
+FIGURE_BBOX = "tight"
+
+# Data handling
 METADATA_COLUMNS = {"file_path", "reason", "was_closed"}
 
 
@@ -69,16 +141,17 @@ def plot_ranges(
     """Plot raw and processed ranges with an independent x-axis
     per descriptor."""
     descriptors = summary["descriptor"].tolist()
-    fig_height = max(4.5, 0.85 * len(descriptors))
+    fig_height = max(
+        RANGE_FIGURE_MIN_HEIGHT,
+        RANGE_ROW_HEIGHT * len(descriptors) * 1.3,
+    )
+
     fig, axes = plt.subplots(
         nrows=len(descriptors),
         ncols=2,
-        figsize=(13, fig_height),
+        figsize=(RANGE_FIGURE_WIDTH, fig_height),
         squeeze=False,
     )
-
-    raw_color = "tab:blue"
-    processed_color = "tab:orange"
 
     for position, (_, row) in enumerate(summary.iterrows()):
         raw_ax = axes[position, 0]
@@ -93,42 +166,53 @@ def plot_ranges(
             0,
             raw_min,
             raw_max,
-            color=raw_color,
-            linewidth=6,
-            linestyles="solid",
+            color=RAW_COLOR,
+            linewidth=RANGE_LINEWIDTH,
+            linestyles=RANGE_LINESTYLE_RAW,
         )
         raw_ax.plot(
             [raw_min, raw_max],
             [0, 0],
-            "|",
-            color=raw_color,
-            markersize=14,
+            RANGE_ENDPOINT_MARKER,
+            color=RAW_COLOR,
         )
+
         processed_ax.hlines(
             0,
             processed_min,
             processed_max,
-            color=processed_color,
-            linewidth=6,
-            linestyles="dashed",
+            color=PROCESSED_COLOR,
+            linewidth=RANGE_LINEWIDTH,
+            linestyles=RANGE_LINESTYLE_PROCESSED,
         )
         processed_ax.plot(
             [processed_min, processed_max],
             [0, 0],
-            "|",
-            color=processed_color,
-            markersize=14,
+            RANGE_ENDPOINT_MARKER,
+            color=PROCESSED_COLOR,
         )
 
         # Add a small margin around each descriptor's own range.
-        raw_padding = (raw_max - raw_min) * 0.08
+        raw_padding = (raw_max - raw_min) * RANGE_PADDING_FRACTION
         if raw_padding == 0:
-            raw_padding = abs(raw_min) * 0.05 or 1.0
-        processed_padding = (processed_max - processed_min) * 0.08
-        if processed_padding == 0:
-            processed_padding = abs(processed_min) * 0.05 or 1.0
+            raw_padding = (
+                abs(raw_min) * ZERO_RANGE_PADDING_FRACTION
+                or ZERO_RANGE_MIN_PADDING
+            )
 
-        raw_ax.set_xlim(raw_min - raw_padding, raw_max + raw_padding)
+        processed_padding = (
+            processed_max - processed_min
+        ) * RANGE_PADDING_FRACTION
+        if processed_padding == 0:
+            processed_padding = (
+                abs(processed_min) * ZERO_RANGE_PADDING_FRACTION
+                or ZERO_RANGE_MIN_PADDING
+            )
+
+        raw_ax.set_xlim(
+            raw_min - raw_padding,
+            raw_max + raw_padding,
+        )
         processed_ax.set_xlim(
             processed_min - processed_padding,
             processed_max + processed_padding,
@@ -136,9 +220,16 @@ def plot_ranges(
 
         raw_ax.set_yticks([])
         processed_ax.set_yticks([])
-        raw_ax.set_ylabel(descriptors[position], rotation=0, ha="right")
-        raw_ax.grid(axis="x", linestyle="--", alpha=0.4)
-        processed_ax.grid(axis="x", linestyle="--", alpha=0.4)
+
+        raw_ax.set_ylabel(
+            descriptors[position],
+            rotation=0,
+            ha="right",
+        )
+
+        # Grid appearance is inherited from rcParams.
+        raw_ax.grid(axis="x")
+        processed_ax.grid(axis="x")
 
         if position == 0:
             raw_ax.set_title("Raw ranges")
@@ -146,13 +237,18 @@ def plot_ranges(
 
     axes[-1, 0].set_xlabel("Raw descriptor value")
     axes[-1, 1].set_xlabel("Processed descriptor value")
+
     fig.suptitle("Raw vs. Processed Descriptor Ranges")
     fig.tight_layout()
 
     if output_path:
         output = Path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(output, dpi=200, bbox_inches="tight", format="pdf")
+        fig.savefig(
+            output,
+            bbox_inches=FIGURE_BBOX,
+            format="pdf",
+        )
         print(f"Saved plot to {output}")
     else:
         plt.show()
@@ -165,7 +261,8 @@ def plot_descriptor_histograms(
     processed_csv: str,
     descriptor: str,
     output_path: str | None = None,
-    bins: int = 50,
+    bins: int = DEFAULT_HISTOGRAM_BINS,
+    verbose: bool = False,
 ):
     """Plot raw and processed distributions for one descriptor side by side."""
     raw_df = pd.read_csv(raw_csv)
@@ -188,27 +285,39 @@ def plot_descriptor_histograms(
             "in one or both CSV files."
         )
 
+    if verbose:
+        print("Raw:\n", raw_values.describe())
+        print("Processed:\n", processed_values.describe())
+
     fig, (raw_ax, processed_ax) = plt.subplots(
         ncols=2,
-        figsize=(12, 4.5),
+        figsize=(
+            HISTOGRAM_FIGURE_WIDTH,
+            HISTOGRAM_FIGURE_HEIGHT,
+        ),
     )
 
-    raw_ax.hist(raw_values, bins=bins, color="tab:blue", edgecolor="black")
+    raw_ax.hist(
+        raw_values,
+        bins=bins,
+        color=RAW_COLOR,
+        edgecolor=HISTOGRAM_EDGE_COLOR,
+    )
     raw_ax.set_title(f"Raw {descriptor}")
     raw_ax.set_xlabel(descriptor)
     raw_ax.set_ylabel("Frequency")
-    raw_ax.grid(axis="y", linestyle="--", alpha=0.35)
+    raw_ax.grid(axis="y")
 
     processed_ax.hist(
         processed_values,
         bins=bins,
-        color="tab:orange",
-        edgecolor="black",
+        color=PROCESSED_COLOR,
+        edgecolor=HISTOGRAM_EDGE_COLOR,
     )
     processed_ax.set_title(f"Processed {descriptor}")
     processed_ax.set_xlabel(descriptor)
     processed_ax.set_ylabel("Frequency")
-    processed_ax.grid(axis="y", linestyle="--", alpha=0.35)
+    processed_ax.grid(axis="y")
 
     fig.suptitle(f"Distribution of {descriptor}: Raw vs. Processed")
     fig.tight_layout()
@@ -216,7 +325,11 @@ def plot_descriptor_histograms(
     if output_path:
         output = Path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
-        fig.savefig(output, dpi=200, bbox_inches="tight", format="pdf")
+        fig.savefig(
+            output,
+            bbox_inches=FIGURE_BBOX,
+            format="pdf",
+        )
         print(f"Saved histogram to {output}")
     else:
         plt.show()
@@ -255,24 +368,31 @@ def main() -> None:
         metavar="DESCRIPTOR",
         help=(
             "Plot side-by-side raw and processed histograms for this "
-            "descriptor, e.g. --histogram eccentricity."
+            "descriptor, e.g. --descriptor eccentricity."
         ),
     )
     parser.add_argument(
         "--bins",
         type=int,
-        default=50,
-        help="Number of histogram bins (default: 50).",
+        default=DEFAULT_HISTOGRAM_BINS,
+        help=(
+            f"Number of histogram bins "
+            f"(default: {DEFAULT_HISTOGRAM_BINS})."
+        ),
     )
 
     args = parser.parse_args()
 
     if args.output is None:
-        args.output = f"descriptor_{args.descriptor}_range_comparison.pdf"
+        if args.descriptor:
+            args.output = f"descriptor_{args.descriptor}_range_comparison.pdf"
+        else:
+            args.output = "descriptor_all_range_comparison.pdf"
 
     if args.descriptor:
         if args.bins < 1:
             parser.error("--bins must be at least 1")
+
         plot_descriptor_histograms(
             raw_csv=args.raw,
             processed_csv=args.processed,

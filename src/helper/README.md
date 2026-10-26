@@ -1,6 +1,6 @@
 # Helper
 ## Prepare database
-File is `prepare_database.py`. 
+File is `prepare_database.py`.
 
 ### How to run
 Run it from the project root using `python -m src.helper.prepare_database -i path/to/raw_database -o path/to/output_directory`. The required `-i` flag specifies the raw 3D-model database directory, while the optional `-o` flag specifies the output directory, defaulting to `3d_models_prepared`. The output directory must be outside the raw database directory.
