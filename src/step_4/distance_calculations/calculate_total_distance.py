@@ -69,7 +69,7 @@ class ShapeDistanceCalculator:
         )
         self.identifier_column = identifier_column
 
-        self.results: dict[str, dict[str, dict[str, float]]] = {}
+        self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
 
         # Load the CSV files once.
         self.databases = {
@@ -105,13 +105,15 @@ class ShapeDistanceCalculator:
             f"'{descriptor}' in any of the supplied CSV files."
         )
 
-    def calculate(self) -> dict[str, dict[str, dict[str, float]]]:
+    def calculate_all_distances(
+        self,
+    ) -> dict[str, dict[str, dict[str, float]]]:
         """Calculate distances using the CSV containing each descriptor."""
 
-        self.results = {}
+        self.all_distances = {}
 
         for function_name, config in self.distance_config.items():
-            self.results[function_name] = {}
+            self.all_distances[function_name] = {}
 
             for descriptor in config.descriptors:
                 csv_database = self._find_database(
@@ -128,9 +130,13 @@ class ShapeDistanceCalculator:
                     histogram=config.histogram,
                 )
 
-                self.results[function_name][descriptor] = distances
+                self.all_distances[function_name][descriptor] = distances
 
-        return self.results
+        return self.all_distances
+
+    def calculate_total_distance(
+            self,
+    ):
 
     def get_distances(
         self,
@@ -140,7 +146,7 @@ class ShapeDistanceCalculator:
         """Return distances for a calculated function and descriptor."""
 
         try:
-            return self.results[function_name][descriptor]
+            return self.all_distances[function_name][descriptor]
         except KeyError as exc:
             raise KeyError(
                 f"No calculated results for function '{function_name}' "
@@ -186,7 +192,7 @@ def main():
         distance_config=DISTANCE_CONFIG,
     )
 
-    print(calculator.calculate())
+    print(calculator.calculate_all_distances())
 
 
 if __name__ == "__main__":

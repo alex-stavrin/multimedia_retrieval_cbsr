@@ -1,4 +1,3 @@
-import math
 import argparse
 from pathlib import Path
 
