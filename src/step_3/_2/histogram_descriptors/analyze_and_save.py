@@ -27,7 +27,6 @@ def proccess_file(args: tuple[Path, Path, int, int]) -> list:
     )
     D1, _ = calculate_distance_from_barycenter(
         mesh=mesh,
-        n_samples=n_samples,
         n_bins_histogram=n_bins,
     )
     D2, _ = calculate_distance_two_vertices(
@@ -56,11 +55,56 @@ def proccess_file(args: tuple[Path, Path, int, int]) -> list:
     ]
 
 
+def analyze_and_save(
+    input: str | Path,
+    output: str | Path,
+    bins: int = 64,
+    samples: int = 100_000,
+):
+    if isinstance(input, str):
+        input = Path(input)
+
+    if isinstance(output, str):
+        output = Path(output)
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+    histogram_descriptors = ["A3", "D1", "D2", "D3", "D4"]
+
+    header = ["file_path"] + [
+        f"{h_desc}_{i}"
+        for h_desc in histogram_descriptors
+        for i in range(bins)
+    ]
+
+    # get all 3D files (.obj)
+    files = [item for item in input.rglob("*.obj") if item.is_file()]
+
+    # Loop through files and map them into their corresponding subplot
+    with open(output, mode="w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(header)
+
+        tasks = [(file, input, samples, bins) for file in files]
+
+        with ProcessPoolExecutor() as executor:
+            n_workers = os.cpu_count() or 1
+            print(f"Using {n_workers} worker processes")
+            for row in tqdm(
+                executor.map(proccess_file, tasks, chunksize=16),
+                total=len(tasks),
+                desc="Calculating Histogram Descriptors",
+            ):
+                writer.writerow(row)
+
+
 def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "-i", "--input", type=Path, help="Input folder of 3D shapes to analyze."
+        "-i",
+        "--input",
+        type=Path,
+        help="Input folder of 3D shapes to analyze.",
     )
 
     parser.add_argument(
@@ -73,37 +117,12 @@ def main():
 
     arguements = parser.parse_args()
 
-    arguements.output.parent.mkdir(parents=True, exist_ok=True)
-    histogram_descriptors = ["A3", "D1", "D2", "D3", "D4"]
-
-    header = ["file_path"] + [
-        f"{h_desc}_{i}"
-        for h_desc in histogram_descriptors
-        for i in range(arguements.bins)
-    ]
-
-    # get all 3D files (.obj)
-    files = [item for item in arguements.input.rglob("*.obj") if item.is_file()]
-
-    # Loop through files and map them into their corresponding subplot
-    with open(arguements.output, mode="w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow(header)
-
-        tasks = [
-            (file, arguements.input, arguements.samples, arguements.bins)
-            for file in files
-        ]
-
-        with ProcessPoolExecutor() as executor:
-            n_workers = os.cpu_count() or 1
-            print(f"Using {n_workers} worker processes")
-            for row in tqdm(
-                executor.map(proccess_file, tasks, chunksize=16),
-                total=len(tasks),
-                desc="Calculating Histogram Descriptors",
-            ):
-                writer.writerow(row)
+    analyze_and_save(
+        input=arguements.input,
+        output=arguements.output,
+        samples=arguements.samples,
+        bins=arguements.bins,
+    )
 
 
 if __name__ == "__main__":
