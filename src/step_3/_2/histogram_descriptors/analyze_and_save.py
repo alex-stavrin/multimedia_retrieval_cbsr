@@ -27,7 +27,6 @@ def proccess_file(args: tuple[Path, Path, int, int]) -> list:
     )
     D1, _ = calculate_distance_from_barycenter(
         mesh=mesh,
-        n_samples=n_samples,
         n_bins_histogram=n_bins,
     )
     D2, _ = calculate_distance_two_vertices(

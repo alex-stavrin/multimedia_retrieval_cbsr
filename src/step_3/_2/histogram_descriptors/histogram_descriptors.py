@@ -56,20 +56,13 @@ def calculate_angle_histogram(
 
 
 def calculate_distance_from_barycenter(
-    mesh: vedo.Mesh, n_samples: int, n_bins_histogram: int
+    mesh: vedo.Mesh, n_bins_histogram: int
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)
     barycenter: numpy.ndarray = numpy.mean(vertices, axis=0)
 
-    # pick a total of n_samples samples
-    samples_indices: numpy.ndarray = numpy.random.randint(
-        low=0, high=len(vertices), size=n_samples
-    )
-
-    samples_vertices: numpy.ndarray = vertices[samples_indices]
-
     # calculate distances from barycenter to vertices
-    vectors: numpy.ndarray = samples_vertices - barycenter
+    vectors: numpy.ndarray = vertices - barycenter
     distances: numpy.ndarray = numpy.linalg.norm(vectors, axis=1)
 
     # because the shapes are already normalized in size. The furthest a vertex can be is
