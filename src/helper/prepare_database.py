@@ -22,6 +22,7 @@ import src.step_2._3.repairment.repair_wireframe as reparation
 import src.step_2._3.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
+import src.step_3._2.histogram_descriptors.analyze_and_save as histogram_descriptor_analyzer
 
 CHECKPOINT_VERSION = 1
 
@@ -217,9 +218,9 @@ def prepare_database(
             "output_path must be outside the raw database directory."
         )
 
-    analysis_path = output_root / "analysis"
+    repair_path = output_root / "analysis"
     databases_path = output_root / "3d_models_steps"
-    analysis_path.mkdir(parents=True, exist_ok=True)
+    repair_path.mkdir(parents=True, exist_ok=True)
     databases_path.mkdir(parents=True, exist_ok=True)
 
     checkpoint_path = output_root / "pipeline_checkpoint.pkl"
@@ -241,7 +242,7 @@ def prepare_database(
     # ---
     # Analysing raw database
 
-    raw_analysis_csv = analysis_path / "raw_shape_analysis.csv"
+    raw_analysis_csv = repair_path / "raw_shape_analysis.csv"
     os.makedirs(os.path.dirname(raw_analysis_csv), exist_ok=True)
     _run_step(
         "analyze_raw_database",
@@ -256,13 +257,15 @@ def prepare_database(
     # ---
     # Resampling database
 
-    resampled = databases_path / "1_models_resampled"
+    repaired = databases_path / "1_models_reparation"
+    resampled = databases_path / "2_models_resampled"
     _run_step(
         "resample_database",
         lambda: resampling.resample_meshes(
             models_path=raw_path,
             input_csv_path=raw_analysis_csv,
             output_path=resampled,
+            repaired_output_path=repaired,
         ),
         state,
         checkpoint_path,
@@ -270,13 +273,15 @@ def prepare_database(
         resampled,
     )
 
-    # Analyse resampled
-    resampled_analysis_csv = analysis_path / "resampled_shape_analysis.csv"
-    os.makedirs(os.path.dirname(resampled_analysis_csv), exist_ok=True)
+    # ---
+    # Analysing repairment
+
+    repair_csv = repair_path / "reparation_analysis.csv"
+    os.makedirs(os.path.dirname(repair_csv), exist_ok=True)
     _run_step(
-        "analyze_resampled_database",
-        lambda: shape_analyzer.analyze_database(
-            str(resampled), str(resampled_analysis_csv)
+        "analyze_reparation",
+        lambda: rep_analyser.compare_hole_fill_stats(
+            str(resampled), str(repaired), str(repair_csv)
         ),
         state,
         checkpoint_path,
@@ -284,47 +289,16 @@ def prepare_database(
     )
 
     # ---
-    # Repairing database
-
-    standardized = databases_path / "2_models_reparation"
-    _run_step(
-        "repair_database",
-        lambda: reparation.repair_directory(str(resampled), str(standardized)),
-        state,
-        checkpoint_path,
-        raw_path,
-        standardized,
-    )
-    os.rename(standardized / "report.csv", analysis_path / "repair_report.csv")
-    os.rename(
-        standardized / "report_conclusion.txt",
-        analysis_path / "repair_report_conclusion.txt",
-    )
-
-    # Analysing standardization
-
-    standardization_csv = analysis_path / "reparation_analysis.csv"
-    os.makedirs(os.path.dirname(standardization_csv), exist_ok=True)
-    _run_step(
-        "analyze_reparation",
-        lambda: rep_analyser.compare_hole_fill_stats(
-            str(resampled), str(standardized), str(standardization_csv)
-        ),
-        state,
-        checkpoint_path,
-        raw_path,
-    )
-
     # Shape analysis after standardisation
 
     reperation_shape_analysis_csv = (
-        analysis_path / "reparation_shape_analysis.csv"
+        repair_path / "reparation_shape_analysis.csv"
     )
     os.makedirs(os.path.dirname(reperation_shape_analysis_csv), exist_ok=True)
     _run_step(
         "reparation_shape_analysis",
         lambda: shape_analyzer.analyze_database(
-            str(standardized), str(reperation_shape_analysis_csv)
+            str(repaired), str(reperation_shape_analysis_csv)
         ),
         state,
         checkpoint_path,
@@ -338,7 +312,7 @@ def prepare_database(
     _run_step(
         "normalize_database",
         lambda: normalizer.center_and_scale_database(
-            str(standardized), str(normalized)
+            str(repaired), str(normalized)
         ),
         state,
         checkpoint_path,
@@ -362,7 +336,7 @@ def prepare_database(
     )
 
     fully_normalized_shape_analysis_csv = (
-        analysis_path / "fully_normalized_shape_analysis.csv"
+        repair_path / "fully_normalized_shape_analysis.csv"
     )
     _run_step(
         "fully_normalized_shape_analysis",
@@ -378,7 +352,7 @@ def prepare_database(
     # ---
     # Calculating simple descriptors
 
-    descriptors_csv = analysis_path / "simple_descriptors.csv"
+    descriptors_csv = fully_normalized / "simple_descriptors.csv"
     os.makedirs(os.path.dirname(descriptors_csv), exist_ok=True)
     _run_step(
         "calculate_descriptors",
@@ -389,6 +363,21 @@ def prepare_database(
         state,
         checkpoint_path,
         raw_path,
+    )
+
+    # ---
+    # Calculate histogram descriptors
+    hist_descriptors_csv = fully_normalized / "histogram_descriptors.csv"
+    os.makedirs(os.path.dirname(hist_descriptors_csv), exist_ok=True)
+    _run_step(
+        "calculate_histogram_descriptor",
+        lambda: histogram_descriptor_analyzer.analyze_and_save(
+            input=fully_normalized,
+            output=hist_descriptors_csv
+        ),
+        state,
+        checkpoint_path,
+        raw_path
     )
 
     print(f"Pipeline complete. Checkpoint: {checkpoint_path}")
