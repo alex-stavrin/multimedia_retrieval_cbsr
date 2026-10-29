@@ -509,6 +509,7 @@ def main() -> None:
                 args.query,
                 args.shapes,
                 descriptor=args.descriptor,
+                distance_measure=args.distance_function,
                 distances=distances,
             )
 

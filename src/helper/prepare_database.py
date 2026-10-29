@@ -18,8 +18,8 @@ from typing import Callable, Any
 import src.step_2._3.resampling as resampling
 import src.step_2._1.shapes_analyzer as shape_analyzer
 import src.step_2._5.normalizer as normalizer
-import step_2.repairment.repair_wireframe as reparation
-import step_2.repairment.repair_analyzer as rep_analyser
+import src.step_2._3.repairment.repair_wireframe as reparation
+import src.step_2._3.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 
