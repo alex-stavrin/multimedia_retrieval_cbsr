@@ -111,7 +111,7 @@ DEFAULT_STEPS = ["preprocess", "close_holes", "correct_winding"]
 
 
 def run_steps(
-    shape: vedo.Mesh, steps: dict[str, Callable]
+    shape: vedo.Mesh, steps: dict[str, Callable] = STEPS
 ) -> tuple[vedo.Mesh, str]:
     """
     Applies the named steps in the given order. Returns the mesh and a
@@ -141,9 +141,7 @@ REPORT_FIELDS = [
 ]
 
 
-def repair_file(
-    input_path: str, output_path: str, steps: dict[str, Callable]
-) -> dict:
+def repair_file(input_path: str, output_path: str, steps: dict[str, Callable]) -> dict:
     """Loads one .obj, applies the steps, writes it. Returns a report row."""
     raw = load_mesh(input_path)
     closed_raw = bool(raw.is_closed())
@@ -213,9 +211,7 @@ def repair_directory(
         f"{n_closed_raw} were closed as loaded and {n_repaired} became "
         f"closed through the steps.\n"
     )
-    with open(
-        os.path.join(output_dir_path, "report_conclusion.txt"), "w"
-    ) as f:
+    with open(os.path.join(output_dir_path, "report_conclusion.txt"), "w") as f:
         f.write(summary)
     print(summary + f"Report written to {report_path}")
 
@@ -237,15 +233,13 @@ def repair_from_path(
         raise ValueError(f"Unknown steps {unknown}. Available: {list(STEPS)}")
 
     if os.path.isdir(input_path):
-        repair_directory(input_path, output_path, steps)
+        repair_directory(input_path, output_path, steps)  # type: ignore
 
     elif os.path.isfile(input_path):
         if os.path.isdir(output_path) or not output_path.endswith(".obj"):
-            output_path = os.path.join(
-                output_path, os.path.basename(input_path)
-            )
+            output_path = os.path.join(output_path, os.path.basename(input_path))
 
-        single_stats_row = repair_file(input_path, output_path, steps)
+        single_stats_row = repair_file(input_path, output_path, steps)  # type: ignore
         print(f"Wrote {output_path}: {single_stats_row}")
 
     else:

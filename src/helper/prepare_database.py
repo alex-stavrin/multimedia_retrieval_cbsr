@@ -18,8 +18,8 @@ from typing import Callable, Any
 import src.step_2._3.resampling as resampling
 import src.step_2._1.shapes_analyzer as shape_analyzer
 import src.step_2._5.normalizer as normalizer
-import step_2.repairment.repair_wireframe as reparation
-import step_2.repairment.repair_analyzer as rep_analyser
+import src.step_2.repairment.repair_wireframe as reparation
+import src.step_2.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 
@@ -121,9 +121,7 @@ def _reset_last_step(state: dict, checkpoint_path: Path) -> None:
         target_index = STEP_ORDER.index(current_step)
     else:
         completed_indices = [
-            STEP_ORDER.index(name)
-            for name in STEP_ORDER
-            if completed.get(name) is True
+            STEP_ORDER.index(name) for name in STEP_ORDER if completed.get(name) is True
         ]
         if not completed_indices:
             print("[RESET] No completed step found; nothing to reset.")
@@ -174,9 +172,7 @@ def _run_step(
     # Remove partial output before retrying a database-producing step.
     if output_database_path is not None:
         if output_database_path.exists():
-            print(
-                f"[CLEAN] Removing incomplete output: {output_database_path}"
-            )
+            print(f"[CLEAN] Removing incomplete output: {output_database_path}")
             shutil.rmtree(output_database_path)
         output_database_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -201,21 +197,15 @@ def prepare_database(
     reset_last_step: bool = False,
 ) -> None:
     if reset_checkpoint and reset_last_step:
-        raise ValueError(
-            "Choose either reset_checkpoint or reset_last_step, not both."
-        )
+        raise ValueError("Choose either reset_checkpoint or reset_last_step, not both.")
 
     raw_path = Path(database_path).expanduser().resolve()
     if not raw_path.is_dir():
-        raise NotADirectoryError(
-            f"Raw database directory not found: {raw_path}"
-        )
+        raise NotADirectoryError(f"Raw database directory not found: {raw_path}")
 
     output_root = Path(output_path).expanduser().resolve()
     if output_root == raw_path or raw_path in output_root.parents:
-        raise ValueError(
-            "output_path must be outside the raw database directory."
-        )
+        raise ValueError("output_path must be outside the raw database directory.")
 
     analysis_path = output_root / "analysis"
     databases_path = output_root / "3d_models_steps"
@@ -245,9 +235,7 @@ def prepare_database(
     os.makedirs(os.path.dirname(raw_analysis_csv), exist_ok=True)
     _run_step(
         "analyze_raw_database",
-        lambda: shape_analyzer.analyze_database(
-            str(raw_path), str(raw_analysis_csv)
-        ),
+        lambda: shape_analyzer.analyze_database(str(raw_path), str(raw_analysis_csv)),
         state,
         checkpoint_path,
         raw_path,
@@ -317,9 +305,7 @@ def prepare_database(
 
     # Shape analysis after standardisation
 
-    reperation_shape_analysis_csv = (
-        analysis_path / "reparation_shape_analysis.csv"
-    )
+    reperation_shape_analysis_csv = analysis_path / "reparation_shape_analysis.csv"
     os.makedirs(os.path.dirname(reperation_shape_analysis_csv), exist_ok=True)
     _run_step(
         "reparation_shape_analysis",
@@ -417,14 +403,12 @@ def main() -> None:
         "--reset_pickle",
         dest="reset_checkpoint",
         action="store_true",
-        help="Delete the checkpoint and rerun the entire pipeline from "
-        "scratch.",
+        help="Delete the checkpoint and rerun the entire pipeline from " "scratch.",
     )
     reset_group.add_argument(
         "--reset_last_step",
         action="store_true",
-        help="Rerun the last unfinished/completed step and all steps "
-        "after it.",
+        help="Rerun the last unfinished/completed step and all steps " "after it.",
     )
     args = parser.parse_args()
 
