@@ -66,17 +66,10 @@ def retrieve_all_shape_files(input_dir_path: str) -> list[str]:
     return sorted(shape_files)
 
 
-def calculate_file_descriptors(
-    file_path: str,
-) -> dict:
-    """Calculate all descriptors for one mesh."""
-
-    shape = __prepare_and_check_file_path(file_path)
-
+def calculate_mesh_descriptors(shape: vedo.Mesh) -> dict:
     # Calculate shared quantities once.
     volume = __approx_volume(shape)
     area = calculate_surface_area(
-        file_path,
         shape=shape,
     )
     pca = __calculate_pca(shape)
@@ -84,33 +77,28 @@ def calculate_file_descriptors(
 
     # Reuse the precomputed values when possible.
     compactness = calculate_compactness(
-        file_path,
         shape=shape,
         volume=volume,
         area=area,
     )
 
     rectangularity = calculate_rectangularity(
-        file_path,
         shape=shape,
         shape_volume=volume,
     )
 
     diameter = calculate_diameter(
-        file_path,
         shape=shape,
         convex_hull=convex_hull,
     )
 
     convexity = calculate_convexity(
-        file_path,
         shape=shape,
         volume=volume,
         convex_hull=convex_hull,
     )
 
     eccentricity = calculate_eccentricity(
-        file_path,
         shape=shape,
         pca=pca,
     )
@@ -125,6 +113,11 @@ def calculate_file_descriptors(
         "eccentricity": float(eccentricity),
         "reason": "",
     }
+
+
+def calculate_file_descriptors(file_path: str) -> dict:
+    shape = __prepare_and_check_file_path(file_path)
+    return calculate_mesh_descriptors(shape)
 
 
 def calculate_database(

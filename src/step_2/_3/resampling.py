@@ -23,7 +23,24 @@ class ResamplingRecord:
     after_vertices: int
 
 
-def resample_one_mesh(
+def resample_mesh(mesh: vedo.Mesh) -> vedo.Mesh:
+    while True:
+        before_vertices = mesh.npoints
+        if MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT:
+            break
+
+        if before_vertices < MIN_VERTEX_COUNT:
+            mesh.subdivide(n=1, method=4)
+        else:
+            mesh.decimate(n=TARGET_VERTEX_COUNT)
+
+        if mesh.npoints == before_vertices:
+            break
+
+    return mesh
+
+
+def resample_mesh_file(
     relative_path: str, vertex_count: int, models_path: Path, output_path: Path
 ) -> tuple[str, ResamplingRecord]:
     mesh_path = models_path / relative_path
@@ -44,20 +61,8 @@ def resample_one_mesh(
 
     mesh = vedo.Mesh(str(mesh_path))
     resampling_record.before_vertices = mesh.npoints
-    mesh.clean()
 
-    for _ in range(MAX_RESAMPLING_ATTEMPTS):
-        before_vertices = mesh.npoints
-        if MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT:
-            break
-
-        if before_vertices < MIN_VERTEX_COUNT:
-            mesh.subdivide(n=1, method=4)
-        else:
-            mesh.decimate(n=TARGET_VERTEX_COUNT)
-
-        if mesh.npoints == before_vertices:
-            break
+    mesh = resample_mesh(mesh)
 
     resampling_record.after_vertices = mesh.npoints
     mesh.write(str(destination))
@@ -168,10 +173,17 @@ def resample_meshes(
         # Resample meshes in parallel
         resample_futures = [
             executor.submit(
+<<<<<<< HEAD
+                resample_mesh_file,
+                str(row.relative_file_path),
+                int(row.n_points),  # type: ignore
+                Path(models_path),
+=======
                 resample_one_mesh,
                 str(relative_path),
                 n_points,
                 resampling_input_root,
+>>>>>>> 21591e7c661ca5bf50836fb71c2a1df8b08af2d9
                 Path(output_path),
             )
             for relative_path, n_points in valid_rows

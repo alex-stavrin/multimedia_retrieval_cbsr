@@ -20,6 +20,16 @@ from src.step_4.user_interface.class_colors import get_class_color, get_shape_cl
 from src.helper.database_functions import retrieve_all_shape_files
 import random
 import os
+import vedo
+from src.step_2.repairment.repair_wireframe import run_steps as repair
+from src.step_2._3.resampling import resample_mesh
+from src.step_3._1.full_normalization import full_normalize
+from src.step_3._2.elementary_descriptors.descriptor_analyzer import (
+    calculate_database,
+)
+from src.step_4.distance_calculations.calculate_total_distance import (
+    ShapeDistanceCalculator,
+)
 
 if sys.platform == "win32":
     ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
@@ -84,12 +94,27 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.selected_file: str | None = None
+        self.database_directory: str | None = None
         self.result_viewers: list[EmbeddedViewer] = []
 
         main_layout = QHBoxLayout(central_widget)
 
         left_panel = QWidget()
         left_layout = QVBoxLayout(left_panel)
+
+        # Database folder name label
+        self.database_label = QLabel(f"Database: {self.database_directory}")
+        self.database_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.database_label.setWordWrap(True)
+        left_layout.addWidget(self.database_label)
+
+        # Pick database folder button
+        self.database_button = QPushButton("Select Database Fodler")
+        self.database_button.setFixedWidth(200)
+        self.database_button.clicked.connect(self.open_database_picker)
+        left_layout.addWidget(
+            self.database_button, alignment=Qt.AlignmentFlag.AlignCenter
+        )
 
         self.selected_class_pill = QLabel()
         self.selected_class_pill.hide()
@@ -103,6 +128,7 @@ class MainWindow(QMainWindow):
 
         button_holder = QHBoxLayout()
 
+        # Pick 3D model button
         self.pick_button = QPushButton("Pick 3D Model")
         self.pick_button.setFixedWidth(200)
         self.pick_button.clicked.connect(self.open_file_picker)
@@ -110,6 +136,7 @@ class MainWindow(QMainWindow):
             self.pick_button, alignment=Qt.AlignmentFlag.AlignCenter
         )
 
+        # Query button
         self.query_button = QPushButton("Query")
         self.query_button.setFixedWidth(200)
         self.query_button.clicked.connect(self.run_query)
@@ -142,16 +169,36 @@ class MainWindow(QMainWindow):
             self.left_viewer.load_mesh(file_path)
             self.query_button.setEnabled(True)
 
+    def open_database_picker(self) -> None:
+        folder = QFileDialog.getExistingDirectory(self, "Select 3D Database Directory")
+        if folder:
+            self.database_directory = folder
+            self.database_label.setText(f"Database: {folder}")
+
     def run_query(self) -> None:
         if not self.selected_file:
             return
 
-        k: int = 6
-        matches = query_random_shapes(
-            query_shape_path=self.selected_file,
-            database_directory="3d_models_full_normalized",
-            k=k,
+        if not self.database_directory:
+            return
+
+        selected_mesh = vedo.Mesh(str(self.selected_file))
+        repaired_mesh, _ = repair(selected_mesh)
+        resampled_mesh: vedo.Mesh = resample_mesh(repaired_mesh)
+        full_normalize(resampled_mesh)
+
+        shape_distance_calculator = ShapeDistanceCalculator(
+            csv_databases=[
+                "analysis_output/simple_descriptors_processed.csv",
+                "analysis_output/histogram_descriptors.csv",
+                "analysis_output/weights_descriptors.csv",
+            ]
         )
+        results = shape_distance_calculator.calculate_total_distance(
+            self.selected_file, shapes_to_compare=[str(self.database_directory)]
+        )
+
+        matches = list(results.items())[:6]
 
         for viewer in self.result_viewers:
             viewer.cleanup()
@@ -160,13 +207,14 @@ class MainWindow(QMainWindow):
         viewer_width = 300
         viewer_height = 300
         for shape_path, distance in matches:
+            full_shape_path = str(Path(self.database_directory) / shape_path)
             card = QWidget()
             card.setFixedWidth(viewer_width)
             card_layout = QVBoxLayout(card)
             card_layout.setContentsMargins(0, 8, 0, 0)
 
             class_pill = QLabel()
-            style_class_pill(class_pill, shape_path)
+            style_class_pill(class_pill, full_shape_path)
             card_layout.addWidget(class_pill, alignment=Qt.AlignmentFlag.AlignCenter)
 
             label = QLabel(f"{os.path.basename(shape_path)}\ndist: {distance:.3f}")
@@ -174,7 +222,7 @@ class MainWindow(QMainWindow):
             card_layout.addWidget(label)
             viewer = EmbeddedViewer(card)
             viewer.setFixedSize(viewer_width, viewer_height)
-            viewer.load_mesh(shape_path)
+            viewer.load_mesh(full_shape_path)
             card_layout.addWidget(viewer, alignment=Qt.AlignmentFlag.AlignCenter)
             card_layout.activate()
             item = QListWidgetItem(self.results_list)

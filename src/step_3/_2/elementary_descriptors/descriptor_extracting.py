@@ -169,10 +169,7 @@ def __oriented_bounding_box(
     return box_center, axes, extents
 
 
-def calculate_surface_area(
-    file_path: str,
-    shape: vedo.Mesh | None = None,
-) -> float:
+def calculate_surface_area(shape: vedo.Mesh) -> float:
     """
     Calculates the provided shapes's surface area.
 
@@ -192,8 +189,7 @@ def calculate_surface_area(
 
 
 def calculate_compactness(
-    file_path: str,
-    shape: vedo.Mesh | None = None,
+    shape: vedo.Mesh,
     volume: float | None = None,
     area: float | None = None,
 ) -> float:
@@ -205,22 +201,16 @@ def calculate_compactness(
             f"{shape} with type {type(shape)}"
         )
 
-    shape_object = shape
-    if shape_object is None:
-        shape_object: vedo.Mesh = __prepare_and_check_file_path(file_path)
-
     if volume is None:
-        volume = __approx_volume(shape_object)
+        volume = __approx_volume(shape)
     if area is None:
-        area = shape_object.area()
+        area = shape.area()
 
     return (36 * math.pi * volume**2) / area**3
 
 
-# MAYBE TRY SUBSAMPLING FOR APPROX VOLUME AND OOBB LATER
 def calculate_rectangularity(
-    file_path: str,
-    shape: vedo.Mesh | None = None,
+    shape: vedo.Mesh,
     shape_volume: float | None = None,
 ) -> float:
     """
@@ -247,8 +237,7 @@ def calculate_rectangularity(
 
 
 def calculate_diameter(
-    file_path: str,
-    shape: vedo.Mesh | None = None,
+    shape: vedo.Mesh,
     convex_hull: vedo.ConvexHull | None = None,
 ) -> float:
     """
@@ -279,8 +268,7 @@ def calculate_diameter(
 
 
 def calculate_convexity(
-    file_path: str,
-    shape: vedo.Mesh | None = None,
+    shape: vedo.Mesh,
     volume: float | None = None,
     convex_hull: vedo.ConvexHull | None = None,
 ) -> float:
@@ -299,12 +287,9 @@ def calculate_convexity(
 
 
 def calculate_eccentricity(
-    file_path: str,
-    shape: vedo.Mesh | None = None,
+    shape: vedo.Mesh,
     pca: PCA | None = None,
 ) -> float:
-    if shape is None:
-        shape = vedo.Mesh(file_path)
 
     if pca is None:
         pca = __calculate_pca(shape)
@@ -347,9 +332,9 @@ def main():
 
         __oriented_bounding_box(vedo.Mesh(args.input), visualize)
     else:
-        # CHECK IF CORRECT
+        mesh: vedo.Mesh = vedo.Mesh(str(args.input))
         shape = __prepare_and_check_file_path(args.input)
-        area = calculate_surface_area(args.input, args.database_path)
+        area = calculate_surface_area(args.input)
         compactness = calculate_compactness(args.input, shape)
         rectangularity = calculate_rectangularity(args.input, shape)
         diameter = calculate_diameter(args.input, shape)

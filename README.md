@@ -50,3 +50,4 @@ Every command is run from the project root (the folder that contains `src`) with
 
 ## Pipeline
 3d_models -> (resampled) -> 3d_models_resampled -> (normalization) -> 3d_models_resampled_normalized
+
