@@ -12,6 +12,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable, Sequence, Any
 import json
+from tqdm import tqdm
 
 import pandas as pd
 import numpy as np
@@ -245,7 +246,7 @@ class ShapeDistanceCalculator:
 
         shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
 
-        for function_name, config in self.distance_config.items():
+        for function_name, config in tqdm(self.distance_config.items()):
             all_distances[function_name] = {}
 
             for descriptor in config.descriptors:

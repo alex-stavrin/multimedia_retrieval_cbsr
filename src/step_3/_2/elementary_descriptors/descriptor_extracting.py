@@ -1,5 +1,6 @@
 import math
 import os
+import sys
 
 import numpy as np
 import pandas as pd
@@ -7,6 +8,7 @@ import pandas as pd
 import vedo
 
 from dataclasses import dataclass
+from step_1.model_viewer import QApplication, ModelViewer
 
 DATABASE: pd.DataFrame | None = None
 
@@ -22,7 +24,8 @@ def __prepare_and_check_file_path(shape: str) -> vedo.Mesh:
     # Type check
     if not isinstance(shape, str):
         raise TypeError(
-            "Shape argument must be of type string " f"{shape} with type: {type(shape)}"
+            "Shape argument must be of type string "
+            f"{shape} with type: {type(shape)}"
         )
 
     if not shape.endswith(".obj"):
@@ -62,7 +65,9 @@ def __calculate_pca(shape: vedo.Mesh) -> PCA:
     points = np.asarray(shape.points)
 
     if points.ndim != 2 or points.shape[1] != 3:
-        raise ValueError(f"Expected points with shape (N, 3), got {points.shape}")
+        raise ValueError(
+            f"Expected points with shape (N, 3), got {points.shape}"
+        )
 
     if len(points) < 2:
         raise ValueError("PCA requires at least two points")
@@ -133,6 +138,7 @@ def __oriented_bounding_box(
     box_center = center + axes @ ((lo + hi) / 2)
 
     if visualise:
+
         corners_local = np.array(
             [
                 [x, y, z]
@@ -146,13 +152,19 @@ def __oriented_bounding_box(
         corners = center + corners_local @ axes.T
 
         # Connect corners differing in exactly one bit.
-        edges = [(i, i | bit) for i in range(8) for bit in (1, 2, 4) if not i & bit]
+        edges = [
+            (i, i | bit) for i in range(8) for bit in (1, 2, 4) if not i & bit
+        ]
 
         starts = corners[[i for i, _ in edges]]
         ends = corners[[j for _, j in edges]]
 
         box = vedo.Lines(starts, ends, c="black", lw=2)
-        vedo.show(shape, box, axes=1)
+        meshes = [shape, box]
+
+        app = QApplication(sys.argv)
+        model_viewer = ModelViewer(qt_app=app, meshes=meshes)
+        model_viewer.exec()
 
     return box_center, axes, extents
 
@@ -189,7 +201,8 @@ def calculate_compactness(
     # Check if not None, it is correct class
     if shape is not None and not isinstance(shape, vedo.Mesh):
         raise ValueError(
-            "shape must be of type vedo.mesh: " f"{shape} with type {type(shape)}"
+            "shape must be of type vedo.mesh: "
+            f"{shape} with type {type(shape)}"
         )
 
     shape_object = shape
@@ -328,7 +341,9 @@ def main():
 
     if args.visualize:
         if os.path.isdir(args.input):
-            raise ValueError(f"Visualising only works for directories: {args.input}")
+            raise ValueError(
+                f"Visualising only works for directories: {args.input}"
+            )
 
         __oriented_bounding_box(vedo.Mesh(args.input), visualize)
     else:
