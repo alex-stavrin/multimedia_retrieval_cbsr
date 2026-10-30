@@ -214,9 +214,11 @@ def visualize_analyses(
             .color("black")
             .linewidth(2)
         )
+
         meshes.extend([vedo.Mesh(shape_path), bounding_box])
 
     app = QApplication(sys.argv)
+
     model_viewer = ModelViewer(qt_app=app, meshes=meshes)
     return model_viewer.exec()
 
