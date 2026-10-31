@@ -1,6 +1,7 @@
 import argparse
 from pathlib import Path
 import vedo
+import vtk
 from src.step_3._2.histogram_descriptors.histogram_descriptors import (
     calculate_angle_histogram,
     calculate_distance_from_barycenter,
@@ -14,8 +15,23 @@ from concurrent.futures import ProcessPoolExecutor
 import os
 
 
-def proccess_file(args: tuple[Path, Path, int, int]) -> list:
+def _silence_vtk() -> None:
+    """Suppress VTK warnings and logger output to console."""
+    try:
+        vtk.vtkLogger.SetStderrVerbosity(vtk.vtkLogger.VERBOSITY_OFF)
+    except Exception:
+        pass
+    try:
+        vtk.vtkObject.GlobalWarningDisplayOff()
+    except Exception:
+        pass
 
+
+_silence_vtk()
+
+
+def proccess_file(args: tuple[Path, Path, int, int]) -> list:
+    _silence_vtk()
     file, input_root, n_samples, n_bins = args
     relative_path = file.relative_to(input_root).as_posix()
     mesh = vedo.Mesh(str(file))
@@ -60,6 +76,7 @@ def analyze_and_save(
     output: str | Path,
     bins: int = 64,
     samples: int = 100_000,
+    max_workers: int | None = None,
 ):
     if isinstance(input, str):
         input = Path(input)
@@ -85,12 +102,13 @@ def analyze_and_save(
         writer.writerow(header)
 
         tasks = [(file, input, samples, bins) for file in files]
+        n_workers = max_workers or os.cpu_count() or 1
+        print(f"Using {n_workers} worker processes")
 
-        with ProcessPoolExecutor() as executor:
-            n_workers = os.cpu_count() or 1
-            print(f"Using {n_workers} worker processes")
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            chunksize = max(1, min(16, len(tasks) // (n_workers * 2))) if len(tasks) > 0 else 1
             for row in tqdm(
-                executor.map(proccess_file, tasks, chunksize=16),
+                executor.map(proccess_file, tasks, chunksize=chunksize),
                 total=len(tasks),
                 desc="Calculating Histogram Descriptors",
             ):
@@ -115,6 +133,14 @@ def main():
 
     parser.add_argument("-b", "--bins", type=int, default=64)
 
+    parser.add_argument(
+        "-w",
+        "--workers",
+        type=int,
+        default=None,
+        help="Number of worker processes (default: all CPU cores).",
+    )
+
     arguements = parser.parse_args()
 
     analyze_and_save(
@@ -122,6 +148,7 @@ def main():
         output=arguements.output,
         samples=arguements.samples,
         bins=arguements.bins,
+        max_workers=arguements.workers,
     )
 
 

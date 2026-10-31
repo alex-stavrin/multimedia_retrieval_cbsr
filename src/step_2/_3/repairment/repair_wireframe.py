@@ -215,7 +215,6 @@ def correct_winding(shape: vedo.Mesh) -> vedo.Mesh:
         faces=np.asarray(shape.cells, dtype=np.int64),
         process=False,
     )
-    trimesh.repair.fix_winding(mesh)
     trimesh.repair.fix_normals(mesh)
     return vedo.Mesh([mesh.vertices, mesh.faces])
 
@@ -261,7 +260,9 @@ REPORT_FIELDS = [
 
 
 def repair_file(
-    input_path: str, output_path: str, steps: dict[str, Callable] = STEPS,
+    input_path: str,
+    output_path: str,
+    steps: dict[str, Callable] = STEPS,
 ) -> dict:
     """Loads one .obj, applies the steps, writes it. Returns a report row."""
     raw = load_mesh(input_path)
@@ -363,13 +364,9 @@ def repair_directory(
                     break
                 pending.add(executor.submit(_repair_worker, job))
 
-            with tqdm(
-                total=len(all_shape_files), desc="Repairing meshes"
-            ) as pbar:
+            with tqdm(total=len(all_shape_files), desc="Repairing meshes") as pbar:
                 while pending:
-                    completed, pending = wait(
-                        pending, return_when=FIRST_COMPLETED
-                    )
+                    completed, pending = wait(pending, return_when=FIRST_COMPLETED)
 
                     for future in completed:
                         try:
@@ -378,8 +375,7 @@ def repair_directory(
                             # Handles unexpected worker/process failures.
                             row = {
                                 "file_path": "",
-                                "reason": "worker error: "
-                                f"{type(e).__name__}: {e}",
+                                "reason": "worker error: " f"{type(e).__name__}: {e}",
                             }
 
                         record_result(writer, row)
@@ -400,9 +396,7 @@ def repair_directory(
         f"closed through the steps.\n"
     )
 
-    with open(
-        os.path.join(output_dir_path, "report_conclusion.txt"), "w"
-    ) as f:
+    with open(os.path.join(output_dir_path, "report_conclusion.txt"), "w") as f:
         f.write(summary)
 
     print(summary + f"Report written to {report_path}")
@@ -422,15 +416,11 @@ def repair_from_path(
         raise ValueError(f"Unknown steps {unknown}. Available: {list(STEPS)}")
 
     if os.path.isdir(input_path):
-        repair_directory(
-            input_path, output_path, steps, max_workers=max_workers
-        )
+        repair_directory(input_path, output_path, steps, max_workers=max_workers)
 
     elif os.path.isfile(input_path):
         if os.path.isdir(output_path) or not output_path.endswith(".obj"):
-            output_path = os.path.join(
-                output_path, os.path.basename(input_path)
-            )
+            output_path = os.path.join(output_path, os.path.basename(input_path))
 
         row = repair_file(input_path, output_path, steps)
         print(f"Wrote {output_path}: {row}")
@@ -477,9 +467,7 @@ def main():
         help="Number of parallel workers (default: CPU count)",
     )
     args = parser.parse_args()
-    repair_from_path(
-        args.input, args.output, args.steps, max_workers=args.workers
-    )
+    repair_from_path(args.input, args.output, args.steps, max_workers=args.workers)
 
 
 if __name__ == "__main__":
