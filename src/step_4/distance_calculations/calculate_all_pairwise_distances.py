@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from step_4.distance_calculations.calculate_total_distance import (
+from src.step_4.distance_calculations.calculate_total_distance import (
     ShapeDistanceCalculator,
     DISTANCE_CONFIG,
     IDENTIFIER_COLUMN,
@@ -193,8 +193,6 @@ def calculate_all_pairwise_distances(
     # Initialize the calculator once so its CSV databases are loaded once.
     calculator = ShapeDistanceCalculator(
         csv_databases=csv_paths,
-        query=remaining_queries[0],
-        shapes_to_compare=[],
         distance_config=distance_config,
         identifier_column=identifier_column,
     )
@@ -205,16 +203,20 @@ def calculate_all_pairwise_distances(
         mesh_index = meshes.index(query_mesh)
         comparison_meshes = meshes[mesh_index + 1 :]
 
-        calculator.query = query_mesh
-        calculator.shapes_to_compare = comparison_meshes
-
-        results = calculator.calculate_all_distances()
+        results = calculator.calculate_all_distances(
+            query=query_mesh,
+            shapes_to_compare=comparison_meshes,
+        )
+        comparison_mesh_set = set(comparison_meshes)
 
         batch_rows = []
 
         for function_name, descriptor_results in results.items():
             for descriptor, distances in descriptor_results.items():
                 for comparison_mesh, distance in distances.items():
+                    if comparison_mesh not in comparison_mesh_set:
+                        continue
+
                     batch_rows.append(
                         {
                             "mesh_a": query_mesh,

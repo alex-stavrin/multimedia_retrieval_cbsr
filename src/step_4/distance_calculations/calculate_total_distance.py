@@ -20,13 +20,11 @@ from src.step_3._2.histogram_descriptors.histogram_descriptors import (
     calculate_area_triangle,
     calculate_volume_tetrahedron,
 )
-
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable, Sequence, Any
 import json
-import math
 import vedo
 
 import pandas as pd
@@ -55,7 +53,8 @@ EUCLIDEAN_DESCRIPTORS = [
 
 COSINE_DESCRIPTORS = []
 
-EMD_DESCRIPTORS = ["A3", "D1", "D2", "D3", "D4"]
+EMD_DESCRIPTORS = []
+EUCLIDEAN_DESCRIPTORS += ["A3", "D1", "D2", "D3", "D4"]
 
 DISTANCE_CONFIG = {
     "euclidean": DistanceConfig(
@@ -79,118 +78,349 @@ class ShapeDistanceCalculator:
         csv_databases: list[str | Path],
         distance_config: dict[str, DistanceConfig] | None = None,
         identifier_column: str = IDENTIFIER_COLUMN,
-        max_workers: int | None = None,
     ) -> None:
         self.csv_databases = [Path(path) for path in csv_databases]
         self.identifier_column = identifier_column
+        self.distance_config = (
+            distance_config if distance_config is not None else DISTANCE_CONFIG
+        )
 
-        # Load supplied CSVs
         self.databases: dict[Path, pd.DataFrame] = {}
         for path in self.csv_databases:
-            if path.is_file():
-                self.databases[path] = pd.read_csv(path)
+            if not path.is_file():
+                raise FileNotFoundError(f"CSV database not found: {path}")
+            self.databases[path] = pd.read_csv(path)
 
         self.simple_df: pd.DataFrame | None = None
         self.hist_df: pd.DataFrame | None = None
         self.weights_df: pd.DataFrame | None = None
+        self._descriptor_sources: dict[
+            tuple[str, str], tuple[pd.DataFrame, list[str], bool]
+        ] = {}
+        self._descriptor_source_paths: dict[tuple[str, str], Path] = {}
 
-        for df in self.databases.values():
+        for path, df in self.databases.items():
             cols = set(df.columns)
             if {"distance_function", "descriptor", "weight"}.issubset(cols):
                 self.weights_df = df
-            elif any(c.startswith("A3_") for c in cols):
-                self.hist_df = df
-            elif any(d in cols for d in EUCLIDEAN_DESCRIPTORS):
-                self.simple_df = df
+                continue
+            if self.identifier_column not in cols:
+                raise ValueError(
+                    f"CSV database '{path}' has no identifier column "
+                    f"'{self.identifier_column}'."
+                )
 
-        # Fallback to standard paths if not found
+        feature_databases = {
+            path: df
+            for path, df in self.databases.items()
+            if not {"distance_function", "descriptor", "weight"}.issubset(
+                df.columns
+            )
+        }
+        if not feature_databases:
+            raise ValueError("No descriptor databases were supplied.")
+
+        self._histogram_columns: dict[tuple[Path, str], list[str]] = {}
+        for path, df in feature_databases.items():
+            for descriptor in self._available_histograms(df):
+                self._histogram_columns[(path, descriptor)] = (
+                    self._get_histogram_columns(df, descriptor)
+                )
+
+        for function_name, config in self.distance_config.items():
+            for descriptor in config.descriptors:
+                source_candidates = []
+                for path, df in feature_databases.items():
+                    scalar_present = descriptor in df.columns
+                    histogram_columns = self._histogram_columns.get(
+                        (path, descriptor), []
+                    )
+                    if config.histogram:
+                        if histogram_columns:
+                            source_candidates.append(
+                                (path, df, histogram_columns, True)
+                            )
+                    elif scalar_present:
+                        source_candidates.append(
+                            (path, df, [descriptor], False)
+                        )
+                    elif histogram_columns:
+                        # Infer histogram input from its numbered bin columns
+                        # when the family is not stored as a scalar column.
+                        source_candidates.append(
+                            (path, df, histogram_columns, True)
+                        )
+
+                if not source_candidates:
+                    raise ValueError(
+                        f"No supplied CSV contains descriptor '{descriptor}' "
+                        "in the form required by the distance configuration."
+                    )
+
+                if len(source_candidates) > 1:
+                    processed_candidates = [
+                        item
+                        for item in source_candidates
+                        if item[0].stem.endswith("_processed")
+                    ]
+                    if len(processed_candidates) == 1:
+                        source_candidates = processed_candidates
+                    else:
+                        paths = [str(item[0]) for item in source_candidates]
+                        raise ValueError(
+                            f"Descriptor '{descriptor}' is present in more "
+                            f"than one supplied CSV: {paths}"
+                        )
+
+                path, source_df, columns, is_histogram = source_candidates[0]
+                self._descriptor_sources[(function_name, descriptor)] = (
+                    source_df,
+                    columns,
+                    is_histogram,
+                )
+                self._descriptor_source_paths[(function_name, descriptor)] = (
+                    path
+                )
+                if is_histogram and self.hist_df is None:
+                    self.hist_df = source_df
+                if not is_histogram and self.simple_df is None:
+                    self.simple_df = source_df
+
+        if not self._descriptor_sources:
+            raise ValueError(
+                "The active distance configuration has no descriptors."
+            )
+
         if self.simple_df is None:
-            self.simple_df = pd.read_csv(
-                "analysis_output/simple_descriptors_processed.csv"
-            )
-        if self.hist_df is None:
-            self.hist_df = pd.read_csv(
-                "analysis_output/histogram_descriptors.csv"
-            )
-        if self.weights_df is None:
-            self.weights_df = pd.read_csv(
-                "analysis_output/weights_descriptors.csv"
-            )
-
-        # Index both databases by file_path and align rows
-        self.simple_df = self.simple_df.set_index(self.identifier_column)
-        self.hist_df = self.hist_df.set_index(self.identifier_column).reindex(
-            self.simple_df.index
-        )
+            # Preserve a common candidate index even for histogram-only
+            # configurations.
+            first_source = next(iter(self._descriptor_sources.values()))[0]
+            self.simple_df = first_source
 
         # Parse descriptor weights
-        self.weights: dict[tuple[str, str], float] = {
-            (str(r["distance_function"]), str(r["descriptor"])): float(
-                r["weight"]
-            )
-            for _, r in self.weights_df.iterrows()
-        }
-
-        # Load normalization parameters (mean, std) from raw simple
-        # descriptors for pipeline standardization
-        raw_csv = Path("analysis_output/simple_descriptors.csv")
-        if raw_csv.is_file():
-            raw_df = pd.read_csv(raw_csv)
-            self._norm_stats = {
-                desc: (float(raw_df[desc].mean()), float(raw_df[desc].std()))
-                for desc in ["surface_area", "convexity", "eccentricity"]
-                if desc in raw_df.columns
-            }
-        else:
-            self._norm_stats = {
-                "surface_area": (2.212288, 2.686136),
-                "convexity": (0.418892, 0.576090),
-                "eccentricity": (133.8659, 1284.303),
+        self.weights: dict[tuple[str, str], float] = {}
+        if self.weights_df is not None:
+            self.weights = {
+                (str(r["distance_function"]), str(r["descriptor"])): float(
+                    r["weight"]
+                )
+                for _, r in self.weights_df.iterrows()
             }
 
-        # Direct O(1) query key lookup map: filename or relative
-        # path -> exact index key
-        self._filename_to_key: dict[str, str] = {}
-        for key in self.simple_df.index:
-            key_str = str(key)
-            self._filename_to_key[key_str] = key_str
-            self._filename_to_key[key_str.replace("\\", "/")] = key_str
-            self._filename_to_key[Path(key_str).name] = key_str
-
-        # Precompute histogram columns and normalized CDF matrices
-        self._hist_cdfs: dict[str, np.ndarray] = {}
-        for desc in EMD_DESCRIPTORS:
-            cols = [
-                c
-                for c in self.hist_df.columns
-                if c.startswith(f"{desc}_") and c[len(desc) + 1 :].isdigit()
+        self._query_transforms: dict[str, tuple[float, float]] = {}
+        for key, (
+            _,
+            columns,
+            is_histogram,
+        ) in self._descriptor_sources.items():
+            if is_histogram or len(columns) != 1:
+                continue
+            source_path = self._descriptor_source_paths[key]
+            if not source_path.stem.endswith("_processed"):
+                continue
+            descriptor = columns[0]
+            raw_sources = [
+                (path, df)
+                for path, df in self.databases.items()
+                if path != source_path
+                and descriptor in df.columns
+                and self.identifier_column in df.columns
+                and not path.stem.endswith("_processed")
             ]
-            cols.sort(key=lambda x: int(x.split("_")[1]))
+            sibling_path = source_path.with_name(
+                f"{source_path.stem.removesuffix('_processed')}.csv"
+            )
+            if sibling_path.is_file():
+                raw_df = pd.read_csv(sibling_path)
+            elif len(raw_sources) == 1:
+                raw_df = raw_sources[0][1]
+            else:
+                continue
 
-            mat = self.hist_df[cols].to_numpy(dtype=float)
-            mat_sum = mat.sum(axis=1, keepdims=True)
-            mat_sum[mat_sum == 0] = 1.0
-            # Normalized cumulative sum across bins
-            self._hist_cdfs[desc] = np.cumsum(mat / mat_sum, axis=1)[:, :-1]
+            raw_values = raw_df.set_index(self.identifier_column)[descriptor]
+            processed_values = self.databases[source_path].set_index(
+                self.identifier_column
+            )[descriptor]
+            paired = pd.concat(
+                [raw_values.rename("raw"), processed_values.rename("fit")],
+                axis=1,
+                join="inner",
+            ).dropna()
+            x = paired["raw"].to_numpy(dtype=float)
+            y = paired["fit"].to_numpy(dtype=float)
+            variance = float(np.var(x))
+            if variance == 0.0:
+                scale = 0.0
+                offset = float(np.mean(y))
+            else:
+                scale = float(
+                    np.mean((x - x.mean()) * (y - y.mean())) / variance
+                )
+                offset = float(y.mean() - scale * x.mean())
+
+            if not np.allclose(
+                y,
+                scale * x + offset,
+                rtol=1e-5,
+                atol=1e-7,
+            ):
+                raise ValueError(
+                    f"The transformation from raw '{descriptor}' values to "
+                    "the supplied descriptor database is not affine. Pass "
+                    "query descriptors in the database's transformed space "
+                    "or provide an explicit transform."
+                )
+            self._query_transforms[descriptor] = (scale, offset)
+
+        identifiers = [
+            set(df[self.identifier_column].dropna().astype(str))
+            for df, _, _ in self._descriptor_sources.values()
+        ]
+        self.shape_identifiers = sorted(set.intersection(*identifiers))
+        if not self.shape_identifiers:
+            raise ValueError(
+                "The supplied descriptor databases have no identifiers "
+                "in common for the active distance configuration."
+            )
+
+        self._filename_to_keys: dict[str, set[str]] = {}
+        for key in self.shape_identifiers:
+            self._filename_to_keys.setdefault(key, set()).add(key)
+            normalized_key = key.replace("\\", "/")
+            self._filename_to_keys.setdefault(normalized_key, set()).add(key)
+            self._filename_to_keys.setdefault(Path(key).name, set()).add(key)
+
+    @staticmethod
+    def _get_histogram_columns(
+        df: pd.DataFrame,
+        descriptor: str,
+    ) -> list[str]:
+        bins = []
+        for column in df.columns:
+            prefix, separator, suffix = str(column).rpartition("_")
+            if separator and prefix == descriptor and suffix.isdigit():
+                bins.append((int(suffix), str(column)))
+        bins.sort(key=lambda item: item[0])
+        indices = [index for index, _ in bins]
+        if indices != list(range(len(indices))):
+            raise ValueError(
+                f"Histogram '{descriptor}' has missing or non-consecutive "
+                "bin columns."
+            )
+        return [column for _, column in bins]
+
+    @classmethod
+    def _available_histograms(cls, df: pd.DataFrame) -> set[str]:
+        families = set()
+        for column in df.columns:
+            prefix, separator, suffix = str(column).rpartition("_")
+            if separator and suffix.isdigit():
+                families.add(prefix)
+        return families
+
+    def _calculate_configured_distances(
+        self,
+        config: DistanceConfig,
+        source_df: pd.DataFrame,
+        columns: list[str],
+        is_histogram: bool,
+        query_features: Sequence[float],
+        descriptor: str,
+        query_identifier: str | None = None,
+    ) -> dict[str, float]:
+        """Use vectorized built-in distances, with a generic fallback."""
+        indexed = source_df.set_index(self.identifier_column)
+        candidates = indexed.loc[self.shape_identifiers, columns].to_numpy(
+            dtype=float
+        )
+        query_vector = np.asarray(query_features, dtype=float)
+
+        if config.function is euclidean_distance:
+            values = (
+                np.linalg.norm(candidates - query_vector, axis=1)
+                if is_histogram
+                else np.abs(candidates[:, 0] - query_vector[0])
+            )
+            return dict(zip(self.shape_identifiers, values.astype(float)))
+
+        if config.function is earth_movers_distance and is_histogram:
+            candidate_sums = candidates.sum(axis=1, keepdims=True)
+            candidate_sums[candidate_sums == 0] = 1.0
+            query_sum = query_vector.sum()
+            if query_sum == 0:
+                query_sum = 1.0
+            candidate_cdfs = np.cumsum(candidates / candidate_sums, axis=1)[
+                :, :-1
+            ]
+            query_cdf = np.cumsum(query_vector / query_sum)[:-1]
+            values = np.abs(candidate_cdfs - query_cdf).sum(axis=1)
+            return dict(zip(self.shape_identifiers, values.astype(float)))
+
+        if config.function is cosine_distance:
+            candidate_norms = np.linalg.norm(candidates, axis=1)
+            query_norm = float(np.linalg.norm(query_vector))
+            if query_norm == 0 or np.any(candidate_norms == 0):
+                raise ValueError(
+                    f"Cosine distance is undefined for descriptor "
+                    f"'{descriptor}' with a zero vector."
+                )
+            similarities = (
+                candidates @ query_vector / (candidate_norms * query_norm)
+            )
+            values = 1.0 - np.clip(similarities, -1.0, 1.0)
+            return dict(zip(self.shape_identifiers, values.astype(float)))
+
+        if query_identifier is None:
+            raise ValueError(
+                "A query identifier is required for a custom distance "
+                f"function on descriptor '{descriptor}'."
+            )
+
+        query_row = {
+            self.identifier_column: query_identifier,
+            **dict(zip(columns, query_features)),
+        }
+        augmented_df = pd.concat(
+            [source_df, pd.DataFrame([query_row])],
+            ignore_index=True,
+        )
+        distances = config.function(
+            df=augmented_df,
+            query=query_identifier,
+            shapes_to_compare=self.shape_identifiers,
+            descriptor=descriptor,
+            identifier_column=self.identifier_column,
+            histogram=is_histogram,
+        )
+        return {
+            self._normalize_shape_path(shape): float(distance)
+            for shape, distance in distances.items()
+        }
 
         self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
         self.total_distances: dict[str, float] = {}
         self.last_query: str | None = None
 
     def _resolve_query_key(self, query: str) -> str:
-        """Resolve a full UI path, relative path,
-        or filename to the CSV row key in O(1)."""
-        filename = Path(query).name
-        if filename in self._filename_to_key:
-            return self._filename_to_key[filename]
+        """Resolve an identifier or unambiguous filename in the databases."""
+        normalized_query = str(query).replace("\\", "/").strip("/")
+        exact_matches = self._filename_to_keys.get(normalized_query, set())
+        if len(exact_matches) == 1:
+            return next(iter(exact_matches))
 
-        norm_query = str(query).replace("\\", "/").strip("/")
-        if norm_query in self._filename_to_key:
-            return self._filename_to_key[norm_query]
+        filename = Path(normalized_query).name
+        filename_matches = self._filename_to_keys.get(filename, set())
+        if len(filename_matches) == 1:
+            return next(iter(filename_matches))
+        if len(filename_matches) > 1:
+            raise ValueError(
+                f"Query filename '{filename}' is ambiguous; pass its full "
+                "database identifier."
+            )
 
         raise ValueError(
-            f"Query mesh '{query}' (filename '{filename}') was not found "
-            "in the descriptor database."
+            f"Query '{query}' was not found in the supplied descriptor "
+            "databases."
         )
 
     def process_mesh_and_extract_descriptors(
@@ -206,56 +436,109 @@ class ShapeDistanceCalculator:
         5. Extract elementary descriptors & standardize with dataset stats
         6. Extract histogram descriptors (A3, D1, D2, D3, D4)
         """
+        is_fully_normalized_file = False
         if isinstance(mesh_or_path, (str, Path)):
             mesh = vedo.Mesh(str(mesh_or_path))
+            is_fully_normalized_file = any(
+                part.endswith("_models_fully_normalized")
+                for part in Path(mesh_or_path).parts
+            )
         else:
             mesh = mesh_or_path.clone()
 
-        # Step 2: Repair
-        repaired_mesh, _ = repair(mesh)
+        # Database descriptor CSVs are extracted directly from the saved
+        # fully-normalized meshes. Apply preprocessing only to raw queries.
+        if not is_fully_normalized_file:
+            # Step 2: Repair
+            repaired_mesh, _ = repair(mesh)
 
-        # Step 2.3: Resample
-        resampled_mesh = resample_mesh(repaired_mesh)
+            # Step 2.3: Resample
+            mesh = resample_mesh(repaired_mesh)
 
-        # Step 3.1: Full normalize
-        full_normalize(resampled_mesh)
+            # Step 3.1: Full normalize
+            full_normalize(mesh)
 
-        # Step 3.2: Elementary descriptors
-        elem_raw = calculate_mesh_descriptors(resampled_mesh)
-
-        elem_standardized: dict[str, float] = {}
-        for k in EUCLIDEAN_DESCRIPTORS:
-            val = float(elem_raw[k])
-            if k == "diameter":
-                elem_standardized[k] = val / math.sqrt(3)
-            elif k in ["compactness", "rectangularity"]:
-                elem_standardized[k] = val
-            elif k in self._norm_stats:
-                mean, std = self._norm_stats[k]
-                elem_standardized[k] = (val - mean) / std if std > 0 else 0.0
-            else:
-                elem_standardized[k] = val
-
-        # Step 3.2: Histogram descriptors
-        hist_descriptors: dict[str, np.ndarray] = {
-            "A3": calculate_angle_histogram(
-                resampled_mesh, n_samples=100_000, n_bins_histogram=64
-            )[0],
-            "D1": calculate_distance_from_barycenter(
-                resampled_mesh, n_bins_histogram=64
-            )[0],
-            "D2": calculate_distance_two_vertices(
-                resampled_mesh, n_samples=100_000, n_bins_histogram=64
-            )[0],
-            "D3": calculate_area_triangle(
-                resampled_mesh, n_samples=100_000, n_bins_histogram=64
-            )[0],
-            "D4": calculate_volume_tetrahedron(
-                resampled_mesh, n_samples=100_000, n_bins_histogram=64
-            )[0],
+        scalar_descriptors = {
+            columns[0]
+            for _, columns, is_histogram in self._descriptor_sources.values()
+            if not is_histogram and len(columns) == 1
+        }
+        histogram_bins = {
+            descriptor: len(columns)
+            for (_, descriptor), (
+                _,
+                columns,
+                is_histogram,
+            ) in self._descriptor_sources.items()
+            if is_histogram
         }
 
-        return elem_standardized, hist_descriptors
+        elem_raw = (
+            calculate_mesh_descriptors(mesh) if scalar_descriptors else {}
+        )
+        elem_values = {
+            descriptor: float(elem_raw[descriptor])
+            for descriptor in scalar_descriptors
+        }
+
+        processed_scalar_descriptors = {
+            columns[0]
+            for key, (
+                _,
+                columns,
+                is_histogram,
+            ) in self._descriptor_sources.items()
+            if not is_histogram
+            and len(columns) == 1
+            and self._descriptor_source_paths[key].stem.endswith("_processed")
+        }
+        missing_transforms = (
+            processed_scalar_descriptors - self._query_transforms.keys()
+        )
+        if missing_transforms:
+            raise ValueError(
+                "Cannot transform query descriptors to match the supplied "
+                "processed database. Could not infer raw-to-database "
+                "transforms for: "
+                f"{sorted(missing_transforms)}. Supply matching raw "
+                "descriptor data or query descriptors in the database's "
+                "transformed space."
+            )
+
+        for descriptor, (scale, offset) in self._query_transforms.items():
+            if descriptor in elem_values:
+                elem_values[descriptor] = (
+                    scale * elem_values[descriptor] + offset
+                )
+
+        histogram_functions = {
+            "A3": lambda bins: calculate_angle_histogram(
+                mesh, n_samples=100_000, n_bins_histogram=bins
+            )[0],
+            "D1": lambda bins: calculate_distance_from_barycenter(
+                mesh, n_bins_histogram=bins
+            )[0],
+            "D2": lambda bins: calculate_distance_two_vertices(
+                mesh, n_samples=100_000, n_bins_histogram=bins
+            )[0],
+            "D3": lambda bins: calculate_area_triangle(
+                mesh, n_samples=100_000, n_bins_histogram=bins
+            )[0],
+            "D4": lambda bins: calculate_volume_tetrahedron(
+                mesh, n_samples=100_000, n_bins_histogram=bins
+            )[0],
+        }
+        hist_values: dict[str, np.ndarray] = {}
+        for descriptor, bins in histogram_bins.items():
+            extractor = histogram_functions.get(descriptor)
+            if extractor is None:
+                raise ValueError(
+                    f"No mesh extractor is registered for histogram "
+                    f"'{descriptor}'."
+                )
+            hist_values[descriptor] = extractor(bins)
+
+        return elem_values, hist_values
 
     def calculate_total_distance_from_mesh(
         self,
@@ -269,54 +552,63 @@ class ShapeDistanceCalculator:
             self.process_mesh_and_extract_descriptors(mesh_or_path)
         )
 
-        if self.simple_df is None:
-            raise RuntimeError(
-                "The simple descriptor DataFrame has not been loaded."
-            )
+        query_identifier = "__query_mesh__"
+        while query_identifier in self.shape_identifiers:
+            query_identifier += "_"
 
-        simple_df = self.simple_df
-        total_distances = np.zeros(len(simple_df), dtype=float)
+        all_distances: dict[str, dict[str, dict[str, float]]] = {}
+        for function_name, config in self.distance_config.items():
+            all_distances[function_name] = {}
+            for descriptor in config.descriptors:
+                source_df, columns, is_histogram = self._descriptor_sources[
+                    (function_name, descriptor)
+                ]
+                query_features = (
+                    hist_descriptors[descriptor]
+                    if is_histogram
+                    else [elem_descriptors[descriptor]]
+                )
+                all_distances[function_name][descriptor] = (
+                    self._calculate_configured_distances(
+                        config=config,
+                        source_df=source_df,
+                        columns=columns,
+                        is_histogram=is_histogram,
+                        query_features=query_features,
+                        descriptor=descriptor,
+                        query_identifier=query_identifier,
+                    )
+                )
 
-        for desc in EUCLIDEAN_DESCRIPTORS:
-            weight = self.weights.get(("euclidean", desc), 0.0)
-            if weight == 0.0 or desc not in simple_df.columns:
-                continue
+        self.all_distances = all_distances
+        return self._sum_weighted_distances(all_distances)
 
-            query_val = elem_descriptors[desc]
-            candidates = simple_df[desc].to_numpy(dtype=float)
-            total_distances += weight * np.abs(candidates - query_val)
-
-        # 2. Vectorized EMD distances via precalculated CDF differences
-        for desc in EMD_DESCRIPTORS:
-            weight = self.weights.get(("emd", desc), 0.0)
-            if weight == 0.0 or desc not in self._hist_cdfs:
-                continue
-
-            cdf_matrix = self._hist_cdfs[desc]
-            q_hist = hist_descriptors[desc]
-            q_sum = q_hist.sum()
-            if q_sum == 0:
-                q_sum = 1.0
-            q_cdf = np.cumsum(q_hist / q_sum)[:-1]
-
-            emd_dists = np.sum(np.abs(cdf_matrix - q_cdf), axis=1)
-            total_distances += weight * emd_dists
-
-        sorted_order = np.argsort(total_distances)
-        all_keys = self.simple_df.index.to_numpy()
-
-        self.total_distances = {
-            all_keys[i]: float(total_distances[i]) for i in sorted_order
-        }
-
-        return self.total_distances
+    def _sum_weighted_distances(
+        self,
+        all_distances: dict[str, dict[str, dict[str, float]]],
+    ) -> dict[str, float]:
+        totals = {shape: 0.0 for shape in self.shape_identifiers}
+        for function_name, descriptors in all_distances.items():
+            for descriptor, distances in descriptors.items():
+                weight = self.weights.get((function_name, descriptor))
+                if weight is None:
+                    raise ValueError(
+                        "Missing weight for configured descriptor "
+                        f"('{function_name}', '{descriptor}')."
+                    )
+                for shape in totals:
+                    if shape not in distances:
+                        raise ValueError(
+                            f"No distance for '{shape}' and descriptor "
+                            f"'{descriptor}'."
+                        )
+                    totals[shape] += weight * distances[shape]
+        return dict(sorted(totals.items(), key=lambda item: item[1]))
 
     @staticmethod
     def _normalize_shape_path(shape: str | Path) -> str:
-        """Normalize a mesh path to its category/filename identifier."""
-        return (
-            Path(shape).as_posix().split("4_models_fully_normalized/", 1)[-1]
-        )
+        """Normalize path separators without assuming a database layout."""
+        return str(shape).replace("\\", "/")
 
     @staticmethod
     def _expand_mesh_paths(paths: Sequence[str | Path]) -> list[str]:
@@ -400,51 +692,54 @@ class ShapeDistanceCalculator:
         query: str,
         shapes_to_compare: list[str] | None = None,
     ) -> dict[str, dict[str, dict[str, float]]]:
-        """Calculate and cache all descriptor distances vectorized."""
+        """Calculate distances using the active distance configuration."""
         self.last_query = query
         query_key = self._resolve_query_key(query)
-        if self.simple_df is None:
-            raise ValueError(
-                "Elemental descriptor DataFrame not loade, "
-                "perhaps missing csv on instancing?"
-            )
-        q_idx = self.simple_df.index.get_loc(query_key)
+        all_distances: dict[str, dict[str, dict[str, float]]] = {}
+        for function_name, config in self.distance_config.items():
+            all_distances[function_name] = {}
+            for descriptor in config.descriptors:
+                source_df, _, is_histogram = self._descriptor_sources[
+                    (function_name, descriptor)
+                ]
+                columns = self._descriptor_sources[
+                    (function_name, descriptor)
+                ][1]
+                query_features = source_df.set_index(
+                    self.identifier_column
+                ).loc[query_key, columns]
+                if isinstance(query_features, pd.Series):
+                    query_features = query_features.to_numpy(dtype=float)
+                else:
+                    query_features = np.asarray([query_features], dtype=float)
 
-        all_distances: dict[str, dict[str, dict[str, float]]] = {
-            "euclidean": {},
-            "emd": {},
-        }
-
-        # Euclidean descriptors
-        for desc in EUCLIDEAN_DESCRIPTORS:
-            if desc in self.simple_df.columns:
-                query_val_raw = self.simple_df.loc[query_key, desc]
-
-                if not isinstance(
-                    query_val_raw, (int, float, np.integer, np.floating)
-                ):
-                    raise ValueError(
-                        f"Descriptor '{desc}' must contain a "
-                        "real numeric value."
+                if config.function in {
+                    euclidean_distance,
+                    earth_movers_distance,
+                    cosine_distance,
+                }:
+                    distances = self._calculate_configured_distances(
+                        config=config,
+                        source_df=source_df,
+                        columns=columns,
+                        is_histogram=is_histogram,
+                        query_features=query_features,
+                        descriptor=descriptor,
                     )
-
-                query_val = float(query_val_raw)
-                candidates = self.simple_df[desc].to_numpy(dtype=float)
-                dists = np.abs(candidates - query_val)
-
-                all_distances["euclidean"][desc] = dict(
-                    zip(self.simple_df.index, dists)
-                )
-
-        # EMD descriptors
-        for desc in EMD_DESCRIPTORS:
-            if desc in self._hist_cdfs:
-                cdf_mat = self._hist_cdfs[desc]
-                cdf_q = cdf_mat[q_idx]
-                emd_dists = np.sum(np.abs(cdf_mat - cdf_q), axis=1)
-                all_distances["emd"][desc] = dict(
-                    zip(self.simple_df.index, emd_dists)
-                )
+                else:
+                    distances = config.function(
+                        df=source_df,
+                        query=query_key,
+                        shapes_to_compare=self.shape_identifiers,
+                        descriptor=descriptor,
+                        identifier_column=self.identifier_column,
+                        histogram=is_histogram,
+                    )
+                    distances = {
+                        self._normalize_shape_path(shape): float(distance)
+                        for shape, distance in distances.items()
+                    }
+                all_distances[function_name][descriptor] = distances
 
         self.all_distances = all_distances
         return self.all_distances
@@ -460,50 +755,16 @@ class ShapeDistanceCalculator:
         If run_pipeline=True, executes the complete pipeline on the query mesh.
         If run_pipeline=False, looks up precomputed values directly.
         """
-        self.last_query = query
+        self.last_query = str(query)
 
         if run_pipeline and (
-            Path(query).is_file() or isinstance(query, vedo.Mesh)
+            isinstance(query, vedo.Mesh)
+            or (isinstance(query, (str, Path)) and Path(query).is_file())
         ):
             return self.calculate_total_distance_from_mesh(query)
 
-        if self.simple_df is None:
-            raise RuntimeError(
-                "The simple descriptor DataFrame has not been loaded."
-            )
-
-        simple_df = self.simple_df
-        query_key = self._resolve_query_key(query)
-        q_idx = simple_df.index.get_loc(query_key)
-
-        total_distances = np.zeros(len(simple_df), dtype=float)
-
-        for desc in EUCLIDEAN_DESCRIPTORS:
-            weight = self.weights.get(("euclidean", desc), 0.0)
-            if weight == 0.0 or desc not in simple_df.columns:
-                continue
-
-            query_val = pd.to_numeric(simple_df.loc[query_key, desc])
-            candidates = simple_df[desc].to_numpy(dtype=float)
-            total_distances += weight * np.abs(candidates - query_val)
-
-        for desc in EMD_DESCRIPTORS:
-            weight = self.weights.get(("emd", desc), 0.0)
-            if weight == 0.0 or desc not in self._hist_cdfs:
-                continue
-
-            cdf_mat = self._hist_cdfs[desc]
-            cdf_q = cdf_mat[q_idx]
-            emd_dists = np.sum(np.abs(cdf_mat - cdf_q), axis=1)
-            total_distances += weight * emd_dists
-
-        sorted_order = np.argsort(total_distances)
-        all_keys = simple_df.index.to_numpy()
-
-        self.total_distances = {
-            all_keys[i]: float(total_distances[i]) for i in sorted_order
-        }
-
+        all_distances = self.calculate_all_distances(str(query))
+        self.total_distances = self._sum_weighted_distances(all_distances)
         return self.total_distances
 
     def _format_results(
