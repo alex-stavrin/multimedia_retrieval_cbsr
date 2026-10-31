@@ -16,6 +16,8 @@ from tqdm import tqdm
 
 import pandas as pd
 import numpy as np
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 IDENTIFIER_COLUMN = "file_path"
 
@@ -63,6 +65,7 @@ class ShapeDistanceCalculator:
         csv_databases: list[str | Path],
         distance_config: dict[str, DistanceConfig] | None = DISTANCE_CONFIG,
         identifier_column: str = IDENTIFIER_COLUMN,
+        max_workers: int | None = None,
     ) -> None:
         self.csv_databases = [Path(path) for path in csv_databases]
         self.distance_config = (
@@ -71,44 +74,62 @@ class ShapeDistanceCalculator:
             else DISTANCE_CONFIG.copy()
         )
         self.identifier_column = identifier_column
+        self.max_workers = (
+            max_workers
+            if max_workers is not None
+            else min(32, (os.cpu_count() or 1) + 4)
+        )
 
-        # Load CSV databases once so the object can be reused.
+        if self.max_workers < 1:
+            raise ValueError(
+                f"max_workers must be at least 1: `{self.max_workers}`"
+            )
+
         self.databases = {
             path: pd.read_csv(path) for path in self.csv_databases
         }
 
         self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
-
         self.total_distances: dict[str, float] = {}
 
-    def _find_database(self, descriptor: str, histogram: bool) -> Path:
-        """Find the CSV containing the requested descriptor."""
-        for path, df in self.databases.items():
-            if self.identifier_column not in df.columns:
-                continue
+        self.database_index = {
+            "elemental": {},
+            "histogram": {},
+        }
 
-            if histogram:
-                # Match columns such as A3_0, A3_1, D2_0, D2_1, etc.
-                matching_columns = [
-                    column
-                    for column in df.columns
-                    if column.startswith(f"{descriptor}_")
-                    and column[len(descriptor) + 1 :].isdigit()
-                ]
+        for csv_path, df in self.databases.items():
+            columns = set(df.columns)
 
-                if matching_columns:
-                    return path
+            # Index elemental descriptors by exact column name.
+            for descriptor in columns:
+                self.database_index["elemental"].setdefault(
+                    descriptor, csv_path
+                )
 
-            elif descriptor in df.columns:
-                return path
+            # Index histogram descriptors by their numbered columns
+            for column in columns:
+                if "_" in column:
+                    descriptor, suffix = column.rsplit("_", 1)
+                    if suffix.isdigit():
+                        self.database_index["histogram"].setdefault(
+                            descriptor, csv_path
+                        )
 
-        descriptor_type = "histogram" if histogram else "elemental"
-        searched_files = ", ".join(str(path) for path in self.databases)
+    def _find_database(
+        self, descriptor: str, histogram: bool = False
+    ) -> pd.DataFrame:
+        """Find the first CSV database containing the requested descriptor."""
+        database_type = "histogram" if histogram else "elemental"
 
-        raise ValueError(
-            f"Could not find {descriptor_type} descriptor '{descriptor}' "
-            f"in any supplied CSV file. Searched: {searched_files}"
-        )
+        csv_path = self.database_index[database_type].get(descriptor)
+
+        if csv_path is None:
+            raise ValueError(
+                f"Could not find database for descriptor '{descriptor}' "
+                f"(histogram={histogram})"
+            )
+
+        return self.databases[csv_path]
 
     def _find_weights(self) -> dict[tuple[str, str], float]:
         """Find and validate the descriptor weights CSV."""
@@ -232,54 +253,115 @@ class ShapeDistanceCalculator:
 
         return mesh_paths
 
+    @staticmethod
+    def _calculate_descriptor_task(
+        function_name: str,
+        descriptor: str,
+        config: DistanceConfig,
+        df: pd.DataFrame,
+        query: str,
+        shapes_to_compare: list[str],
+        identifier_column: str,
+    ) -> tuple[str, str, dict[str, float]]:
+        """Calculate distances for one descriptor."""
+        distances = config.function(
+            df=df,
+            query=query,
+            shapes_to_compare=shapes_to_compare,
+            descriptor=descriptor,
+            identifier_column=identifier_column,
+            histogram=config.histogram,
+        )
+
+        normalized_distances = {}
+
+        for shape, distance in distances.items():
+            normalized_shape = ShapeDistanceCalculator._normalize_shape_path(
+                shape
+            )
+
+            if normalized_shape in normalized_distances:
+                raise ValueError(
+                    f"Multiple shapes normalize to the same identifier "
+                    f"'{normalized_shape}' for descriptor '{descriptor}' "
+                    f"using '{function_name}'"
+                )
+
+            normalized_distances[normalized_shape] = distance
+
+        return function_name, descriptor, normalized_distances
+
     def calculate_all_distances(
         self,
         query: str,
         shapes_to_compare: list[str],
     ) -> dict[str, dict[str, dict[str, float]]]:
-        """Calculate distances and store results using normalized
-        shape paths."""
+        """Calculate descriptor distances concurrently.
+        Public call that always expands list to avoid error"""
 
         self.last_query = query
+        expanded_shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
 
-        all_distances = {}
+        return self._calculate_all_distances_expanded(
+            query, expanded_shapes_to_compare
+        )
 
-        shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
-
-        for function_name, config in tqdm(self.distance_config.items()):
-            all_distances[function_name] = {}
-
+    def _calculate_all_distances_expanded(
+        self,
+        query: str,
+        expanded_shapes_to_compare: list[str],
+    ) -> dict[str, dict[str, dict[str, float]]]:
+        """Calculates descriptor distances concurrently,
+        from given expanded file paths, used to avoid more work of expending
+        all file paths, as this can get expensive quickly."""
+        # Resolve databases before starting concurrent work.
+        tasks = []
+        for function_name, config in self.distance_config.items():
             for descriptor in config.descriptors:
                 csv_database = self._find_database(
                     descriptor=descriptor,
                     histogram=config.histogram,
                 )
 
-                distances = config.function(
-                    csv_database=csv_database,
-                    query=query,
-                    shapes_to_compare=shapes_to_compare,
-                    descriptor=descriptor,
-                    identifier_column=self.identifier_column,
-                    histogram=config.histogram,
+                tasks.append(
+                    (
+                        function_name,
+                        descriptor,
+                        config,
+                        csv_database,
+                        query,
+                        expanded_shapes_to_compare,
+                        self.identifier_column,
+                    )
                 )
 
-                # Normalize candidate paths before storing the results.
-                normalized_distances = {}
+        # Keep worker count configurable through the constructor.
+        results = {}
 
-                for shape, distance in distances.items():
-                    normalized_shape = self._normalize_shape_path(shape)
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            futures = [
+                executor.submit(self._calculate_descriptor_task, *task)
+                for task in tasks
+            ]
 
-                    if normalized_shape in normalized_distances:
-                        raise ValueError(
-                            f"Multiple shapes normalize to the same "
-                            f"identifier '{normalized_shape}' for descriptor "
-                            f"'{descriptor}' using '{function_name}'"
-                        )
+            for future in tqdm(
+                as_completed(futures),
+                total=len(futures),
+                desc="Calculating distances",
+            ):
+                function_name, descriptor, distances = future.result()
+                results[(function_name, descriptor)] = distances
 
-                    normalized_distances[normalized_shape] = distance
+        # Reconstruct the original nested dictionary and ordering.
+        all_distances = {}
 
-                all_distances[function_name][descriptor] = normalized_distances
+        for function_name, config in self.distance_config.items():
+            all_distances[function_name] = {}
+
+            for descriptor in config.descriptors:
+                all_distances[function_name][descriptor] = results[
+                    (function_name, descriptor)
+                ]
 
         self.all_distances = all_distances
         return self.all_distances
@@ -333,29 +415,40 @@ class ShapeDistanceCalculator:
             for normalized_shape in normalized_shapes.values()
         }
 
-        for function_name, descriptors in self.all_distances.items():
-            for descriptor, shape_distances in descriptors.items():
-                weight = weights[(function_name, descriptor)]
+        total_steps = sum(
+            len(descriptors) * len(normalized_shapes)
+            for descriptors in self.all_distances.values()
+        )
 
-                for normalized_shape in normalized_shapes.values():
-                    if normalized_shape not in shape_distances:
-                        raise ValueError(
-                            f"Missing distance for '{normalized_shape}', "
-                            f"descriptor '{descriptor}', "
-                            f"function '{function_name}'."
-                        )
+        with tqdm(
+            total=total_steps,
+            desc="Calculating total distances",
+            unit="distance",
+        ) as pbar:
+            for function_name, descriptors in self.all_distances.items():
+                for descriptor, shape_distances in descriptors.items():
+                    weight = weights[(function_name, descriptor)]
 
-                    distance = shape_distances[normalized_shape]
+                    for normalized_shape in normalized_shapes.values():
+                        if normalized_shape not in shape_distances:
+                            raise ValueError(
+                                f"Missing distance for '{normalized_shape}', "
+                                f"descriptor '{descriptor}', "
+                                f"function '{function_name}'."
+                            )
 
-                    if not np.isfinite(distance):
-                        raise ValueError(
-                            f"Non-finite distance for shape"
-                            f" '{normalized_shape}', "
-                            f"descriptor '{descriptor}', "
-                            f"function '{function_name}'."
-                        )
+                        distance = shape_distances[normalized_shape]
 
-                    total_distances[normalized_shape] += weight * distance
+                        if not np.isfinite(distance):
+                            raise ValueError(
+                                f"Non-finite distance for shape "
+                                f"'{normalized_shape}', "
+                                f"descriptor '{descriptor}', "
+                                f"function '{function_name}'."
+                            )
+
+                        total_distances[normalized_shape] += weight * distance
+                        pbar.update(1)
 
         self.total_distances = dict(
             sorted(
@@ -498,11 +591,9 @@ def main():
 
     args.shapes = ShapeDistanceCalculator._expand_mesh_paths(args.shapes)
 
-    print(calculator.calculate_all_distances(args.query, args.shapes))
-    total_distances = calculator.calculate_total_distance(
+    total_distances = calculator._calculate_all_distances_expanded(
         args.query, args.shapes
     )
-    print(total_distances)
 
     if args.output:
         calculator.save_results(args.output)

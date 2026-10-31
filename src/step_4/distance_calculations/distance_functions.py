@@ -165,7 +165,7 @@ def _find_shape(
 
 
 def euclidean_distance(
-    csv_database: str,
+    df: pd.DataFrame,
     query: str,
     shapes_to_compare: list[str],
     descriptor: str,
@@ -173,13 +173,6 @@ def euclidean_distance(
     identifier_column=IDENTIFIER_COLUMN,
 ) -> dict[str, float]:
     """Calculate Euclidean distances between meshes."""
-    csv_path = Path(csv_database)
-
-    if not csv_path.is_file():
-        raise ValueError(f"CSV database does not exist: {csv_database}")
-
-    df = pd.read_csv(csv_path)
-
     if identifier_column not in df.columns:
         raise ValueError(
             f"Required identifier column '{identifier_column}' "
@@ -215,7 +208,7 @@ def euclidean_distance(
 
 
 def cosine_distance(
-    csv_database: str,
+    df: pd.DataFrame,
     query: str,
     shapes_to_compare: list[str],
     descriptor: str,
@@ -223,13 +216,6 @@ def cosine_distance(
     histogram: bool = False,
 ) -> dict[str, float]:
     """Calculate cosine distances between meshes."""
-    csv_path = Path(csv_database)
-
-    if not csv_path.is_file():
-        raise ValueError(f"CSV database does not exist: {csv_database}")
-
-    df = pd.read_csv(csv_path)
-
     if identifier_column not in df.columns:
         raise ValueError(
             f"Required identifier column '{identifier_column}' "
@@ -276,7 +262,7 @@ def cosine_distance(
 
 
 def earth_movers_distance(
-    csv_database: str | Path,
+    df: pd.DataFrame,
     query: str,
     shapes_to_compare: list[str],
     descriptor: str,
@@ -299,14 +285,6 @@ def earth_movers_distance(
     Returns:
         Dictionary mapping each comparison mesh's identifier to its distance.
     """
-    # Load descriptor database
-    csv_database = Path(csv_database)
-
-    if not csv_database.is_file():
-        raise FileNotFoundError(f"CSV database not found: {csv_database}")
-
-    df = pd.read_csv(csv_database)
-
     if identifier_column not in df.columns:
         raise ValueError(
             f"Identifier column '{identifier_column}' "
@@ -484,8 +462,9 @@ def main() -> None:
     args = parser.parse_args()
 
     try:
+        df = pd.read_csv(args.input)
         distances = DISTANCE_FUNCTIONS[args.distance_function](
-            csv_database=args.input,
+            df=df,
             query=args.query,
             shapes_to_compare=args.shapes,
             descriptor=args.descriptor,
