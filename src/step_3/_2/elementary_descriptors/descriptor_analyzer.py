@@ -17,6 +17,7 @@ from src.step_3._2.elementary_descriptors.descriptor_extracting import (
     __approx_volume,
     __calculate_pca,
 )
+from src.helper.silence_vtk import silence_vtk
 
 DESCRIPTOR_FIELDS = [
     "file_path",
@@ -30,20 +31,7 @@ DESCRIPTOR_FIELDS = [
     "reason",
 ]
 
-
-def _silence_vtk() -> None:
-    """Suppress VTK warnings and logger output to console."""
-    try:
-        vtk.vtkLogger.SetStderrVerbosity(vtk.vtkLogger.VERBOSITY_OFF)
-    except Exception:
-        pass
-    try:
-        vtk.vtkObject.GlobalWarningDisplayOff()
-    except Exception:
-        pass
-
-
-# Silence VTK warnings on import
+_silence_vtk = silence_vtk
 _silence_vtk()
 
 
@@ -60,6 +48,7 @@ def retrieve_all_shape_files(input_dir_path: str) -> list[str]:
 
 
 def calculate_mesh_descriptors(shape: vedo.Mesh) -> dict:
+    _silence_vtk()
     # Calculate shared quantities once.
     volume = __approx_volume(shape)
     area = calculate_surface_area(

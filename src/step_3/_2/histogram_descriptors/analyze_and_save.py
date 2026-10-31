@@ -13,20 +13,9 @@ from tqdm import tqdm
 import csv
 from concurrent.futures import ProcessPoolExecutor
 import os
+from src.helper.silence_vtk import silence_vtk
 
-
-def _silence_vtk() -> None:
-    """Suppress VTK warnings and logger output to console."""
-    try:
-        vtk.vtkLogger.SetStderrVerbosity(vtk.vtkLogger.VERBOSITY_OFF)
-    except Exception:
-        pass
-    try:
-        vtk.vtkObject.GlobalWarningDisplayOff()
-    except Exception:
-        pass
-
-
+_silence_vtk = silence_vtk
 _silence_vtk()
 
 

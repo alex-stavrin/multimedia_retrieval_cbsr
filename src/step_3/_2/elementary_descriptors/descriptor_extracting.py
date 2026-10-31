@@ -10,20 +10,9 @@ import vtk
 
 from dataclasses import dataclass
 from src.step_1.model_viewer import QApplication, ModelViewer
+from src.helper.silence_vtk import silence_vtk
 
-
-def _silence_vtk() -> None:
-    """Suppress VTK warnings and logger output to console."""
-    try:
-        vtk.vtkLogger.SetStderrVerbosity(vtk.vtkLogger.VERBOSITY_OFF)
-    except Exception:
-        pass
-    try:
-        vtk.vtkObject.GlobalWarningDisplayOff()
-    except Exception:
-        pass
-
-
+_silence_vtk = silence_vtk
 _silence_vtk()
 
 DATABASE: pd.DataFrame | None = None

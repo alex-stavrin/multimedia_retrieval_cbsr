@@ -15,6 +15,7 @@ import shutil
 from pathlib import Path
 from typing import Callable, Any
 
+import src.helper.silence_vtk  # noqa: F401
 import src.step_2._3.resampling as resampling
 import src.step_2._1.shapes_analyzer as shape_analyzer
 import src.step_2._3.repairment.repair_wireframe as reparation
@@ -238,7 +239,7 @@ def prepare_database(
         _run_step(
             "analyze_reparation",
             lambda: rep_analyser.compare_hole_fill_stats(
-                str(raw_path), str(repaired), str(repair_csv)
+                str(raw_path), str(repaired), str(repair_csv), show_progress=True
             ),
             state,
             checkpoint_path,

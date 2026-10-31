@@ -27,6 +27,7 @@ def compare_hole_fill_stats(
     original_database_path: str,
     filled_database_path: str,
     output_path: str,
+    show_progress: bool = True,
 ):
     if not isinstance(original_database_path, str):
         raise TypeError(
@@ -65,7 +66,14 @@ def compare_hole_fill_stats(
         writer.writeheader()
 
         # Sorted so the CSV output is deterministic
-        for relative_path in sorted(original_files):
+        file_keys = sorted(original_files)
+        iterator = (
+            tqdm(file_keys, desc="Analyzing reparation")
+            if show_progress
+            else file_keys
+        )
+
+        for relative_path in iterator:
             original_shape = vedo.Mesh(original_files[relative_path])
             filled_shape = vedo.Mesh(filled_files[relative_path])
 
