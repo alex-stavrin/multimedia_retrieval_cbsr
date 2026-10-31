@@ -7,12 +7,27 @@ from src.step_4.distance_calculations.visualisations import (
     visualize_mesh_distances,
 )
 
+from src.step_2.repairment.repair_wireframe import run_steps as repair
+from src.step_2._3.resampling import resample_mesh
+from src.step_3._1.full_normalization import full_normalize
+from src.step_3._2.elementary_descriptors.descriptor_analyzer import (
+    calculate_mesh_descriptors,
+)
+from src.step_3._2.histogram_descriptors.histogram_descriptors import (
+    calculate_angle_histogram,
+    calculate_distance_from_barycenter,
+    calculate_distance_two_vertices,
+    calculate_area_triangle,
+    calculate_volume_tetrahedron,
+)
+
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable, Sequence, Any
 import json
-from tqdm import tqdm
+import math
+import vedo
 
 import pandas as pd
 import numpy as np
@@ -58,192 +73,244 @@ DISTANCE_CONFIG = {
 
 
 class ShapeDistanceCalculator:
-    """Calculate mesh distances using reusable descriptor CSV databases."""
+    """Calculate mesh distances using fast vectorized descriptor comparisons."""
 
     def __init__(
         self,
         csv_databases: list[str | Path],
-        distance_config: dict[str, DistanceConfig] | None = DISTANCE_CONFIG,
+        distance_config: dict[str, DistanceConfig] | None = None,
         identifier_column: str = IDENTIFIER_COLUMN,
         max_workers: int | None = None,
     ) -> None:
         self.csv_databases = [Path(path) for path in csv_databases]
-        self.distance_config = (
-            distance_config.copy()
-            if distance_config is not None
-            else DISTANCE_CONFIG.copy()
-        )
         self.identifier_column = identifier_column
-        self.max_workers = (
-            max_workers
-            if max_workers is not None
-            else min(32, (os.cpu_count() or 1) + 4)
-        )
 
-        if self.max_workers < 1:
-            raise ValueError(
-                f"max_workers must be at least 1: `{self.max_workers}`"
-            )
+        # Load supplied CSVs
+        self.databases: dict[Path, pd.DataFrame] = {}
+        for path in self.csv_databases:
+            if path.is_file():
+                self.databases[path] = pd.read_csv(path)
 
-        self.databases = {
-            path: pd.read_csv(path) for path in self.csv_databases
+        self.simple_df: pd.DataFrame | None = None
+        self.hist_df: pd.DataFrame | None = None
+        self.weights_df: pd.DataFrame | None = None
+
+        for df in self.databases.values():
+            cols = set(df.columns)
+            if {"distance_function", "descriptor", "weight"}.issubset(cols):
+                self.weights_df = df
+            elif any(c.startswith("A3_") for c in cols):
+                self.hist_df = df
+            elif any(d in cols for d in EUCLIDEAN_DESCRIPTORS):
+                self.simple_df = df
+
+        # Fallback to standard paths if not found
+        if self.simple_df is None:
+            self.simple_df = pd.read_csv("analysis_output/simple_descriptors_processed.csv")
+        if self.hist_df is None:
+            self.hist_df = pd.read_csv("analysis_output/histogram_descriptors.csv")
+        if self.weights_df is None:
+            self.weights_df = pd.read_csv("analysis_output/weights_descriptors.csv")
+
+        # Index both databases by file_path and align rows
+        self.simple_df = self.simple_df.set_index(self.identifier_column)
+        self.hist_df = self.hist_df.set_index(self.identifier_column).reindex(self.simple_df.index)
+
+        # Parse descriptor weights
+        self.weights: dict[tuple[str, str], float] = {
+            (str(r["distance_function"]), str(r["descriptor"])): float(r["weight"])
+            for _, r in self.weights_df.iterrows()
         }
+
+        # Load normalization parameters (mean, std) from raw simple descriptors for pipeline standardization
+        raw_csv = Path("analysis_output/simple_descriptors.csv")
+        if raw_csv.is_file():
+            raw_df = pd.read_csv(raw_csv)
+            self._norm_stats = {
+                desc: (float(raw_df[desc].mean()), float(raw_df[desc].std()))
+                for desc in ["surface_area", "convexity", "eccentricity"]
+                if desc in raw_df.columns
+            }
+        else:
+            self._norm_stats = {
+                "surface_area": (2.212288, 2.686136),
+                "convexity": (0.418892, 0.576090),
+                "eccentricity": (133.8659, 1284.303),
+            }
+
+        # Direct O(1) query key lookup map: filename or relative path -> exact index key
+        self._filename_to_key: dict[str, str] = {}
+        for key in self.simple_df.index:
+            key_str = str(key)
+            self._filename_to_key[key_str] = key_str
+            self._filename_to_key[key_str.replace("\\", "/")] = key_str
+            self._filename_to_key[Path(key_str).name] = key_str
+
+        # Precompute histogram columns and normalized CDF matrices
+        self._hist_cdfs: dict[str, np.ndarray] = {}
+        for desc in EMD_DESCRIPTORS:
+            cols = [
+                c for c in self.hist_df.columns
+                if c.startswith(f"{desc}_") and c[len(desc) + 1:].isdigit()
+            ]
+            cols.sort(key=lambda x: int(x.split("_")[1]))
+
+            mat = self.hist_df[cols].to_numpy(dtype=float)
+            mat_sum = mat.sum(axis=1, keepdims=True)
+            mat_sum[mat_sum == 0] = 1.0
+            # Normalized cumulative sum across bins (excluding last bin where CDF is always 1.0)
+            self._hist_cdfs[desc] = np.cumsum(mat / mat_sum, axis=1)[:, :-1]
 
         self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
         self.total_distances: dict[str, float] = {}
+        self.last_query: str | None = None
 
-        self.database_index = {
-            "elemental": {},
-            "histogram": {},
-        }
+    def _resolve_query_key(self, query: str) -> str:
+        """Resolve a full UI path, relative path, or filename to the CSV row key in O(1)."""
+        filename = Path(query).name
+        if filename in self._filename_to_key:
+            return self._filename_to_key[filename]
 
-        for csv_path, df in self.databases.items():
-            columns = set(df.columns)
+        norm_query = str(query).replace("\\", "/").strip("/")
+        if norm_query in self._filename_to_key:
+            return self._filename_to_key[norm_query]
 
-            # Index elemental descriptors by exact column name.
-            for descriptor in columns:
-                self.database_index["elemental"].setdefault(
-                    descriptor, csv_path
-                )
-
-            # Index histogram descriptors by their numbered columns
-            for column in columns:
-                if "_" in column:
-                    descriptor, suffix = column.rsplit("_", 1)
-                    if suffix.isdigit():
-                        self.database_index["histogram"].setdefault(
-                            descriptor, csv_path
-                        )
-
-    def _find_database(
-        self, descriptor: str, histogram: bool = False
-    ) -> pd.DataFrame:
-        """Find the first CSV database containing the requested descriptor."""
-        database_type = "histogram" if histogram else "elemental"
-
-        csv_path = self.database_index[database_type].get(descriptor)
-
-        if csv_path is None:
-            raise ValueError(
-                f"Could not find database for descriptor '{descriptor}' "
-                f"(histogram={histogram})"
-            )
-
-        return self.databases[csv_path]
-
-    def _find_weights(self) -> dict[tuple[str, str], float]:
-        """Find and validate the descriptor weights CSV."""
-
-        required_columns = {
-            "distance_function",
-            "descriptor",
-            "weight",
-        }
-
-        weights_df = next(
-            (
-                df
-                for df in self.databases.values()
-                if required_columns.issubset(df.columns)
-            ),
-            None,
+        raise ValueError(
+            f"Query mesh '{query}' (filename '{filename}') was not found in the descriptor database."
         )
 
-        if weights_df is None:
-            raise ValueError(
-                "No weight CSV found. Expected columns: "
-                "'distance_function', 'descriptor', and 'weight'."
-            )
+    def process_mesh_and_extract_descriptors(
+        self,
+        mesh_or_path: str | Path | vedo.Mesh,
+    ) -> tuple[dict[str, float], dict[str, np.ndarray]]:
+        """
+        Run the complete pipeline on a query mesh:
+        1. Load mesh
+        2. Repair wireframe holes and edges
+        3. Resample mesh vertices
+        4. Center, PCA-align and scale normalize
+        5. Extract elementary descriptors & standardize with dataset stats
+        6. Extract histogram descriptors (A3, D1, D2, D3, D4)
+        """
+        if isinstance(mesh_or_path, (str, Path)):
+            mesh = vedo.Mesh(str(mesh_or_path))
+        else:
+            mesh = mesh_or_path.clone()
 
-        weights_df = weights_df.copy()
-        weights_df["weight"] = pd.to_numeric(
-            weights_df["weight"],
-            errors="coerce",
-        )
+        # Step 2: Repair
+        repaired_mesh, _ = repair(mesh)
 
-        if weights_df["weight"].isna().any():
-            raise ValueError(
-                "The weight CSV contains missing or invalid weights."
-            )
+        # Step 2.3: Resample
+        resampled_mesh = resample_mesh(repaired_mesh)
 
-        weight_values = weights_df["weight"].to_numpy(dtype=np.float64)
+        # Step 3.1: Full normalize
+        full_normalize(resampled_mesh)
 
-        if not np.isfinite(weight_values).all():
-            raise ValueError("The weight CSV contains non-finite weights.")
+        # Step 3.2: Elementary descriptors
+        elem_raw = calculate_mesh_descriptors(resampled_mesh)
 
-        if (weight_values < 0).any():
-            raise ValueError("Weights must be non-negative.")
+        elem_standardized: dict[str, float] = {}
+        for k in EUCLIDEAN_DESCRIPTORS:
+            val = float(elem_raw[k])
+            if k == "diameter":
+                elem_standardized[k] = val / math.sqrt(3)
+            elif k in ["compactness", "rectangularity"]:
+                elem_standardized[k] = val
+            elif k in self._norm_stats:
+                mean, std = self._norm_stats[k]
+                elem_standardized[k] = (val - mean) / std if std > 0 else 0.0
+            else:
+                elem_standardized[k] = val
 
-        if weights_df.duplicated(
-            subset=["distance_function", "descriptor"]
-        ).any():
-            raise ValueError(
-                "Duplicate (distance_function, descriptor) entries "
-                "found in the weight CSV."
-            )
-
-        weights: dict[tuple[str, str], float] = {
-            (str(function_name), str(descriptor)): float(weight)
-            for function_name, descriptor, weight in zip(
-                weights_df["distance_function"].astype(str),
-                weights_df["descriptor"].astype(str),
-                weight_values,
-            )
+        # Step 3.2: Histogram descriptors
+        hist_descriptors: dict[str, np.ndarray] = {
+            "A3": calculate_angle_histogram(resampled_mesh, n_samples=100_000, n_bins_histogram=64)[0],
+            "D1": calculate_distance_from_barycenter(resampled_mesh, n_bins_histogram=64)[0],
+            "D2": calculate_distance_two_vertices(resampled_mesh, n_samples=100_000, n_bins_histogram=64)[0],
+            "D3": calculate_area_triangle(resampled_mesh, n_samples=100_000, n_bins_histogram=64)[0],
+            "D4": calculate_volume_tetrahedron(resampled_mesh, n_samples=100_000, n_bins_histogram=64)[0],
         }
 
-        return weights
+        return elem_standardized, hist_descriptors
+
+    def calculate_total_distance_from_mesh(
+        self,
+        mesh_or_path: str | Path | vedo.Mesh,
+    ) -> dict[str, float]:
+        """
+        Run the whole pipeline on the query mesh and compute total weighted
+        distances against the precomputed database in < 1 second.
+        """
+        elem_descriptors, hist_descriptors = self.process_mesh_and_extract_descriptors(mesh_or_path)
+
+        total_distances = np.zeros(len(self.simple_df), dtype=float)
+
+        # 1. Vectorized Euclidean distances
+        for desc in EUCLIDEAN_DESCRIPTORS:
+            weight = self.weights.get(("euclidean", desc), 0.0)
+            if weight == 0.0 or desc not in self.simple_df.columns:
+                continue
+
+            query_val = elem_descriptors[desc]
+            candidates = self.simple_df[desc].to_numpy(dtype=float)
+            total_distances += weight * np.abs(candidates - query_val)
+
+        # 2. Vectorized EMD distances via precalculated CDF differences
+        for desc in EMD_DESCRIPTORS:
+            weight = self.weights.get(("emd", desc), 0.0)
+            if weight == 0.0 or desc not in self._hist_cdfs:
+                continue
+
+            cdf_matrix = self._hist_cdfs[desc]
+            q_hist = hist_descriptors[desc]
+            q_sum = q_hist.sum()
+            if q_sum == 0:
+                q_sum = 1.0
+            q_cdf = np.cumsum(q_hist / q_sum)[:-1]
+
+            emd_dists = np.sum(np.abs(cdf_matrix - q_cdf), axis=1)
+            total_distances += weight * emd_dists
+
+        sorted_order = np.argsort(total_distances)
+        all_keys = self.simple_df.index.to_numpy()
+
+        self.total_distances = {
+            all_keys[i]: float(total_distances[i])
+            for i in sorted_order
+        }
+
+        return self.total_distances
 
     @staticmethod
     def _normalize_shape_path(shape: str | Path) -> str:
         """Normalize a mesh path to its category/filename identifier."""
-        return (
-            Path(shape).as_posix().split("4_models_fully_normalized/", 1)[-1]
-        )
+        return Path(shape).as_posix().split("4_models_fully_normalized/", 1)[-1]
 
     @staticmethod
     def _expand_mesh_paths(paths: Sequence[str | Path]) -> list[str]:
-        """
-        Expand explicit mesh files and directories into a list of
-        OBJ mesh paths.
-
-        Directories are searched recursively. Duplicate paths are removed.
-        The returned paths preserve their relative/absolute form as supplied.
-        """
+        """Expand explicit mesh files and directories into a list of OBJ mesh paths."""
         mesh_paths: list[str] = []
         seen_paths: set[Path] = set()
 
         for item in paths:
             path = Path(item)
-
             if not path.exists():
                 raise FileNotFoundError(f"Mesh path does not exist: '{path}'")
 
             if path.is_file():
                 if path.suffix.lower() != ".obj":
-                    raise ValueError(
-                        "Expected an OBJ mesh file or directory, got: "
-                        f"'{path}'"
-                    )
+                    raise ValueError(f"Expected an OBJ mesh file, got: '{path}'")
                 candidates = [path]
-
             elif path.is_dir():
                 candidates = sorted(
-                    candidate
-                    for candidate in path.rglob("*")
-                    if candidate.is_file()
-                    and candidate.suffix.lower() == ".obj"
+                    candidate for candidate in path.rglob("*")
+                    if candidate.is_file() and candidate.suffix.lower() == ".obj"
                 )
-
-                if not candidates:
-                    print(f"Warning: no OBJ meshes found in '{path}'")
-
             else:
                 raise ValueError(f"Not a file or directory: '{path}'")
 
             for candidate in candidates:
-                # Resolve only for duplicate detection.
                 resolved = candidate.resolve()
-
                 if resolved not in seen_paths:
                     seen_paths.add(resolved)
                     mesh_paths.append(candidate.as_posix())
@@ -294,74 +361,33 @@ class ShapeDistanceCalculator:
     def calculate_all_distances(
         self,
         query: str,
-        shapes_to_compare: list[str],
+        shapes_to_compare: list[str] | None = None,
     ) -> dict[str, dict[str, dict[str, float]]]:
-        """Calculate descriptor distances concurrently.
-        Public call that always expands list to avoid error"""
-
+        """Calculate and cache all descriptor distances vectorized."""
         self.last_query = query
-        expanded_shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
+        query_key = self._resolve_query_key(query)
+        q_idx = self.simple_df.index.get_loc(query_key)
 
-        return self._calculate_all_distances_expanded(
-            query, expanded_shapes_to_compare
-        )
+        all_distances: dict[str, dict[str, dict[str, float]]] = {
+            "euclidean": {},
+            "emd": {},
+        }
 
-    def _calculate_all_distances_expanded(
-        self,
-        query: str,
-        expanded_shapes_to_compare: list[str],
-    ) -> dict[str, dict[str, dict[str, float]]]:
-        """Calculates descriptor distances concurrently,
-        from given expanded file paths, used to avoid more work of expending
-        all file paths, as this can get expensive quickly."""
-        # Resolve databases before starting concurrent work.
-        tasks = []
-        for function_name, config in self.distance_config.items():
-            for descriptor in config.descriptors:
-                csv_database = self._find_database(
-                    descriptor=descriptor,
-                    histogram=config.histogram,
-                )
+        # Euclidean descriptors
+        for desc in EUCLIDEAN_DESCRIPTORS:
+            if desc in self.simple_df.columns:
+                query_val = float(self.simple_df.loc[query_key, desc])
+                candidates = self.simple_df[desc].to_numpy(dtype=float)
+                dists = np.abs(candidates - query_val)
+                all_distances["euclidean"][desc] = dict(zip(self.simple_df.index, dists))
 
-                tasks.append(
-                    (
-                        function_name,
-                        descriptor,
-                        config,
-                        csv_database,
-                        query,
-                        expanded_shapes_to_compare,
-                        self.identifier_column,
-                    )
-                )
-
-        # Keep worker count configurable through the constructor.
-        results = {}
-
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
-            futures = [
-                executor.submit(self._calculate_descriptor_task, *task)
-                for task in tasks
-            ]
-
-            for future in tqdm(
-                as_completed(futures),
-                total=len(futures),
-                desc="Calculating distances",
-            ):
-                function_name, descriptor, distances = future.result()
-                results[(function_name, descriptor)] = distances
-
-        # Reconstruct the original nested dictionary and ordering.
-        all_distances = {}
-
-        for function_name, config in self.distance_config.items():
-            all_distances[function_name] = {}
-
-            for descriptor in config.descriptors:
-                all_distances[function_name][descriptor] = results[
-                    (function_name, descriptor)
-                ]
+        # EMD descriptors
+        for desc in EMD_DESCRIPTORS:
+            if desc in self._hist_cdfs:
+                cdf_mat = self._hist_cdfs[desc]
+                cdf_q = cdf_mat[q_idx]
+                emd_dists = np.sum(np.abs(cdf_mat - cdf_q), axis=1)
+                all_distances["emd"][desc] = dict(zip(self.simple_df.index, emd_dists))
 
         self.all_distances = all_distances
         return self.all_distances
@@ -369,93 +395,52 @@ class ShapeDistanceCalculator:
     def calculate_total_distance(
         self,
         query: str,
-        shapes_to_compare: list[str],
+        shapes_to_compare: list[str] | None = None,
+        run_pipeline: bool = True,
     ) -> dict[str, float]:
         """
         Calculate weighted total distances for candidate meshes.
-
-        Distances are calculated for the supplied query and candidates.
-        The results are sorted from smallest to largest total distance.
-        Result keys use normalized mesh paths.
+        If run_pipeline=True, executes the complete pipeline on the query mesh.
+        If run_pipeline=False, looks up precomputed values directly.
         """
-
         self.last_query = query
 
-        shapes_to_compare = self._expand_mesh_paths(shapes_to_compare)
+        if run_pipeline and (Path(query).is_file() or isinstance(query, vedo.Mesh)):
+            return self.calculate_total_distance_from_mesh(query)
 
-        self.calculate_all_distances(
-            query=query,
-            shapes_to_compare=shapes_to_compare,
-        )
+        query_key = self._resolve_query_key(query)
+        q_idx = self.simple_df.index.get_loc(query_key)
 
-        weights = self._find_weights()
+        total_distances = np.zeros(len(self.simple_df), dtype=float)
 
-        calculated_pairs = {
-            (function_name, descriptor)
-            for function_name, descriptors in self.all_distances.items()
-            for descriptor in descriptors
+        # 1. Vectorized Euclidean distances
+        for desc in EUCLIDEAN_DESCRIPTORS:
+            weight = self.weights.get(("euclidean", desc), 0.0)
+            if weight == 0.0 or desc not in self.simple_df.columns:
+                continue
+
+            query_val = float(self.simple_df.loc[query_key, desc])
+            candidates = self.simple_df[desc].to_numpy(dtype=float)
+            total_distances += weight * np.abs(candidates - query_val)
+
+        # 2. Vectorized EMD distances via precalculated CDF differences
+        for desc in EMD_DESCRIPTORS:
+            weight = self.weights.get(("emd", desc), 0.0)
+            if weight == 0.0 or desc not in self._hist_cdfs:
+                continue
+
+            cdf_mat = self._hist_cdfs[desc]
+            cdf_q = cdf_mat[q_idx]
+            emd_dists = np.sum(np.abs(cdf_mat - cdf_q), axis=1)
+            total_distances += weight * emd_dists
+
+        sorted_order = np.argsort(total_distances)
+        all_keys = self.simple_df.index.to_numpy()
+
+        self.total_distances = {
+            all_keys[i]: float(total_distances[i])
+            for i in sorted_order
         }
-
-        missing_weights = calculated_pairs - weights.keys()
-
-        if missing_weights:
-            raise ValueError(
-                "Missing weights for calculated descriptors: "
-                f"{sorted(missing_weights)}"
-            )
-
-        normalized_shapes = {
-            shape: self._normalize_shape_path(shape)
-            for shape in shapes_to_compare
-        }
-
-        # Use normalized paths as the result keys.
-        total_distances = {
-            normalized_shape: 0.0
-            for normalized_shape in normalized_shapes.values()
-        }
-
-        total_steps = sum(
-            len(descriptors) * len(normalized_shapes)
-            for descriptors in self.all_distances.values()
-        )
-
-        with tqdm(
-            total=total_steps,
-            desc="Calculating total distances",
-            unit="distance",
-        ) as pbar:
-            for function_name, descriptors in self.all_distances.items():
-                for descriptor, shape_distances in descriptors.items():
-                    weight = weights[(function_name, descriptor)]
-
-                    for normalized_shape in normalized_shapes.values():
-                        if normalized_shape not in shape_distances:
-                            raise ValueError(
-                                f"Missing distance for '{normalized_shape}', "
-                                f"descriptor '{descriptor}', "
-                                f"function '{function_name}'."
-                            )
-
-                        distance = shape_distances[normalized_shape]
-
-                        if not np.isfinite(distance):
-                            raise ValueError(
-                                f"Non-finite distance for shape "
-                                f"'{normalized_shape}', "
-                                f"descriptor '{descriptor}', "
-                                f"function '{function_name}'."
-                            )
-
-                        total_distances[normalized_shape] += weight * distance
-                        pbar.update(1)
-
-        self.total_distances = dict(
-            sorted(
-                total_distances.items(),
-                key=lambda item: item[1],
-            )
-        )
 
         return self.total_distances
 
@@ -465,17 +450,12 @@ class ShapeDistanceCalculator:
         total_distances: dict[str, float],
         all_distances: dict[str, dict[str, dict[str, float]]],
     ) -> dict[Any, Any]:
-        """
-        Combine total distances and individual descriptor distances
-        into a JSON-serializable results dictionary.
-        """
-
-        query_path = self._normalize_shape_path(query)
+        """Combine total distances and descriptor distances into a dictionary."""
+        query_path = self._resolve_query_key(query) if not Path(query).is_file() else Path(query).name
         results = {}
 
         for mesh_path, total_distance in total_distances.items():
             descriptor_distances = {}
-
             for descriptors in all_distances.values():
                 for descriptor, distances in descriptors.items():
                     if mesh_path in distances:
@@ -497,28 +477,21 @@ class ShapeDistanceCalculator:
         query: str | None = None,
         results: dict[Any, Any] | None = None,
     ) -> None:
-
-        if not results:
-            if self.total_distances == {}:
-                raise ValueError(
-                    "Results not given, nor latest total distances saved."
-                )
-            if self.all_distances == {}:
-                raise ValueError(
-                    "Results not given, nor latest all distances saved."
-                )
-
-            if not query:
-                results = self._format_results(
-                    query=self.last_query,
-                    all_distances=self.all_distances,
-                    total_distances=self.total_distances,
-                )
         """Save formatted distance results to a JSON file."""
+        if not results:
+            if not self.total_distances:
+                raise ValueError("No total distances calculated to save.")
+            if not self.all_distances:
+                self.calculate_all_distances(query or self.last_query or "")
+
+            results = self._format_results(
+                query=query or self.last_query or "",
+                all_distances=self.all_distances,
+                total_distances=self.total_distances,
+            )
 
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-
         with output_path.open("w", encoding="utf-8") as file:
             json.dump(results, file, indent=4)
 
@@ -528,7 +501,6 @@ class ShapeDistanceCalculator:
         descriptor: str,
     ) -> dict[str, float]:
         """Return the most recently calculated descriptor distances."""
-
         try:
             return self.all_distances[function_name][descriptor]
         except KeyError as exc:
@@ -549,31 +521,26 @@ def main():
         type=str,
         help="File path(s) to csv file(s) containing the descriptor values",
     )
-
     parser.add_argument(
         "-q",
         "--query",
         type=str,
         required=True,
-        help=("Query mesh identifier, filename, or relative path."),
+        help="Query mesh identifier, filename, or path.",
     )
-
     parser.add_argument(
         "-s",
         "--shapes",
-        nargs="+",
+        nargs="*",
         metavar="MESH",
-        required=True,
-        help=("Comparison mesh identifiers, filenames, " "or relative paths."),
+        default=None,
+        help="Comparison mesh identifiers or paths.",
     )
-
     parser.add_argument(
         "--visualise",
         action="store_true",
-        help="Visualises the distances between shapes in interacrtive 3D "
-        "renderder",
+        help="Visualises the distances between shapes in interactive 3D renderer",
     )
-
     parser.add_argument(
         "-o",
         "--output",
@@ -583,25 +550,20 @@ def main():
 
     args = parser.parse_args()
 
-    parser.add_argument
-    calculator = ShapeDistanceCalculator(
-        csv_databases=args.csv_paths,
-        distance_config=DISTANCE_CONFIG,
-    )
-
-    args.shapes = ShapeDistanceCalculator._expand_mesh_paths(args.shapes)
-
-    total_distances = calculator._calculate_all_distances_expanded(
-        args.query, args.shapes
-    )
+    calculator = ShapeDistanceCalculator(csv_databases=args.csv_paths)
+    total_distances = calculator.calculate_total_distance(args.query, args.shapes, run_pipeline=True)
+    print("Total distances calculated. Top 10:")
+    for k, v in list(total_distances.items())[:10]:
+        print(f"  {k}: {v:.4f}")
 
     if args.output:
         calculator.save_results(args.output)
 
     if args.visualise:
+        shapes = args.shapes or list(total_distances.keys())[:10]
         visualize_mesh_distances(
             query=args.query,
-            shapes_to_compare=args.shapes,
+            shapes_to_compare=shapes,
             descriptor="total distance",
             distances=total_distances,
         )

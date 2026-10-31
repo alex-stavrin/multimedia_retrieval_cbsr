@@ -17,16 +17,7 @@ from pathlib import Path
 import sys
 from src.step_4.user_interface.viewer import EmbeddedViewer
 from src.step_4.user_interface.class_colors import get_class_color, get_shape_class
-from src.helper.database_functions import retrieve_all_shape_files
-import random
 import os
-import vedo
-from src.step_2.repairment.repair_wireframe import run_steps as repair
-from src.step_2._3.resampling import resample_mesh
-from src.step_3._1.full_normalization import full_normalize
-from src.step_3._2.elementary_descriptors.descriptor_analyzer import (
-    calculate_database,
-)
 from src.step_4.distance_calculations.calculate_total_distance import (
     ShapeDistanceCalculator,
 )
@@ -37,25 +28,6 @@ if sys.platform == "win32":
     )
 else:
     os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
-
-
-def query_random_shapes(
-    query_shape_path: str,
-    database_directory: str,
-    k: int,
-) -> list[tuple[str, float]]:
-    all_shapes = retrieve_all_shape_files(database_directory)
-    results: list[tuple[str, float]] = []
-
-    for shape_path in all_shapes:
-        if shape_path == query_shape_path:
-            continue
-
-        distance = random.random()
-        results.append((str(shape_path), distance))
-
-    results.sort(key=lambda item: item[1])
-    return results[:k]
 
 
 def style_class_pill(pill: QLabel, shape_path: str) -> None:
@@ -75,9 +47,7 @@ def style_class_pill(pill: QLabel, shape_path: str) -> None:
 
 
 class MainWindow(QMainWindow):
-    def __init__(
-        self,
-    ):
+    def __init__(self) -> None:
         super().__init__()
 
         app_icon_path = Path(__file__).resolve().parents[3] / "assets" / "icon.png"
@@ -97,6 +67,15 @@ class MainWindow(QMainWindow):
         self.database_directory: str | None = None
         self.result_viewers: list[EmbeddedViewer] = []
 
+        # Initialize the distance calculator once at startup
+        self.shape_distance_calculator = ShapeDistanceCalculator(
+            csv_databases=[
+                "analysis_output/simple_descriptors_processed.csv",
+                "analysis_output/histogram_descriptors.csv",
+                "analysis_output/weights_descriptors.csv",
+            ]
+        )
+
         main_layout = QHBoxLayout(central_widget)
 
         left_panel = QWidget()
@@ -109,7 +88,7 @@ class MainWindow(QMainWindow):
         left_layout.addWidget(self.database_label)
 
         # Pick database folder button
-        self.database_button = QPushButton("Select Database Fodler")
+        self.database_button = QPushButton("Select Database Folder")
         self.database_button.setFixedWidth(200)
         self.database_button.clicked.connect(self.open_database_picker)
         left_layout.addWidget(
@@ -182,21 +161,24 @@ class MainWindow(QMainWindow):
         if not self.database_directory:
             return
 
-        selected_mesh = vedo.Mesh(str(self.selected_file))
-        repaired_mesh, _ = repair(selected_mesh)
-        resampled_mesh: vedo.Mesh = resample_mesh(repaired_mesh)
-        full_normalize(resampled_mesh)
+        # Visual feedback during pipeline and query execution
+        self.query_button.setEnabled(False)
+        self.query_button.setText("Processing...")
+        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        QApplication.processEvents()
 
-        shape_distance_calculator = ShapeDistanceCalculator(
-            csv_databases=[
-                "analysis_output/simple_descriptors_processed.csv",
-                "analysis_output/histogram_descriptors.csv",
-                "analysis_output/weights_descriptors.csv",
-            ]
-        )
-        results = shape_distance_calculator.calculate_total_distance(
-            self.selected_file, shapes_to_compare=[str(self.database_directory)]
-        )
+        try:
+            # Runs the complete pipeline on the query mesh and performs vectorized comparison
+            results = self.shape_distance_calculator.calculate_total_distance(
+                self.selected_file, run_pipeline=True
+            )
+        except Exception as error:
+            self.file_label.setText(f"Error: {error}")
+            return
+        finally:
+            QApplication.restoreOverrideCursor()
+            self.query_button.setText("Query")
+            self.query_button.setEnabled(True)
 
         matches = list(results.items())[:6]
 
@@ -204,6 +186,7 @@ class MainWindow(QMainWindow):
             viewer.cleanup()
         self.result_viewers.clear()
         self.results_list.clear()
+
         viewer_width = 300
         viewer_height = 300
         for shape_path, distance in matches:
