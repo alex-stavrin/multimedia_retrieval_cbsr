@@ -71,7 +71,8 @@ DISTANCE_CONFIG = {
 
 
 class ShapeDistanceCalculator:
-    """Calculate mesh distances using fast vectorized descriptor comparisons."""
+    """Calculate mesh distances using
+    fast vectorized descriptor comparisons."""
 
     def __init__(
         self,
@@ -82,7 +83,6 @@ class ShapeDistanceCalculator:
     ) -> None:
         self.csv_databases = [Path(path) for path in csv_databases]
         self.identifier_column = identifier_column
-
 
         # Load supplied CSVs
         self.databases: dict[Path, pd.DataFrame] = {}
