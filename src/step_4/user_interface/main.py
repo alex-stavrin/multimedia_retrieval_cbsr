@@ -67,7 +67,6 @@ class MainWindow(QMainWindow):
         self.database_directory: str | None = None
         self.result_viewers: list[EmbeddedViewer] = []
 
-        # Initialize the distance calculator once at startup
         self.shape_distance_calculator = ShapeDistanceCalculator(
             csv_databases=[
                 "analysis_output/simple_descriptors_processed.csv",
@@ -161,24 +160,9 @@ class MainWindow(QMainWindow):
         if not self.database_directory:
             return
 
-        # Visual feedback during pipeline and query execution
-        self.query_button.setEnabled(False)
-        self.query_button.setText("Processing...")
-        QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
-        QApplication.processEvents()
-
-        try:
-            # Runs the complete pipeline on the query mesh and performs vectorized comparison
-            results = self.shape_distance_calculator.calculate_total_distance(
-                self.selected_file, run_pipeline=True
-            )
-        except Exception as error:
-            self.file_label.setText(f"Error: {error}")
-            return
-        finally:
-            QApplication.restoreOverrideCursor()
-            self.query_button.setText("Query")
-            self.query_button.setEnabled(True)
+        results = self.shape_distance_calculator.calculate_total_distance(
+            self.selected_file, shapes_to_compare=[str(self.database_directory)]
+        )
 
         matches = list(results.items())[:6]
 
