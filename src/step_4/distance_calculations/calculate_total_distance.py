@@ -83,6 +83,7 @@ class ShapeDistanceCalculator:
         self.csv_databases = [Path(path) for path in csv_databases]
         self.identifier_column = identifier_column
 
+
         # Load supplied CSVs
         self.databases: dict[Path, pd.DataFrame] = {}
         for path in self.csv_databases:
