@@ -1,8 +1,10 @@
 import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 
 import numpy as np
 import vedo
+from tqdm import tqdm
 
 from src.types.mesh_types import Box
 from src.step_2._5.normalizer import (
@@ -125,13 +127,27 @@ def full_normalize_file(input_path: str, output_path: str) -> FullNormalizationR
     return report
 
 
+def _normalize_worker(
+    task: tuple[str, str],
+) -> tuple[FullNormalizationReport | None, str, str | None]:
+    """Worker task to normalize a single file in a background process."""
+    input_path, output_path = task
+    try:
+        report = full_normalize_file(input_path, output_path)
+        return report, input_path, None
+    except Exception as e:
+        return None, input_path, str(e)
+
+
 def full_normalize_database(
-    input_root: str, output_root: str
+    input_root: str,
+    output_root: str,
+    max_workers: int | None = None,
 ) -> list[FullNormalizationReport]:
-    """Fully normalize every .obj file under `input_root`, mirroring the
+    """Fully normalize every .obj file under `input_root` in parallel, mirroring the
     class-subfolder layout into `output_root`. Skips files that fail to
     load or normalize rather than aborting the whole run."""
-    reports: list[FullNormalizationReport] = []
+    tasks: list[tuple[str, str]] = []
 
     for dirpath, _, filenames in os.walk(input_root):
         for filename in filenames:
@@ -141,12 +157,48 @@ def full_normalize_database(
             input_path = os.path.join(dirpath, filename)
             relative_path = os.path.relpath(input_path, input_root)
             output_path = os.path.join(output_root, relative_path)
+            tasks.append((input_path, output_path))
 
+    if not tasks:
+        print(f"No .obj files found under {input_root}")
+        return []
+
+    tasks.sort()
+
+    n_workers = max_workers or os.cpu_count() or 1
+    print(f"Using {n_workers} worker processes")
+
+    reports: list[FullNormalizationReport] = []
+
+    if max_workers == 1:
+        for task in tqdm(tasks, desc="Fully normalizing meshes"):
+            report, input_path, error = _normalize_worker(task)
+            if error is not None:
+                tqdm.write(f"Skipping {input_path}: {error}")
+            elif report is not None:
+                reports.append(report)
+        return reports
+
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(_normalize_worker, task) for task in tasks]
+
+        for future in tqdm(
+            as_completed(futures),
+            total=len(futures),
+            desc="Fully normalizing meshes",
+        ):
             try:
-                reports.append(full_normalize_file(input_path, output_path))
+                report, input_path, error = future.result()
             except Exception as e:
-                print(f"Skipping {input_path}: {e}")
+                tqdm.write(f"Worker failure: {e}")
+                continue
 
+            if error is not None:
+                tqdm.write(f"Skipping {input_path}: {error}")
+            elif report is not None:
+                reports.append(report)
+
+    reports.sort(key=lambda r: r.shape_path)
     return reports
 
 
@@ -221,10 +273,21 @@ def main():
         required=True,
         help="Path to write the normalized OBJ file, or output root directory",
     )
+    parser.add_argument(
+        "-j",
+        "-w",
+        "--workers",
+        dest="workers",
+        type=int,
+        default=None,
+        help="Number of worker processes to use (default: CPU count)",
+    )
     args = parser.parse_args()
 
     if os.path.isdir(args.input):
-        reports = full_normalize_database(args.input, args.output)
+        reports = full_normalize_database(
+            args.input, args.output, max_workers=args.workers
+        )
         summarize_reports(reports)
         verify_saved_database(args.output, check_alignment=True)
     else:
