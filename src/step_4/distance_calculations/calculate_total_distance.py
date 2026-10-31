@@ -46,8 +46,12 @@ DISTANCE_CONFIG = {
     "euclidean": DistanceConfig(
         euclidean_distance, EUCLIDEAN_DESCRIPTORS, histogram=False
     ),
-    "cosine": DistanceConfig(cosine_distance, COSINE_DESCRIPTORS, histogram=True),
-    "emd": DistanceConfig(earth_movers_distance, EMD_DESCRIPTORS, histogram=True),
+    "cosine": DistanceConfig(
+        cosine_distance, COSINE_DESCRIPTORS, histogram=True
+    ),
+    "emd": DistanceConfig(
+        earth_movers_distance, EMD_DESCRIPTORS, histogram=True
+    ),
 }
 
 
@@ -69,7 +73,9 @@ class ShapeDistanceCalculator:
         self.identifier_column = identifier_column
 
         # Load CSV databases once so the object can be reused.
-        self.databases = {path: pd.read_csv(path) for path in self.csv_databases}
+        self.databases = {
+            path: pd.read_csv(path) for path in self.csv_databases
+        }
 
         self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
 
@@ -135,7 +141,9 @@ class ShapeDistanceCalculator:
         )
 
         if weights_df["weight"].isna().any():
-            raise ValueError("The weight CSV contains missing or invalid weights.")
+            raise ValueError(
+                "The weight CSV contains missing or invalid weights."
+            )
 
         weight_values = weights_df["weight"].to_numpy(dtype=np.float64)
 
@@ -145,7 +153,9 @@ class ShapeDistanceCalculator:
         if (weight_values < 0).any():
             raise ValueError("Weights must be non-negative.")
 
-        if weights_df.duplicated(subset=["distance_function", "descriptor"]).any():
+        if weights_df.duplicated(
+            subset=["distance_function", "descriptor"]
+        ).any():
             raise ValueError(
                 "Duplicate (distance_function, descriptor) entries "
                 "found in the weight CSV."
@@ -165,7 +175,9 @@ class ShapeDistanceCalculator:
     @staticmethod
     def _normalize_shape_path(shape: str | Path) -> str:
         """Normalize a mesh path to its category/filename identifier."""
-        return Path(shape).as_posix().split("4_models_fully_normalized/", 1)[-1]
+        return (
+            Path(shape).as_posix().split("4_models_fully_normalized/", 1)[-1]
+        )
 
     @staticmethod
     def _expand_mesh_paths(paths: Sequence[str | Path]) -> list[str]:
@@ -188,7 +200,8 @@ class ShapeDistanceCalculator:
             if path.is_file():
                 if path.suffix.lower() != ".obj":
                     raise ValueError(
-                        "Expected an OBJ mesh file or directory, got: " f"'{path}'"
+                        "Expected an OBJ mesh file or directory, got: "
+                        f"'{path}'"
                     )
                 candidates = [path]
 
@@ -196,7 +209,8 @@ class ShapeDistanceCalculator:
                 candidates = sorted(
                     candidate
                     for candidate in path.rglob("*")
-                    if candidate.is_file() and candidate.suffix.lower() == ".obj"
+                    if candidate.is_file()
+                    and candidate.suffix.lower() == ".obj"
                 )
 
                 if not candidates:
@@ -309,12 +323,14 @@ class ShapeDistanceCalculator:
             )
 
         normalized_shapes = {
-            shape: self._normalize_shape_path(shape) for shape in shapes_to_compare
+            shape: self._normalize_shape_path(shape)
+            for shape in shapes_to_compare
         }
 
         # Use normalized paths as the result keys.
         total_distances = {
-            normalized_shape: 0.0 for normalized_shape in normalized_shapes.values()
+            normalized_shape: 0.0
+            for normalized_shape in normalized_shapes.values()
         }
 
         for function_name, descriptors in self.all_distances.items():
@@ -391,9 +407,13 @@ class ShapeDistanceCalculator:
 
         if not results:
             if self.total_distances == {}:
-                raise ValueError("Results not given, nor latest total distances saved.")
+                raise ValueError(
+                    "Results not given, nor latest total distances saved."
+                )
             if self.all_distances == {}:
-                raise ValueError("Results not given, nor latest all distances saved.")
+                raise ValueError(
+                    "Results not given, nor latest all distances saved."
+                )
 
             if not query:
                 results = self._format_results(
@@ -457,7 +477,8 @@ def main():
     parser.add_argument(
         "--visualise",
         action="store_true",
-        help="Visualises the distances between shapes in interacrtive 3D " "renderder",
+        help="Visualises the distances between shapes in interacrtive 3D "
+        "renderder",
     )
 
     parser.add_argument(
@@ -478,7 +499,9 @@ def main():
     args.shapes = ShapeDistanceCalculator._expand_mesh_paths(args.shapes)
 
     print(calculator.calculate_all_distances(args.query, args.shapes))
-    total_distances = calculator.calculate_total_distance(args.query, args.shapes)
+    total_distances = calculator.calculate_total_distance(
+        args.query, args.shapes
+    )
     print(total_distances)
 
     if args.output:
