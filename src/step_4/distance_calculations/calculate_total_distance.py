@@ -628,6 +628,7 @@ def main():
     if args.output:
         calculator.save_results(args.output)
 
+    # Visualise shapes
     if args.visualise:
         shapes = args.shapes or list(total_distances.keys())[:10]
         visualize_mesh_distances(
