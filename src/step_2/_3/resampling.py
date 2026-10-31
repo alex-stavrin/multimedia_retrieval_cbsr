@@ -8,6 +8,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 import os
 
+from src.step_2._3.repairment.repair_wireframe import repair_file
+
 MIN_VERTEX_COUNT: Final = 5_000
 TARGET_VERTEX_COUNT: Final = 7_500
 MAX_VERTEX_COUNT: Final = 10_000
@@ -21,7 +23,24 @@ class ResamplingRecord:
     after_vertices: int
 
 
-def resample_one_mesh(
+def resample_mesh(mesh: vedo.Mesh) -> vedo.Mesh:
+    while True:
+        before_vertices = mesh.npoints
+        if MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT:
+            break
+
+        if before_vertices < MIN_VERTEX_COUNT:
+            mesh.subdivide(n=1, method=4)
+        else:
+            mesh.decimate(n=TARGET_VERTEX_COUNT)
+
+        if mesh.npoints == before_vertices:
+            break
+
+    return mesh
+
+
+def resample_mesh_file(
     relative_path: str, vertex_count: int, models_path: Path, output_path: Path
 ) -> tuple[str, ResamplingRecord]:
     mesh_path = models_path / relative_path
@@ -42,20 +61,8 @@ def resample_one_mesh(
 
     mesh = vedo.Mesh(str(mesh_path))
     resampling_record.before_vertices = mesh.npoints
-    mesh.clean()
 
-    for _ in range(MAX_RESAMPLING_ATTEMPTS):
-        before_vertices = mesh.npoints
-        if MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT:
-            break
-
-        if before_vertices < MIN_VERTEX_COUNT:
-            mesh.subdivide(n=1, method=4)
-        else:
-            mesh.decimate(n=TARGET_VERTEX_COUNT)
-
-        if mesh.npoints == before_vertices:
-            break
+    mesh = resample_mesh(mesh)
 
     resampling_record.after_vertices = mesh.npoints
     mesh.write(str(destination))
@@ -67,6 +74,7 @@ def resample_meshes(
     models_path: Path,
     input_csv_path: Path,
     output_path: Path,
+    repaired_output_path: Path | None = None,
     print_outlier_stats=False,
     print_decimating_logs=False,
     print_subdivision_logs=False,
@@ -85,23 +93,105 @@ def resample_meshes(
         "fine": fine_models,
     }
 
+    # If a separate repaired output directory is supplied,
+    # resampling will use that directory as its input.
+    repair_output_root = (
+        Path(repaired_output_path)
+        if repaired_output_path is not None
+        else Path(output_path)
+    )
+
+    resampling_input_root = (
+        Path(repaired_output_path)
+        if repaired_output_path is not None
+        else Path(models_path)
+    )
+
+    # Validate CSV rows once so both stages process the same meshes.
+    valid_rows = []
+
+    for row in data_frame.itertuples():
+        relative_path_value = row.relative_file_path
+        n_points_value = row.n_points
+
+        if pandas.isna(relative_path_value) or pandas.isna(n_points_value):
+            tqdm.write("Skipping row with a missing path or vertex count")
+            continue
+
+        relative_path = Path(str(relative_path_value))
+
+        if relative_path.is_absolute() or ".." in relative_path.parts:
+            tqdm.write(f"Skipping invalid relative path: {relative_path}")
+            continue
+
+        try:
+            n_points = int(float(str(n_points_value)))
+        except (ValueError, TypeError, OverflowError):
+            tqdm.write(
+                f"Skipping {relative_path}: invalid vertex count "
+                f"{n_points_value!r}"
+            )
+            continue
+
+        if n_points < 0:
+            tqdm.write(
+                f"Skipping {relative_path}: negative vertex count {n_points}"
+            )
+            continue
+
+        valid_rows.append((relative_path, n_points))
+
     with ProcessPoolExecutor() as executor:
         n_workers = os.cpu_count() or 1
-        print(f"Using {n_workers} threads")
-        futures = [
+        print(f"Using {n_workers} worker processes")
+
+        # Repair meshes in parallel
+        repair_futures = []
+
+        for relative_path, _ in valid_rows:
+            source = Path(models_path) / relative_path
+            destination = repair_output_root / relative_path
+
+            destination.parent.mkdir(parents=True, exist_ok=True)
+
+            repair_futures.append(
+                executor.submit(
+                    repair_file,
+                    str(source),
+                    str(destination),
+                )
+            )
+
+        for future in tqdm(
+            as_completed(repair_futures),
+            total=len(repair_futures),
+            desc="Repairing meshes",
+        ):
+            future.result()
+
+        # ---
+        # Resample meshes in parallel
+        resample_futures = [
             executor.submit(
-                resample_one_mesh,
+<<<<<<< HEAD
+                resample_mesh_file,
                 str(row.relative_file_path),
                 int(row.n_points),  # type: ignore
                 Path(models_path),
+=======
+                resample_one_mesh,
+                str(relative_path),
+                n_points,
+                resampling_input_root,
+>>>>>>> 21591e7c661ca5bf50836fb71c2a1df8b08af2d9
                 Path(output_path),
             )
-            for row in data_frame.itertuples()
+            for relative_path, n_points in valid_rows
         ]
 
         for future in tqdm(
-            as_completed(futures),
-            total=len(futures),
+            as_completed(resample_futures),
+            total=len(resample_futures),
             desc="Resampling meshes",
         ):
             category, record = future.result()
@@ -125,11 +215,14 @@ def resample_meshes(
 
             if should_print:
                 tqdm.write(
-                    f"{record.relative_path}: {record.before_vertices} -> {record.after_vertices}"
+                    f"{record.relative_path}: "
+                    f"{record.before_vertices} -> "
+                    f"{record.after_vertices}"
                 )
 
+    # ---
     # Logging
-    log_folder = Path("./") / "logs"
+    log_folder = Path("./logs")
     log_folder.mkdir(parents=True, exist_ok=True)
 
     log_path = log_folder / "resampled_outliers.log"
@@ -138,43 +231,49 @@ def resample_meshes(
         log_file.write(f"SUBDIVIDED MODELS ({len(subdivided_models)} total)\n")
         log_file.write("=================\n")
 
-        for resampling_record in subdivided_models:
+        for record in subdivided_models:
             log_file.write(
-                f"{resampling_record.relative_path} had {resampling_record.before_vertices} and now has {resampling_record.after_vertices} vertices\n"
+                f"{record.relative_path} had {record.before_vertices} "
+                f"and now has {record.after_vertices} vertices\n"
             )
 
         log_file.write(f"\nDECIMATED MODELS ({len(decimated_models)} total)\n")
         log_file.write("================\n")
 
-        for resampling_record in decimated_models:
+        for record in decimated_models:
             log_file.write(
-                f"{resampling_record.relative_path} had {resampling_record.before_vertices} and now has {resampling_record.after_vertices} vertices\n"
+                f"{record.relative_path} had {record.before_vertices} "
+                f"and now has {record.after_vertices} vertices\n"
             )
 
-        log_file.write(f"\nFINE MODELS\n ({len(fine_models)} total)")
+        log_file.write(f"\nFINE MODELS ({len(fine_models)} total)\n")
         log_file.write("================\n")
 
-        for resampling_record in fine_models:
-            log_file.write(f"{resampling_record}\n")
+        for record in fine_models:
+            log_file.write(f"{record}\n")
 
         log_file.write(
-            f"\nFAILED MODELS DECIMATION ({len(failed_models_decimation)} total)\n"
+            f"\nFAILED MODELS DECIMATION "
+            f"({len(failed_models_decimation)} total)\n"
         )
         log_file.write("================\n")
 
-        for resampling_record in failed_models_decimation:
+        for record in failed_models_decimation:
             log_file.write(
-                f"{resampling_record.relative_path} had {resampling_record.before_vertices} and now has {resampling_record.after_vertices} vertices\n"
+                f"{record.relative_path} had {record.before_vertices} "
+                f"and now has {record.after_vertices} vertices\n"
             )
 
         log_file.write(
-            f"\nFAILED MODELS SUBDIVSION ({len(failed_models_subdivision)} total)\n"
+            f"\nFAILED MODELS SUBDIVISION "
+            f"({len(failed_models_subdivision)} total)\n"
         )
         log_file.write("================\n")
 
-        for resampling_record in failed_models_subdivision:
+        for record in failed_models_subdivision:
             log_file.write(
-                f"{resampling_record.relative_path} had {resampling_record.before_vertices} and now has {resampling_record.after_vertices} vertices\n"
+                f"{record.relative_path} had {record.before_vertices} "
+                f"and now has {record.after_vertices} vertices\n"
             )
 
 
@@ -187,9 +286,20 @@ def main() -> None:
         "-icsv", "--input_csv_path", type=Path, required=True
     )
 
-    arguements_parser.add_argument("-m", "--models_path", type=Path, required=True)
+    arguements_parser.add_argument(
+        "-m", "--models_path", type=Path, required=True
+    )
 
-    arguements_parser.add_argument("-o", "--output_path", type=Path, required=True)
+    arguements_parser.add_argument(
+        "-o", "--output_path", type=Path, required=True
+    )
+
+    arguements_parser.add_argument(
+        "--repair_step_output_path",
+        type=Path,
+        required=False,
+        help="Optional extra root directory for mesh repairment step",
+    )
 
     arguements_parser.add_argument(
         "-pos",
@@ -220,6 +330,7 @@ def main() -> None:
         models_path=arguements.models_path,
         input_csv_path=arguements.input_csv_path,
         output_path=arguements.output_path,
+        repaired_output_path=arguements.repair_step_output_path,
         print_outlier_stats=arguements.print_outliers_stats,
         print_decimating_logs=arguements.print_decimate_logs,
         print_subdivision_logs=arguements.print_subdivision_logs,

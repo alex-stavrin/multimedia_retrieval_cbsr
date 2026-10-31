@@ -1,0 +1,3 @@
+Steps: preprocess > close_holes > correct_winding
+Done. 2483 shapes: 817 closed, 1666 still open, 0 errors.
+490 were closed as loaded and 337 became closed through the steps.

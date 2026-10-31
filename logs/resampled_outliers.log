@@ -136,6 +136,7 @@ Bookset/D01146.obj had 2694 and now has 9440 vertices
 Bookset/D01109.obj had 1203 and now has 8064 vertices
 Bookset/D01184.obj had 247 and now has 6475 vertices
 Bird/m30.obj had 390 and now has 7496 vertices
+Bottle/D00020.obj had 971 and now has 7697 vertices
 Bird/m48.obj had 427 and now has 7504 vertices
 Bird/m44.obj had 401 and now has 7500 vertices
 Bottle/D00020.obj had 971 and now has 7697 vertices
@@ -286,7 +287,6 @@ Chess/D01123.obj had 390 and now has 7500 vertices
 Chess/m1605.obj had 89 and now has 6809 vertices
 Chess/m1608.obj had 242 and now has 6482 vertices
 Chess/D01145.obj had 390 and now has 7500 vertices
-Chess/m1607.obj had 802 and now has 7202 vertices
 Chess/m1598.obj had 1182 and now has 7500 vertices
 City/D01007.obj had 3163 and now has 6263 vertices
 City/D01092.obj had 1380 and now has 6621 vertices
@@ -420,8 +420,6 @@ Door/D01141.obj had 2447 and now has 6857 vertices
 Door/D01155.obj had 128 and now has 7448 vertices
 Door/D01143.obj had 48 and now has 8760 vertices
 Door/m1711.obj had 68 and now has 5348 vertices
-Door/m1708.obj had 16 and now has 5840 vertices
-Door/m1715.obj had 676 and now has 5932 vertices
 Door/m1712.obj had 1724 and now has 5192 vertices
 Door/m1716.obj had 2447 and now has 6857 vertices
 Door/D01194.obj had 18 and now has 6570 vertices
@@ -990,7 +988,6 @@ Jet/m1288.obj had 1502 and now has 7563 vertices
 Jet/m1276.obj had 236 and now has 7530 vertices
 Knife/D01063.obj had 885 and now has 6103 vertices
 Knife/D01107.obj had 976 and now has 6799 vertices
-Jet/m1269.obj had 230 and now has 7530 vertices
 Knife/D01077.obj had 334 and now has 8254 vertices
 Knife/D01150.obj had 287 and now has 7103 vertices
 Knife/D01119.obj had 113 and now has 8615 vertices
@@ -1444,6 +1441,8 @@ Ship/m1440.obj had 4230 and now has 7817 vertices
 Ship/m1458.obj had 2509 and now has 7128 vertices
 Ship/m1432.obj had 573 and now has 7554 vertices
 Ship/m1455.obj had 314 and now has 7802 vertices
+Ship/m1452.obj had 776 and now has 6584 vertices
+Ship/m1458.obj had 2509 and now has 7128 vertices
 Ship/m1454.obj had 325 and now has 8099 vertices
 Ship/m1463.obj had 629 and now has 5573 vertices
 Ship/m1438.obj had 1309 and now has 7526 vertices
@@ -2091,10 +2090,7 @@ Sword/D00249.obj had 15478 and now has 7492 vertices
 SubmachineGun/D00459.obj had 24710 and now has 7541 vertices
 Sword/D00906.obj had 14621 and now has 7504 vertices
 Sword/m710.obj had 10936 and now has 7516 vertices
-Sword/m717.obj had 18888 and now has 7602 vertices
-Train/m1581.obj had 11299 and now has 7557 vertices
-Tree/D00385.obj had 12534 and now has 8365 vertices
-Tree/D00200.obj had 19368 and now has 9982 vertices
+Sword/m717.obj had 18888 and now has 7563 vertices
 Train/D01055.obj had 10979 and now has 8734 vertices
 Tree/D00612.obj had 11385 and now has 7577 vertices
 Tree/D00777.obj had 21856 and now has 8265 vertices
@@ -2118,16 +2114,16 @@ Tree/D00911.obj had 58369 and now has 9089 vertices
 Truck/D00835.obj had 11749 and now has 8299 vertices
 Truck/D00987.obj had 13228 and now has 8649 vertices
 TruckNonContainer/D00353.obj had 11914 and now has 8969 vertices
-Truck/m1575.obj had 47209 and now has 7616 vertices
-WheelChair/D00004.obj had 27581 and now has 7644 vertices
-WheelChair/D00449.obj had 27053 and now has 7376 vertices
-WheelChair/D00088.obj had 26911 and now has 7642 vertices
-WheelChair/D00628.obj had 29552 and now has 7626 vertices
-WheelChair/D00394.obj had 36064 and now has 7575 vertices
-WheelChair/D00720.obj had 43966 and now has 7534 vertices
+Truck/m1575.obj had 47209 and now has 7677 vertices
+WheelChair/D00449.obj had 20666 and now has 7365 vertices
+WheelChair/D00004.obj had 24138 and now has 7546 vertices
+WheelChair/D00628.obj had 22753 and now has 7549 vertices
+WheelChair/D00088.obj had 26912 and now has 7589 vertices
+WheelChair/D00394.obj had 29285 and now has 7555 vertices
+WheelChair/D00720.obj had 43912 and now has 7619 vertices
 
-FINE MODELS
- (361 total)================
+FINE MODELS (361 total)
+================
 ResamplingRecord(relative_path='AircraftBuoyant/m1338.obj', before_vertices=8761, after_vertices=8761)
 ResamplingRecord(relative_path='Apartment/D00496.obj', before_vertices=7737, after_vertices=7737)
 ResamplingRecord(relative_path='Apartment/D00780.obj', before_vertices=8240, after_vertices=8240)
@@ -2157,16 +2153,16 @@ ResamplingRecord(relative_path='BuildingNonResidential/m416.obj', before_vertice
 ResamplingRecord(relative_path='BuildingNonResidential/m420.obj', before_vertices=7226, after_vertices=7226)
 ResamplingRecord(relative_path='BuildingNonResidential/m421.obj', before_vertices=6853, after_vertices=6853)
 ResamplingRecord(relative_path='Bus/D00114.obj', before_vertices=7643, after_vertices=7643)
-ResamplingRecord(relative_path='Bus/D00179.obj', before_vertices=5976, after_vertices=5976)
 ResamplingRecord(relative_path='Bus/D00151.obj', before_vertices=9415, after_vertices=9415)
+ResamplingRecord(relative_path='Bus/D00179.obj', before_vertices=5976, after_vertices=5976)
 ResamplingRecord(relative_path='Bus/D00448.obj', before_vertices=7367, after_vertices=7367)
 ResamplingRecord(relative_path='Bus/D00483.obj', before_vertices=6097, after_vertices=6097)
 ResamplingRecord(relative_path='Bus/D00754.obj', before_vertices=8866, after_vertices=8866)
-ResamplingRecord(relative_path='Bus/D00815.obj', before_vertices=7075, after_vertices=7075)
 ResamplingRecord(relative_path='Bus/D00769.obj', before_vertices=8963, after_vertices=8963)
 ResamplingRecord(relative_path='Bus/D00775.obj', before_vertices=9510, after_vertices=9510)
 ResamplingRecord(relative_path='Bus/D00823.obj', before_vertices=7367, after_vertices=7367)
 ResamplingRecord(relative_path='Bus/D00857.obj', before_vertices=5223, after_vertices=5223)
+ResamplingRecord(relative_path='Bus/D00823.obj', before_vertices=7367, after_vertices=7367)
 ResamplingRecord(relative_path='Car/D00377.obj', before_vertices=8260, after_vertices=8260)
 ResamplingRecord(relative_path='Car/D00504.obj', before_vertices=5153, after_vertices=5153)
 ResamplingRecord(relative_path='Car/D00785.obj', before_vertices=7248, after_vertices=7248)
@@ -2203,10 +2199,10 @@ ResamplingRecord(relative_path='Chess/m1601.obj', before_vertices=6727, after_ve
 ResamplingRecord(relative_path='Chess/m1610.obj', before_vertices=6094, after_vertices=6094)
 ResamplingRecord(relative_path='City/D01001.obj', before_vertices=6645, after_vertices=6645)
 ResamplingRecord(relative_path='City/D01018.obj', before_vertices=6529, after_vertices=6529)
-ResamplingRecord(relative_path='City/D01066.obj', before_vertices=9894, after_vertices=9894)
 ResamplingRecord(relative_path='City/D01068.obj', before_vertices=5538, after_vertices=5538)
-ResamplingRecord(relative_path='City/D01079.obj', before_vertices=9201, after_vertices=9201)
+ResamplingRecord(relative_path='City/D01066.obj', before_vertices=9894, after_vertices=9894)
 ResamplingRecord(relative_path='City/D01090.obj', before_vertices=7089, after_vertices=7089)
+ResamplingRecord(relative_path='City/D01079.obj', before_vertices=9201, after_vertices=9201)
 ResamplingRecord(relative_path='City/D01124.obj', before_vertices=5211, after_vertices=5211)
 ResamplingRecord(relative_path='City/D01133.obj', before_vertices=5804, after_vertices=5804)
 ResamplingRecord(relative_path='City/D01181.obj', before_vertices=5137, after_vertices=5137)
@@ -2217,21 +2213,21 @@ ResamplingRecord(relative_path='ClassicPiano/D00092.obj', before_vertices=5901, 
 ResamplingRecord(relative_path='ClassicPiano/D00233.obj', before_vertices=5205, after_vertices=5205)
 ResamplingRecord(relative_path='ClassicPiano/D00279.obj', before_vertices=7253, after_vertices=7253)
 ResamplingRecord(relative_path='ClassicPiano/D00314.obj', before_vertices=6800, after_vertices=6800)
-ResamplingRecord(relative_path='ClassicPiano/D00605.obj', before_vertices=8121, after_vertices=8121)
 ResamplingRecord(relative_path='ClassicPiano/D00784.obj', before_vertices=5131, after_vertices=5131)
+ResamplingRecord(relative_path='ClassicPiano/D00605.obj', before_vertices=8121, after_vertices=8121)
 ResamplingRecord(relative_path='Computer/D01067.obj', before_vertices=5026, after_vertices=5026)
 ResamplingRecord(relative_path='Computer/D01115.obj', before_vertices=8163, after_vertices=8163)
 ResamplingRecord(relative_path='Computer/m1778.obj', before_vertices=5026, after_vertices=5026)
 ResamplingRecord(relative_path='ComputerKeyboard/D00197.obj', before_vertices=6987, after_vertices=6987)
-ResamplingRecord(relative_path='ComputerKeyboard/D00382.obj', before_vertices=8346, after_vertices=8346)
 ResamplingRecord(relative_path='ComputerKeyboard/D00360.obj', before_vertices=6193, after_vertices=6193)
+ResamplingRecord(relative_path='ComputerKeyboard/D00382.obj', before_vertices=8346, after_vertices=8346)
 ResamplingRecord(relative_path='ComputerKeyboard/D00525.obj', before_vertices=8309, after_vertices=8309)
 ResamplingRecord(relative_path='ComputerKeyboard/D00597.obj', before_vertices=8460, after_vertices=8460)
 ResamplingRecord(relative_path='ComputerKeyboard/D00627.obj', before_vertices=6564, after_vertices=6564)
 ResamplingRecord(relative_path='ComputerKeyboard/D00676.obj', before_vertices=7956, after_vertices=7956)
 ResamplingRecord(relative_path='ComputerKeyboard/D00805.obj', before_vertices=6954, after_vertices=6954)
-ResamplingRecord(relative_path='Cup/D00363.obj', before_vertices=5433, after_vertices=5433)
 ResamplingRecord(relative_path='Cup/D00355.obj', before_vertices=7114, after_vertices=7114)
+ResamplingRecord(relative_path='Cup/D00363.obj', before_vertices=5433, after_vertices=5433)
 ResamplingRecord(relative_path='Cup/D00587.obj', before_vertices=7102, after_vertices=7102)
 ResamplingRecord(relative_path='Cup/D00638.obj', before_vertices=6786, after_vertices=6786)
 ResamplingRecord(relative_path='Cup/D00843.obj', before_vertices=9127, after_vertices=9127)
@@ -2244,21 +2240,21 @@ ResamplingRecord(relative_path='Drum/D00026.obj', before_vertices=5506, after_ve
 ResamplingRecord(relative_path='Drum/D00163.obj', before_vertices=8433, after_vertices=8433)
 ResamplingRecord(relative_path='Drum/D00297.obj', before_vertices=5561, after_vertices=5561)
 ResamplingRecord(relative_path='Drum/D00939.obj', before_vertices=5390, after_vertices=5390)
-ResamplingRecord(relative_path='Drum/D00980.obj', before_vertices=5653, after_vertices=5653)
 ResamplingRecord(relative_path='Drum/D00951.obj', before_vertices=7993, after_vertices=7993)
+ResamplingRecord(relative_path='Drum/D00980.obj', before_vertices=5653, after_vertices=5653)
 ResamplingRecord(relative_path='Fish/D00748.obj', before_vertices=5046, after_vertices=5046)
 ResamplingRecord(relative_path='FloorLamp/D00186.obj', before_vertices=7694, after_vertices=7694)
 ResamplingRecord(relative_path='FloorLamp/D00211.obj', before_vertices=5097, after_vertices=5097)
 ResamplingRecord(relative_path='FloorLamp/D00955.obj', before_vertices=8300, after_vertices=8300)
 ResamplingRecord(relative_path='FloorLamp/m620.obj', before_vertices=5584, after_vertices=5584)
-ResamplingRecord(relative_path='Glasses/D00050.obj', before_vertices=6852, after_vertices=6852)
 ResamplingRecord(relative_path='Glasses/D00201.obj', before_vertices=6519, after_vertices=6519)
+ResamplingRecord(relative_path='Glasses/D00050.obj', before_vertices=6852, after_vertices=6852)
 ResamplingRecord(relative_path='Glasses/D00507.obj', before_vertices=6852, after_vertices=6852)
 ResamplingRecord(relative_path='Guitar/D00076.obj', before_vertices=8889, after_vertices=8889)
 ResamplingRecord(relative_path='Guitar/D00232.obj', before_vertices=7781, after_vertices=7781)
 ResamplingRecord(relative_path='Guitar/D00461.obj', before_vertices=8636, after_vertices=8636)
-ResamplingRecord(relative_path='Guitar/D00655.obj', before_vertices=8251, after_vertices=8251)
 ResamplingRecord(relative_path='Guitar/D00844.obj', before_vertices=9253, after_vertices=9253)
+ResamplingRecord(relative_path='Guitar/D00655.obj', before_vertices=8251, after_vertices=8251)
 ResamplingRecord(relative_path='Gun/D00137.obj', before_vertices=5308, after_vertices=5308)
 ResamplingRecord(relative_path='Gun/D00204.obj', before_vertices=5558, after_vertices=5558)
 ResamplingRecord(relative_path='Gun/D00209.obj', before_vertices=6826, after_vertices=6826)
@@ -2280,8 +2276,8 @@ ResamplingRecord(relative_path='Helicopter/D00397.obj', before_vertices=5567, af
 ResamplingRecord(relative_path='Helicopter/D00473.obj', before_vertices=5823, after_vertices=5823)
 ResamplingRecord(relative_path='Helicopter/D00500.obj', before_vertices=9980, after_vertices=9980)
 ResamplingRecord(relative_path='Helicopter/D00977.obj', before_vertices=5681, after_vertices=5681)
-ResamplingRecord(relative_path='Helicopter/m1305.obj', before_vertices=7105, after_vertices=7105)
 ResamplingRecord(relative_path='Helicopter/m1306.obj', before_vertices=8547, after_vertices=8547)
+ResamplingRecord(relative_path='Helicopter/m1305.obj', before_vertices=7105, after_vertices=7105)
 ResamplingRecord(relative_path='Helicopter/m1320.obj', before_vertices=7818, after_vertices=7818)
 ResamplingRecord(relative_path='Helicopter/m1323.obj', before_vertices=6136, after_vertices=6136)
 ResamplingRecord(relative_path='Helicopter/m1327.obj', before_vertices=7851, after_vertices=7851)
@@ -2292,17 +2288,17 @@ ResamplingRecord(relative_path='House/D00946.obj', before_vertices=7423, after_v
 ResamplingRecord(relative_path='HumanHead/D00013.obj', before_vertices=5244, after_vertices=5244)
 ResamplingRecord(relative_path='HumanHead/D00061.obj', before_vertices=5119, after_vertices=5119)
 ResamplingRecord(relative_path='HumanHead/D00072.obj', before_vertices=5284, after_vertices=5284)
-ResamplingRecord(relative_path='HumanHead/D00106.obj', before_vertices=5276, after_vertices=5276)
 ResamplingRecord(relative_path='HumanHead/D00131.obj', before_vertices=5161, after_vertices=5161)
 ResamplingRecord(relative_path='HumanHead/D00313.obj', before_vertices=6146, after_vertices=6146)
+ResamplingRecord(relative_path='HumanHead/D00106.obj', before_vertices=5276, after_vertices=5276)
 ResamplingRecord(relative_path='HumanHead/D00488.obj', before_vertices=6211, after_vertices=6211)
-ResamplingRecord(relative_path='HumanHead/D00591.obj', before_vertices=5167, after_vertices=5167)
 ResamplingRecord(relative_path='HumanHead/D00578.obj', before_vertices=7968, after_vertices=7968)
+ResamplingRecord(relative_path='HumanHead/D00591.obj', before_vertices=5167, after_vertices=5167)
 ResamplingRecord(relative_path='HumanHead/D00690.obj', before_vertices=5253, after_vertices=5253)
 ResamplingRecord(relative_path='HumanHead/m348.obj', before_vertices=9166, after_vertices=9166)
 ResamplingRecord(relative_path='HumanHead/m353.obj', before_vertices=7896, after_vertices=7896)
-ResamplingRecord(relative_path='HumanHead/m370.obj', before_vertices=5641, after_vertices=5641)
 ResamplingRecord(relative_path='HumanHead/m369.obj', before_vertices=9843, after_vertices=9843)
+ResamplingRecord(relative_path='HumanHead/m370.obj', before_vertices=5641, after_vertices=5641)
 ResamplingRecord(relative_path='Humanoid/m138.obj', before_vertices=7401, after_vertices=7401)
 ResamplingRecord(relative_path='Humanoid/m140.obj', before_vertices=9061, after_vertices=9061)
 ResamplingRecord(relative_path='Humanoid/m143.obj', before_vertices=5647, after_vertices=5647)
@@ -2310,8 +2306,8 @@ ResamplingRecord(relative_path='Humanoid/m181.obj', before_vertices=8520, after_
 ResamplingRecord(relative_path='Humanoid/m193.obj', before_vertices=8622, after_vertices=8622)
 ResamplingRecord(relative_path='Humanoid/m199.obj', before_vertices=6540, after_vertices=6540)
 ResamplingRecord(relative_path='Humanoid/m216.obj', before_vertices=9272, after_vertices=9272)
-ResamplingRecord(relative_path='Humanoid/m226.obj', before_vertices=6368, after_vertices=6368)
 ResamplingRecord(relative_path='Humanoid/m224.obj', before_vertices=9660, after_vertices=9660)
+ResamplingRecord(relative_path='Humanoid/m226.obj', before_vertices=6368, after_vertices=6368)
 ResamplingRecord(relative_path='Humanoid/m227.obj', before_vertices=7015, after_vertices=7015)
 ResamplingRecord(relative_path='Humanoid/m249.obj', before_vertices=7970, after_vertices=7970)
 ResamplingRecord(relative_path='Humanoid/m251.obj', before_vertices=8077, after_vertices=8077)
@@ -2364,16 +2360,16 @@ ResamplingRecord(relative_path='NonWheelChair/D00480.obj', before_vertices=5063,
 ResamplingRecord(relative_path='NonWheelChair/m801.obj', before_vertices=8188, after_vertices=8188)
 ResamplingRecord(relative_path='PianoBoard/D00181.obj', before_vertices=9628, after_vertices=9628)
 ResamplingRecord(relative_path='PianoBoard/D00623.obj', before_vertices=5694, after_vertices=5694)
-ResamplingRecord(relative_path='PianoBoard/D00755.obj', before_vertices=8133, after_vertices=8133)
 ResamplingRecord(relative_path='PianoBoard/D00885.obj', before_vertices=6622, after_vertices=6622)
+ResamplingRecord(relative_path='PianoBoard/D00755.obj', before_vertices=8133, after_vertices=8133)
 ResamplingRecord(relative_path='PlantIndoors/D00466.obj', before_vertices=9900, after_vertices=9900)
 ResamplingRecord(relative_path='PlantIndoors/D00657.obj', before_vertices=5801, after_vertices=5801)
 ResamplingRecord(relative_path='PlantIndoors/m1002.obj', before_vertices=8260, after_vertices=8260)
 ResamplingRecord(relative_path='PlantIndoors/m1003.obj', before_vertices=8453, after_vertices=8453)
 ResamplingRecord(relative_path='PlantIndoors/m1007.obj', before_vertices=7930, after_vertices=7930)
 ResamplingRecord(relative_path='PlantIndoors/m1008.obj', before_vertices=5383, after_vertices=5383)
-ResamplingRecord(relative_path='PlantIndoors/m1009.obj', before_vertices=5348, after_vertices=5348)
 ResamplingRecord(relative_path='PlantIndoors/m1010.obj', before_vertices=6257, after_vertices=6257)
+ResamplingRecord(relative_path='PlantIndoors/m1009.obj', before_vertices=5348, after_vertices=5348)
 ResamplingRecord(relative_path='PlantIndoors/m1011.obj', before_vertices=7529, after_vertices=7529)
 ResamplingRecord(relative_path='PlantIndoors/m1013.obj', before_vertices=6365, after_vertices=6365)
 ResamplingRecord(relative_path='PlantIndoors/m1016.obj', before_vertices=5307, after_vertices=5307)
@@ -2382,8 +2378,8 @@ ResamplingRecord(relative_path='PlantIndoors/m1022.obj', before_vertices=7882, a
 ResamplingRecord(relative_path='PlantIndoors/m1025.obj', before_vertices=6696, after_vertices=6696)
 ResamplingRecord(relative_path='PlantIndoors/m995.obj', before_vertices=7323, after_vertices=7323)
 ResamplingRecord(relative_path='PlantWildNonTree/m961.obj', before_vertices=6513, after_vertices=6513)
-ResamplingRecord(relative_path='PlantWildNonTree/m968.obj', before_vertices=9018, after_vertices=9018)
 ResamplingRecord(relative_path='PlantWildNonTree/m966.obj', before_vertices=7920, after_vertices=7920)
+ResamplingRecord(relative_path='PlantWildNonTree/m968.obj', before_vertices=9018, after_vertices=9018)
 ResamplingRecord(relative_path='PlantWildNonTree/m980.obj', before_vertices=8937, after_vertices=8937)
 ResamplingRecord(relative_path='PlantWildNonTree/m986.obj', before_vertices=6656, after_vertices=6656)
 ResamplingRecord(relative_path='Quadruped/D00509.obj', before_vertices=8159, after_vertices=8159)
@@ -2430,8 +2426,8 @@ ResamplingRecord(relative_path='Sword/D00484.obj', before_vertices=6873, after_v
 ResamplingRecord(relative_path='Sword/D00540.obj', before_vertices=8181, after_vertices=8181)
 ResamplingRecord(relative_path='Sword/D00992.obj', before_vertices=5872, after_vertices=5872)
 ResamplingRecord(relative_path='Sword/m691.obj', before_vertices=8583, after_vertices=8583)
-ResamplingRecord(relative_path='Sword/m695.obj', before_vertices=9880, after_vertices=9880)
 ResamplingRecord(relative_path='Sword/m696.obj', before_vertices=5548, after_vertices=5548)
+ResamplingRecord(relative_path='Sword/m695.obj', before_vertices=9880, after_vertices=9880)
 ResamplingRecord(relative_path='Sword/m705.obj', before_vertices=7910, after_vertices=7910)
 ResamplingRecord(relative_path='Sword/m709.obj', before_vertices=6598, after_vertices=6598)
 ResamplingRecord(relative_path='Sword/m711.obj', before_vertices=9457, after_vertices=9457)
@@ -2440,16 +2436,16 @@ ResamplingRecord(relative_path='Tool/D01044.obj', before_vertices=5201, after_ve
 ResamplingRecord(relative_path='Tool/D01069.obj', before_vertices=6198, after_vertices=6198)
 ResamplingRecord(relative_path='Tool/D01127.obj', before_vertices=6104, after_vertices=6104)
 ResamplingRecord(relative_path='Tool/D01142.obj', before_vertices=5110, after_vertices=5110)
-ResamplingRecord(relative_path='Tool/D01154.obj', before_vertices=5202, after_vertices=5202)
 ResamplingRecord(relative_path='Tool/D01156.obj', before_vertices=5508, after_vertices=5508)
+ResamplingRecord(relative_path='Tool/D01154.obj', before_vertices=5202, after_vertices=5202)
 ResamplingRecord(relative_path='Train/D01016.obj', before_vertices=7754, after_vertices=7754)
 ResamplingRecord(relative_path='Train/D01047.obj', before_vertices=5450, after_vertices=5450)
 ResamplingRecord(relative_path='Train/D01059.obj', before_vertices=7243, after_vertices=7243)
-ResamplingRecord(relative_path='Train/D01061.obj', before_vertices=6494, after_vertices=6494)
 ResamplingRecord(relative_path='Train/D01064.obj', before_vertices=5037, after_vertices=5037)
+ResamplingRecord(relative_path='Train/D01061.obj', before_vertices=6494, after_vertices=6494)
 ResamplingRecord(relative_path='Train/D01095.obj', before_vertices=6385, after_vertices=6385)
-ResamplingRecord(relative_path='Train/D01137.obj', before_vertices=6422, after_vertices=6422)
 ResamplingRecord(relative_path='Train/D01134.obj', before_vertices=8721, after_vertices=8721)
+ResamplingRecord(relative_path='Train/D01137.obj', before_vertices=6422, after_vertices=6422)
 ResamplingRecord(relative_path='Train/D01149.obj', before_vertices=8616, after_vertices=8616)
 ResamplingRecord(relative_path='Train/m1582.obj', before_vertices=8239, after_vertices=8239)
 ResamplingRecord(relative_path='Train/m1585.obj', before_vertices=5303, after_vertices=5303)
@@ -2457,11 +2453,11 @@ ResamplingRecord(relative_path='Train/m1586.obj', before_vertices=5520, after_ve
 ResamplingRecord(relative_path='Tree/m1050.obj', before_vertices=5410, after_vertices=5410)
 ResamplingRecord(relative_path='Tree/m1086.obj', before_vertices=6247, after_vertices=6247)
 ResamplingRecord(relative_path='Tree/m1090.obj', before_vertices=5482, after_vertices=5482)
-ResamplingRecord(relative_path='Truck/D00003.obj', before_vertices=6683, after_vertices=6683)
 ResamplingRecord(relative_path='Truck/D00010.obj', before_vertices=6939, after_vertices=6939)
+ResamplingRecord(relative_path='Truck/D00003.obj', before_vertices=6683, after_vertices=6683)
 ResamplingRecord(relative_path='Truck/D00029.obj', before_vertices=5209, after_vertices=5209)
-ResamplingRecord(relative_path='Truck/D00112.obj', before_vertices=7853, after_vertices=7853)
 ResamplingRecord(relative_path='Truck/D00158.obj', before_vertices=8315, after_vertices=8315)
+ResamplingRecord(relative_path='Truck/D00112.obj', before_vertices=7853, after_vertices=7853)
 ResamplingRecord(relative_path='Truck/D00287.obj', before_vertices=5290, after_vertices=5290)
 ResamplingRecord(relative_path='Truck/D00303.obj', before_vertices=8955, after_vertices=8955)
 ResamplingRecord(relative_path='Truck/D00518.obj', before_vertices=5427, after_vertices=5427)
@@ -2493,5 +2489,5 @@ ResamplingRecord(relative_path='WheelChair/D00846.obj', before_vertices=8834, af
 FAILED MODELS DECIMATION (0 total)
 ================
 
-FAILED MODELS SUBDIVSION (0 total)
+FAILED MODELS SUBDIVISION (0 total)
 ================

@@ -51,6 +51,7 @@ def main():
         arguements.columns,
         figsize=(12, 8),
         constrained_layout=True,
+        squeeze=False,
     )
     axes = axes.flatten()
 
@@ -86,7 +87,6 @@ def main():
             elif arguements.descriptor == "D1":
                 histogram, bin_centers = calculate_distance_from_barycenter(
                     mesh=mesh,
-                    n_samples=arguements.samples,
                     n_bins_histogram=arguements.bins,
                 )
                 figure.suptitle(
