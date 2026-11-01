@@ -275,14 +275,17 @@ def main():
     )
 
     parser.add_argument(
+        "-i",
         "--csv_paths",
+        "--input",
         nargs="+",
         required=True,
-        metavar="CSV",
+        metavar="CSV's",
         help="Descriptor CSV files.",
     )
 
     parser.add_argument(
+        "-o",
         "--output",
         default="all_pairwise_distances.csv",
         help="Output CSV path.",

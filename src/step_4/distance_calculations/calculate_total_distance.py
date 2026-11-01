@@ -98,6 +98,9 @@ class ShapeDistanceCalculator:
             tuple[str, str], tuple[pd.DataFrame, list[str], bool]
         ] = {}
         self._descriptor_source_paths: dict[tuple[str, str], Path] = {}
+        self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
+        self.total_distances: dict[str, float] = {}
+        self.last_query: str | None = None
 
         for path, df in self.databases.items():
             cols = set(df.columns)
@@ -206,6 +209,18 @@ class ShapeDistanceCalculator:
                 )
                 for _, r in self.weights_df.iterrows()
             }
+
+        # Pairwise descriptor distances have very different units (for
+        # example, scalar z-score distances versus histogram-bin distances).
+        # Use the pairwise mean from the same calibration CSV as a scale so a
+        # typical distance for each descriptor is approximately one.
+        self._distance_scales: dict[tuple[str, str], float] = {}
+        if self.weights_df is not None and "mean" in self.weights_df.columns:
+            for _, row in self.weights_df.iterrows():
+                key = (str(row["distance_function"]), str(row["descriptor"]))
+                scale = pd.to_numeric(row["mean"], errors="coerce")
+                if pd.notna(scale) and np.isfinite(scale) and scale > 0:
+                    self._distance_scales[key] = float(scale)
 
         self._query_transforms: dict[str, tuple[float, float]] = {}
         for key, (
@@ -324,7 +339,7 @@ class ShapeDistanceCalculator:
         source_df: pd.DataFrame,
         columns: list[str],
         is_histogram: bool,
-        query_features: Sequence[float],
+        query_features: Sequence[float] | np.ndarray,
         descriptor: str,
         query_identifier: str | None = None,
     ) -> dict[str, float]:
@@ -396,10 +411,6 @@ class ShapeDistanceCalculator:
             self._normalize_shape_path(shape): float(distance)
             for shape, distance in distances.items()
         }
-
-        self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
-        self.total_distances: dict[str, float] = {}
-        self.last_query: str | None = None
 
     def _resolve_query_key(self, query: str) -> str:
         """Resolve an identifier or unambiguous filename in the databases."""
@@ -548,6 +559,24 @@ class ShapeDistanceCalculator:
         Run the whole pipeline on the query mesh and compute total weighted
         distances against the precomputed database in < 1 second.
         """
+        # If the query is one of the indexed database meshes, use its saved
+        # descriptor row as the query vector. Re-extracting it from the raw
+        # mesh would apply repair/resampling/normalization that was not used
+        # to build the database descriptors, so even a self-match could be
+        # non-zero.
+        if isinstance(mesh_or_path, (str, Path)):
+            try:
+                query_key = self._resolve_query_key(str(mesh_or_path))
+            except ValueError:
+                query_key = None
+            if query_key is not None:
+                self.last_query = str(mesh_or_path)
+                self.all_distances = self.calculate_all_distances(query_key)
+                self.total_distances = self._sum_weighted_distances(
+                    self.all_distances
+                )
+                return self.total_distances
+
         elem_descriptors, hist_descriptors = (
             self.process_mesh_and_extract_descriptors(mesh_or_path)
         )
@@ -596,13 +625,16 @@ class ShapeDistanceCalculator:
                         "Missing weight for configured descriptor "
                         f"('{function_name}', '{descriptor}')."
                     )
+                scale = self._distance_scales.get(
+                    (function_name, descriptor), 1.0
+                )
                 for shape in totals:
                     if shape not in distances:
                         raise ValueError(
                             f"No distance for '{shape}' and descriptor "
                             f"'{descriptor}'."
                         )
-                    totals[shape] += weight * distances[shape]
+                    totals[shape] += weight * (distances[shape] / scale)
         return dict(sorted(totals.items(), key=lambda item: item[1]))
 
     @staticmethod
@@ -775,11 +807,11 @@ class ShapeDistanceCalculator:
     ) -> dict[Any, Any]:
         """Combine total distances and descriptor distances into
         a dictionary."""
-        query_path = (
-            self._resolve_query_key(query)
-            if not Path(query).is_file()
-            else Path(query).name
-        )
+        if Path(query).is_file():
+            query_parts = Path(query).parts
+            query_path = "/".join(query_parts[-2:])
+        else:
+            query_path = self._resolve_query_key(query)
         results = {}
 
         for mesh_path, total_distance in total_distances.items():
@@ -807,15 +839,21 @@ class ShapeDistanceCalculator:
     ) -> None:
         """Save formatted distance results to a JSON file."""
         if not results:
-            if not self.total_distances:
-                raise ValueError("No total distances calculated to save.")
             if not self.all_distances:
-                self.calculate_all_distances(query or self.last_query or "")
+                raise ValueError("No distances calculated to save.")
+
+            total_distances = self.total_distances
+            if not total_distances:
+                # Mesh queries populate descriptor distances but return the
+                # weighted totals without retaining them on the instance.
+                total_distances = self._sum_weighted_distances(
+                    self.all_distances
+                )
 
             results = self._format_results(
                 query=query or self.last_query or "",
                 all_distances=self.all_distances,
-                total_distances=self.total_distances,
+                total_distances=total_distances,
             )
 
         output_path = Path(output_path)

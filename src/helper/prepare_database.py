@@ -92,7 +92,9 @@ def _reset_last_step(state: dict, checkpoint_path: Path) -> None:
         target_index = STEP_ORDER.index(current_step)
     else:
         completed_indices = [
-            STEP_ORDER.index(name) for name in STEP_ORDER if completed.get(name) is True
+            STEP_ORDER.index(name)
+            for name in STEP_ORDER
+            if completed.get(name) is True
         ]
         if not completed_indices:
             print("[RESET] No completed step found; nothing to reset.")
@@ -143,7 +145,9 @@ def _run_step(
     # Remove partial output before retrying a database-producing step.
     if output_database_path is not None:
         if output_database_path.exists():
-            print(f"[CLEAN] Removing incomplete output: {output_database_path}")
+            print(
+                f"[CLEAN] Removing incomplete output: {output_database_path}"
+            )
             shutil.rmtree(output_database_path)
         output_database_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -169,15 +173,21 @@ def prepare_database(
     reset_last_step: bool = False,
 ) -> None:
     if reset_checkpoint and reset_last_step:
-        raise ValueError("Choose either reset_checkpoint or reset_last_step, not both.")
+        raise ValueError(
+            "Choose either reset_checkpoint or reset_last_step, not both."
+        )
 
     raw_path = Path(database_path).expanduser().resolve()
     if not raw_path.is_dir():
-        raise NotADirectoryError(f"Raw database directory not found: {raw_path}")
+        raise NotADirectoryError(
+            f"Raw database directory not found: {raw_path}"
+        )
 
     output_root = Path(output_path).expanduser().resolve()
     if output_root == raw_path or raw_path in output_root.parents:
-        raise ValueError("output_path must be outside the raw database directory.")
+        raise ValueError(
+            "output_path must be outside the raw database directory."
+        )
 
     repair_path = output_root / "analysis"
     databases_path = output_root / "3d_models_steps"
@@ -239,15 +249,22 @@ def prepare_database(
         _run_step(
             "analyze_reparation",
             lambda: rep_analyser.compare_hole_fill_stats(
-                str(raw_path), str(repaired), str(repair_csv), show_progress=True
+                str(raw_path),
+                str(repaired),
+                str(repair_csv),
+                show_progress=True,
             ),
             state,
             checkpoint_path,
             raw_path,
         )
 
-        reperation_shape_analysis_csv = repair_path / "reparation_shape_analysis.csv"
-        os.makedirs(os.path.dirname(reperation_shape_analysis_csv), exist_ok=True)
+        reperation_shape_analysis_csv = (
+            repair_path / "reparation_shape_analysis.csv"
+        )
+        os.makedirs(
+            os.path.dirname(reperation_shape_analysis_csv), exist_ok=True
+        )
         _run_step(
             "reparation_shape_analysis",
             lambda: shape_analyzer.analyze_database(
@@ -306,7 +323,9 @@ def prepare_database(
         fully_normalized_shape_analysis_csv = (
             repair_path / "fully_normalized_shape_analysis.csv"
         )
-        os.makedirs(os.path.dirname(fully_normalized_shape_analysis_csv), exist_ok=True)
+        os.makedirs(
+            os.path.dirname(fully_normalized_shape_analysis_csv), exist_ok=True
+        )
         _run_step(
             "fully_normalized_shape_analysis",
             lambda: shape_analyzer.analyze_database(

@@ -4,6 +4,7 @@ from typing import cast
 
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 from src.step_4.distance_calculations.calculate_total_distance import (
     DISTANCE_CONFIG,
@@ -48,10 +49,12 @@ def calculate_weights(
     columns = ["distance_function", "descriptor", "distance"]
     rows_processed = 0
 
-    for chunk in pd.read_csv(
-        input_path,
-        usecols=columns,
-        chunksize=chunksize,
+    for chunk in tqdm(
+        pd.read_csv(
+            input_path,
+            usecols=columns,
+            chunksize=chunksize,
+        )
     ):
         rows_processed += len(chunk)
 
@@ -126,13 +129,22 @@ def calculate_weights(
 
     stats = pd.DataFrame(records)
 
-    # Calculate inverse-mean weights across all descriptors.
-    valid = stats["mean"].notna() & (stats["mean"] > 0)
-
     stats["weight"] = 0.0
-
-    inverse_mean = 1.0 / stats.loc[valid, "mean"]
-    stats.loc[valid, "weight"] = inverse_mean / inverse_mean.sum()
+    # Give each distance function its own normalized set of weights. A zero
+    # or unavailable standard deviation has no usable inverse-std weight.
+    valid = (
+        stats["std"].notna() & np.isfinite(stats["std"]) & (stats["std"] > 0)
+    )
+    for _, indices in stats.groupby(
+        "distance_function", sort=False
+    ).groups.items():
+        function_valid = stats.loc[indices].index.intersection(
+            stats.index[valid]
+        )
+        if function_valid.empty:
+            continue
+        inverse_std = 1.0 / stats.loc[function_valid, "std"]
+        stats.loc[function_valid, "weight"] = inverse_std / inverse_std.sum()
 
     output_file = Path(output_path)
 
