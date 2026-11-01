@@ -24,3 +24,5 @@ __pycache__/
 3d_models_reduced_normalized/
 
 resampled_models
+
+*.png
