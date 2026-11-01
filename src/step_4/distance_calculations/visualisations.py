@@ -9,6 +9,7 @@ def visualize_mesh_distances(
     descriptor: str | None = None,
     distance_measure: str | None = None,
     distances: dict[str, float] | None = None,
+    config: str | None = None,
 ) -> None:
     """Display meshes side by side, coloured by distance to the query."""
     distances = distances or {}
@@ -136,7 +137,7 @@ def visualize_mesh_distances(
 
     plotter = vedo.Plotter(
         title="3D Mesh Similarity Comparison",
-        axes=1,
+        axes=0,
         bg="white",
     )
 
@@ -147,11 +148,12 @@ def visualize_mesh_distances(
     z_center = (bounds[:, 4].min() + bounds[:, 5].max()) / 2
     y_top = bounds[:, 3].max()
 
-    if descriptor is None:
-        descriptor = "unknown"
+    title_text = f"Config: {config}" if config else None
+    if title_text is None:
+        title_text = f"Descriptor: {descriptor or 'unknown'}"
 
     title = vedo.Text3D(
-        f"Descriptor: {descriptor}",
+        title_text,
         pos=(x_center, y_top + 0.6, z_center),
         s=0.3,
         c="black",

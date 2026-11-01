@@ -828,14 +828,14 @@ class ShapeDistanceCalculator:
 def main():
 
     available_configs = {
-        "mixed": DISTANCE_CONFIG_MIXED,
+        "emd": DISTANCE_CONFIG_MIXED,
+        "emd-equal": DISTANCE_CONFIG_MIXED,
+        "emd-rec": DISTANCE_CONFIG_MIXED,
         "l2": DISTANCE_CONFIG_L2,
-        "mixed-equal": DISTANCE_CONFIG_MIXED,
         "l2-equal": DISTANCE_CONFIG_L2,
+        "l2-rec": DISTANCE_CONFIG_L2,
         "cosine": DISTANCE_CONFIG_COSINE,
         "cosine-equal": DISTANCE_CONFIG_COSINE,
-        "emd-rec": DISTANCE_CONFIG_MIXED,
-        "l2-rec": DISTANCE_CONFIG_L2,
         "cosine-rec": DISTANCE_CONFIG_COSINE,
     }
 
@@ -908,11 +908,25 @@ def main():
     # Visualise shapes
     if args.visualise:
         shapes = args.shapes or list(total_distances.keys())[:10]
+        if len(shapes) == 1 and Path(shapes[0]).is_dir():
+            mesh_root = Path(shapes[0])
+            shapes = [
+                str(mesh_root / shape)
+                for shape in list(total_distances.keys())[:10]
+            ]
         visualize_mesh_distances(
             query=args.query,
             shapes_to_compare=shapes,
-            descriptor="total distance",
             distances=total_distances,
+            config=(
+                "Euclidean (equal weights)"
+                if args.config == "l2-equal"
+                else "Euclidean"
+                if args.config.startswith("l2")
+                else "Cosine"
+                if args.config.startswith("cosine")
+                else "EMD"
+            ),
         )
 
 

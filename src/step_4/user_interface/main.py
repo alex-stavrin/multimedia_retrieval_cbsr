@@ -23,6 +23,8 @@ from src.step_4.user_interface.class_colors import (
 import os
 from src.step_4.distance_calculations.calculate_total_distance import (
     ShapeDistanceCalculator,
+    DISTANCE_CONFIG_L2,
+    DISTANCE_CONFIG_MIXED,
 )
 
 if sys.platform == "win32":
@@ -72,12 +74,21 @@ class MainWindow(QMainWindow):
         self.database_directory: str | None = None
         self.result_viewers: list[EmbeddedViewer] = []
 
+        # self.shape_distance_calculator = ShapeDistanceCalculator(
+        #     csv_databases=[
+        #         "analysis_output/descriptors/simple_descriptors_normalized.csv",
+        #         "analysis_output/descriptors/histogram_descriptors.csv",
+        #         "analysis_output/distances/L2_weights_descriptors.csv",
+        #     ],
+        #     distance_config=DISTANCE_CONFIG_L2
+        # )
         self.shape_distance_calculator = ShapeDistanceCalculator(
             csv_databases=[
                 "analysis_output/descriptors/simple_descriptors_normalized.csv",
                 "analysis_output/descriptors/histogram_descriptors.csv",
-                "analysis_output/distances/complete_weights_descriptors.csv",
-            ]
+                "analysis_output/distances/weights_emd_descriptors.csv",
+            ],
+            distance_config=DISTANCE_CONFIG_MIXED
         )
 
         main_layout = QHBoxLayout(central_widget)
@@ -173,7 +184,7 @@ class MainWindow(QMainWindow):
             self.selected_file, shapes_to_compare=[str(self.database_directory)]
         )
 
-        matches = list(results.items())[:6]
+        matches = list(results.items())[:20]
 
         for viewer in self.result_viewers:
             viewer.cleanup()

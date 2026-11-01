@@ -2,12 +2,13 @@
 set -euo pipefail
 
 usage() {
-    echo "Usage: $0 --config <l2|mixed|cosine|l2-equal|mixed-equal|cosine-equal|l2-rec|emd-rec|cosine-rec> --query <query-mesh-path> [-o <output-path>]" >&2
+    echo "Usage: $0 --config <l2|emd|cosine|l2-equal|emd-equal|cosine-equal|l2-rec|emd-rec|cosine-rec> --query <query-mesh-path> [-o <output-path>] [--visualise]" >&2
 }
 
 config=""
 query_path=""
 output_path="test.json"
+visualise=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -28,6 +29,10 @@ while [[ $# -gt 0 ]]; do
             output_path="$2"
             shift 2
             ;;
+        -v|--visualise|--visualize)
+            visualise=true
+            shift
+            ;;
         *)
             echo "Unknown argument: $1" >&2
             usage
@@ -45,8 +50,8 @@ fi
 case "$config" in
     l2) weights_csv="3d_models_prepared/analysis/L2_weights_descriptors.csv" ;;
     l2-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;
-    mixed) weights_csv="3d_models_prepared/analysis/weights_EMD_descriptors.csv" ;;
-    mixed-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;
+    emd) weights_csv="3d_models_prepared/analysis/weights_emd_descriptors.csv" ;;
+    emd-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;
     cosine) weights_csv="3d_models_prepared/analysis/weights_cosine_descriptors.csv" ;;
     cosine-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;
     l2-rec) weights_csv="analysis_output/distances/L2_recommended_weights.csv" ;;
@@ -61,7 +66,7 @@ if [[ ! -f "$weights_csv" ]]; then
     exit 1
 fi
 
-uv run -m src.step_4.distance_calculations.calculate_total_distance \
+command=(uv run -m src.step_4.distance_calculations.calculate_total_distance \
     --config "$config" \
     --csv_paths \
     "$weights_csv" \
@@ -69,4 +74,10 @@ uv run -m src.step_4.distance_calculations.calculate_total_distance \
     3d_models_prepared/analysis/simple_descriptors_normalized.csv \
     -q "$query_path" \
     -s 3d_models_prepared/3d_models_steps/3_models_fully_normalized/ \
-    -o "$output_path"
+    -o "$output_path")
+
+if [[ "$visualise" == true ]]; then
+    command+=(--visualise)
+fi
+
+"${command[@]}"

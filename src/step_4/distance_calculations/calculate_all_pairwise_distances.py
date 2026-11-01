@@ -278,9 +278,9 @@ def main():
     )
 
     available_configs = {
-        "mixed": DISTANCE_CONFIG_MIXED,
+        "emd": DISTANCE_CONFIG_MIXED,
+        "emd-equal": DISTANCE_CONFIG_MIXED,
         "l2": DISTANCE_CONFIG_L2,
-        "mixed-equal": DISTANCE_CONFIG_MIXED,
         "l2-equal": DISTANCE_CONFIG_L2,
         "cosine": DISTANCE_CONFIG_COSINE,
         "cosine-equal": DISTANCE_CONFIG_COSINE,
