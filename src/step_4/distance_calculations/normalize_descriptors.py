@@ -126,11 +126,17 @@ def main() -> None:
             input_path.with_name(f"{input_path.stem}_processed.csv")
         )
 
-    process_descriptors(
-        csv_path=args.input,
-        output_path=output_path,
-        ignorable_columns=args.ignore,
-    )
+    if not args.ignore:
+        process_descriptors(
+            csv_path=args.input,
+            output_path=output_path
+        )
+    else:
+        process_descriptors(
+            csv_path=args.input,
+            output_path=output_path,
+            ignorable_columns=args.ignore,
+        )
 
 
 if __name__ == "__main__":

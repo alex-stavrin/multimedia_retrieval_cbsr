@@ -15,6 +15,10 @@ AircraftBuoyant/m1349.obj had 432 and now has 7511 vertices using method: Centro
 AircraftBuoyant/m1352.obj had 3236 and now has 7508 vertices using method: Linear (method 1)
 Apartment/D00348.obj had 2006 and now has 5574 vertices using method: Centroid (method 4)
 AircraftBuoyant/m1350.obj had 1097 and now has 7507 vertices using method: Linear (method 1) (2 iterations)
+Apartment/D00859.obj had 1327 and now has 7555 vertices using method: Centroid (method 4) (2 iterations)
+Apartment/D00953.obj had 4156 and now has 7894 vertices using method: Centroid (method 4)
+AircraftBuoyant/m1337.obj had 201 and now has 7501 vertices using method: Linear (method 1) (3 iterations)
+AquaticAnimal/m61.obj had 216 and now has 5364 vertices using method: Centroid (method 4) (3 iterations)
 Apartment/D00792.obj had 795 and now has 6011 vertices using method: Centroid (method 4) (2 iterations)
 Apartment/D00366.obj had 1294 and now has 7499 vertices using method: Centroid (method 4) (2 iterations)
 Apartment/m465.obj had 2335 and now has 6733 vertices using method: Centroid (method 4)
@@ -55,6 +59,8 @@ Bicycle/D00016.obj had 2769 and now has 8118 vertices using method: Centroid (me
 Bicycle/D00033.obj had 2192 and now has 6640 vertices using method: Centroid (method 4)
 Bed/D00217.obj had 3238 and now has 7514 vertices using method: Linear (method 1)
 Bicycle/D00567.obj had 436 and now has 7306 vertices using method: Linear (method 1) (2 iterations)
+Bed/D00545.obj had 415 and now has 7499 vertices using method: Centroid (method 4) (3 iterations)
+AquaticAnimal/m79.obj had 159 and now has 7505 vertices using method: Centroid (method 4) (4 iterations)
 Bicycle/D00621.obj had 2769 and now has 8118 vertices using method: Centroid (method 4)
 Bed/m947.obj had 441 and now has 9983 vertices using method: Centroid (method 4) (3 iterations)
 AquaticAnimal/m78.obj had 468 and now has 7524 vertices using method: Centroid (method 4) (3 iterations)
@@ -357,9 +363,16 @@ Cup/D00519.obj had 456 and now has 7266 vertices using method: Linear (method 1)
 Cup/D00642.obj had 1541 and now has 6158 vertices using method: Linear (method 1)
 Cup/D00874.obj had 1899 and now has 7590 vertices using method: Linear (method 1)
 Cup/D00328.obj had 2570 and now has 7500 vertices using method: Linear (method 1)
+ComputerKeyboard/D00127.obj had 701 and now has 7404 vertices using method: Centroid (method 4) (2 iterations)
+Cup/D00363.obj had 3426 and now has 7500 vertices using method: Linear (method 1)
+ComputerKeyboard/D00600.obj had 1837 and now has 7653 vertices using method: Centroid (method 4)
+Cup/D00642.obj had 1541 and now has 6158 vertices using method: Linear (method 1)
+ClassicPiano/D00983.obj had 204 and now has 7457 vertices using method: Centroid (method 4) (3 iterations)
 Cup/D00882.obj had 1553 and now has 6206 vertices using method: Linear (method 1)
 Computer/m1777.obj had 325 and now has 7508 vertices using method: Linear (method 1) (3 iterations)
 Cup/m495.obj had 1401 and now has 5598 vertices using method: Linear (method 1)
+ComputerKeyboard/D00990.obj had 1646 and now has 7608 vertices using method: Centroid (method 4)
+Computer/D01102.obj had 28 and now has 7511 vertices using method: Linear (method 1) (5 iterations)
 Cup/m498.obj had 380 and now has 6050 vertices using method: Linear (method 1) (2 iterations)
 Cup/m497.obj had 3008 and now has 9144 vertices using method: Centroid (method 4)
 Cup/D00363.obj had 3426 and now has 7500 vertices using method: Linear (method 1)
@@ -430,7 +443,11 @@ Door/m1711.obj had 68 and now has 5348 vertices using method: Centroid (method 4
 Door/D01143.obj had 48 and now has 9228 vertices using method: Linear (method 1) (4 iterations)
 Door/m1707.obj had 456 and now has 7266 vertices using method: Linear (method 1) (2 iterations)
 Door/m1712.obj had 1724 and now has 6926 vertices using method: Linear (method 1)
+Door/D01136.obj had 718 and now has 7506 vertices using method: Linear (method 1) (2 iterations)
+Door/D01177.obj had 90 and now has 5004 vertices using method: Linear (method 1) (3 iterations)
 Door/m1714.obj had 861 and now has 7865 vertices using method: Centroid (method 4) (2 iterations)
+Door/m1707.obj had 456 and now has 7266 vertices using method: Linear (method 1) (2 iterations)
+Door/D01194.obj had 18 and now has 7501 vertices using method: Centroid (method 4) (6 iterations)
 Door/m1718.obj had 2691 and now has 7701 vertices using method: Centroid (method 4)
 Door/m1716.obj had 2447 and now has 9692 vertices using method: Linear (method 1)
 Door/m1717.obj had 858 and now has 7790 vertices using method: Centroid (method 4) (2 iterations)
@@ -526,7 +543,6 @@ Gun/D00103.obj had 833 and now has 7489 vertices using method: Centroid (method 
 Guitar/D00645.obj had 1033 and now has 8857 vertices using method: Centroid (method 4) (2 iterations)
 Glasses/D00432.obj had 408 and now has 7501 vertices using method: Centroid (method 4) (3 iterations)
 Gun/D00209.obj had 3278 and now has 9766 vertices using method: Centroid (method 4)
-FloorLamp/m622.obj had 54 and now has 7502 vertices using method: Linear (method 1) (4 iterations)
 Gun/D00477.obj had 1995 and now has 5899 vertices using method: Centroid (method 4)
 Gun/D00239.obj had 2121 and now has 6350 vertices using method: Centroid (method 4)
 Guitar/D00097.obj had 270 and now has 7522 vertices using method: Linear (method 1) (3 iterations)
@@ -629,7 +645,6 @@ Helicopter/m1304.obj had 1066 and now has 9442 vertices using method: Centroid (
 Helicopter/m1315.obj had 510 and now has 7920 vertices using method: Linear (method 1) (2 iterations)
 Hat/m1640.obj had 1002 and now has 7501 vertices using method: Linear (method 1) (2 iterations)
 Helicopter/m1319.obj had 599 and now has 9194 vertices using method: Linear (method 1) (2 iterations)
-Helicopter/m1329.obj had 665 and now has 5761 vertices using method: Centroid (method 4) (2 iterations)
 Helicopter/m1321.obj had 2729 and now has 7959 vertices using method: Centroid (method 4)
 Glasses/D00656.obj had 224 and now has 7413 vertices using method: Centroid (method 4) (3 iterations)
 Helicopter/m1334.obj had 267 and now has 7079 vertices using method: Centroid (method 4) (3 iterations)
@@ -676,6 +691,10 @@ House/m441.obj had 2086 and now has 7818 vertices using method: Centroid (method
 HumanHead/m340.obj had 1426 and now has 5698 vertices using method: Linear (method 1)
 HumanHead/m341.obj had 1887 and now has 5625 vertices using method: Centroid (method 4)
 House/m447.obj had 1431 and now has 7538 vertices using method: Centroid (method 4) (2 iterations)
+HumanHead/D00205.obj had 1166 and now has 7982 vertices using method: Centroid (method 4)
+House/m439.obj had 356 and now has 7550 vertices using method: Linear (method 1) (3 iterations)
+House/m460.obj had 4748 and now has 7766 vertices using method: Centroid (method 4)
+House/m436.obj had 220 and now has 7525 vertices using method: Centroid (method 4) (4 iterations)
 HumanHead/D00758.obj had 959 and now has 6548 vertices using method: Centroid (method 4)
 HumanHead/D00205.obj had 1166 and now has 7982 vertices using method: Centroid (method 4)
 House/m460.obj had 4748 and now has 7766 vertices using method: Centroid (method 4)
@@ -899,6 +918,8 @@ Jet/m1187.obj had 299 and now has 8047 vertices using method: Centroid (method 4
 Jet/m1199.obj had 602 and now has 5370 vertices using method: Centroid (method 4) (2 iterations)
 Jet/m1196.obj had 523 and now has 7933 vertices using method: Linear (method 1) (2 iterations)
 Jet/m1198.obj had 223 and now has 6229 vertices using method: Centroid (method 4) (3 iterations)
+Jet/m1199.obj had 602 and now has 5370 vertices using method: Centroid (method 4) (2 iterations)
+Jet/m1200.obj had 197 and now has 6047 vertices using method: Centroid (method 4) (3 iterations)
 Jet/m1205.obj had 369 and now has 5634 vertices using method: Linear (method 1) (2 iterations)
 Jet/m1193.obj had 1017 and now has 9137 vertices using method: Centroid (method 4) (2 iterations)
 Jet/m1197.obj had 235 and now has 6579 vertices using method: Centroid (method 4) (3 iterations)
@@ -1003,6 +1024,7 @@ Knife/D01107.obj had 976 and now has 6799 vertices using method: Centroid (metho
 Jet/m1273.obj had 475 and now has 7502 vertices using method: Centroid (method 4) (3 iterations)
 Jet/m1281.obj had 415 and now has 7505 vertices using method: Centroid (method 4) (3 iterations)
 Knife/D01174.obj had 808 and now has 5602 vertices using method: Centroid (method 4)
+Knife/D01119.obj had 113 and now has 8615 vertices using method: Centroid (method 4) (3 iterations)
 Knife/D01077.obj had 334 and now has 8254 vertices using method: Centroid (method 4) (2 iterations)
 Knife/D01150.obj had 287 and now has 7103 vertices using method: Centroid (method 4) (2 iterations)
 Jet/m1296.obj had 250 and now has 7505 vertices using method: Linear (method 1) (3 iterations)
@@ -1226,6 +1248,11 @@ PlantWildNonTree/m976.obj had 1272 and now has 8912 vertices using method: Centr
 PlantWildNonTree/m978.obj had 3411 and now has 8697 vertices using method: Centroid (method 4)
 PlantIndoors/m1026.obj had 1519 and now has 7584 vertices using method: Centroid (method 4) (2 iterations)
 PlantIndoors/m1036.obj had 234 and now has 7512 vertices using method: Linear (method 1) (3 iterations)
+PlantIndoors/m991.obj had 4867 and now has 7935 vertices using method: Centroid (method 4)
+PlantIndoors/m1027.obj had 3855 and now has 7656 vertices using method: Centroid (method 4)
+PlantIndoors/m1030.obj had 395 and now has 9677 vertices using method: Centroid (method 4) (3 iterations)
+PlantIndoors/m1029.obj had 316 and now has 7440 vertices using method: Centroid (method 4) (3 iterations)
+PlantIndoors/m994.obj had 409 and now has 7509 vertices using method: Centroid (method 4) (3 iterations)
 PlantWildNonTree/m971.obj had 3447 and now has 8684 vertices using method: Centroid (method 4)
 PlantWildNonTree/m979.obj had 1236 and now has 8556 vertices using method: Centroid (method 4) (2 iterations)
 PianoBoard/D00441.obj had 538 and now has 7453 vertices using method: Centroid (method 4) (2 iterations)
@@ -1278,6 +1305,7 @@ RectangleTable/D00421.obj had 95 and now has 5324 vertices using method: Linear 
 Quadruped/m111.obj had 1238 and now has 7503 vertices using method: Linear (method 1) (2 iterations)
 RectangleTable/D00302.obj had 122 and now has 9402 vertices using method: Centroid (method 4) (4 iterations)
 Quadruped/m97.obj had 3602 and now has 7507 vertices using method: Centroid (method 4)
+Quadruped/m98.obj had 4195 and now has 7515 vertices using method: Centroid (method 4)
 RectangleTable/D00230.obj had 3713 and now has 7549 vertices using method: Centroid (method 4)
 NonWheelChair/m818.obj had 76 and now has 7507 vertices using method: Centroid (method 4) (5 iterations)
 Quadruped/m95.obj had 956 and now has 7501 vertices using method: Linear (method 1) (2 iterations)
@@ -1426,6 +1454,8 @@ RoundTable/m933.obj had 55 and now has 7502 vertices using method: Linear (metho
 Shelf/m861.obj had 150 and now has 9430 vertices using method: Centroid (method 4) (4 iterations)
 Shelf/m847.obj had 158 and now has 7508 vertices using method: Centroid (method 4) (4 iterations)
 Ship/D00042.obj had 2168 and now has 6086 vertices using method: Centroid (method 4)
+Ship/D00099.obj had 336 and now has 5376 vertices using method: Linear (method 1) (2 iterations)
+Shelf/m868.obj had 112 and now has 7312 vertices using method: Centroid (method 4) (4 iterations)
 Ship/D00647.obj had 1713 and now has 5087 vertices using method: Centroid (method 4)
 Shelf/m868.obj had 112 and now has 7312 vertices using method: Centroid (method 4) (4 iterations)
 Shelf/D00337.obj had 1397 and now has 7500 vertices using method: Centroid (method 4) (2 iterations)
@@ -1687,7 +1717,10 @@ Vase/m538.obj had 301 and now has 8595 vertices using method: Centroid (method 4
 TruckNonContainer/D00252.obj had 2288 and now has 7670 vertices using method: Centroid (method 4)
 Vase/m527.obj had 176 and now has 7500 vertices using method: Linear (method 1) (3 iterations)
 Vase/m535.obj had 176 and now has 7500 vertices using method: Linear (method 1) (3 iterations)
+Vase/m539.obj had 2526 and now has 7574 vertices using method: Centroid (method 4)
+TruckNonContainer/D00215.obj had 4409 and now has 8384 vertices using method: Centroid (method 4)
 Vase/m545.obj had 402 and now has 6402 vertices using method: Linear (method 1) (2 iterations)
+Vase/m537.obj had 504 and now has 8064 vertices using method: Linear (method 1) (2 iterations)
 Vase/m543.obj had 624 and now has 9924 vertices using method: Linear (method 1) (2 iterations)
 Vase/m547.obj had 529 and now has 8137 vertices using method: Linear (method 1) (2 iterations)
 TruckNonContainer/D00148.obj had 2448 and now has 7590 vertices using method: Centroid (method 4)
@@ -1757,6 +1790,7 @@ Wheel/m742.obj had 256 and now has 7501 vertices using method: Linear (method 1)
 
 DECIMATED MODELS (362 total)
 ================
+Apartment/D00156.obj had 11753 and now has 7631 vertices
 AircraftBuoyant/m1351.obj had 12985 and now has 7723 vertices
 Apartment/D00045.obj had 14865 and now has 7762 vertices
 Apartment/D00156.obj had 11753 and now has 7631 vertices
@@ -1765,6 +1799,7 @@ Apartment/D00478.obj had 15670 and now has 9170 vertices
 Apartment/D00651.obj had 11760 and now has 7632 vertices
 Apartment/D00086.obj had 20462 and now has 7625 vertices
 Apartment/D00681.obj had 12682 and now has 7982 vertices
+Apartment/D00086.obj had 20462 and now has 7625 vertices
 Apartment/D00860.obj had 15670 and now has 9176 vertices
 AquaticAnimal/m54.obj had 18143 and now has 7649 vertices
 AquaticAnimal/m55.obj had 19505 and now has 7561 vertices
@@ -1842,8 +1877,12 @@ Car/m1555.obj had 16599 and now has 7583 vertices
 Cellphone/D00018.obj had 14101 and now has 7581 vertices
 Car/m1559.obj had 15606 and now has 7592 vertices
 Car/m1551.obj had 18528 and now has 7656 vertices
-Cellphone/D00079.obj had 20105 and now has 7607 vertices
+Car/m1555.obj had 16599 and now has 7583 vertices
+Cellphone/D00018.obj had 14101 and now has 7581 vertices
+Car/m1509.obj had 47473 and now has 7607 vertices
 Car/m1560.obj had 21686 and now has 7426 vertices
+Cellphone/D00079.obj had 20105 and now has 7607 vertices
+Car/m1556.obj had 34973 and now has 8350 vertices
 Cellphone/D00542.obj had 16185 and now has 8500 vertices
 Car/m1509.obj had 47473 and now has 7607 vertices
 Cellphone/D00362.obj had 27252 and now has 7543 vertices
@@ -1856,10 +1895,10 @@ City/D01192.obj had 14710 and now has 7979 vertices
 Chess/m1593.obj had 25650 and now has 7671 vertices
 Car/m1544.obj had 60220 and now has 7811 vertices
 Computer/D01023.obj had 11468 and now has 7509 vertices
-Computer/D01128.obj had 17298 and now has 7636 vertices
 City/D01101.obj had 26064 and now has 7468 vertices
 Computer/m1772.obj had 17298 and now has 7636 vertices
 Cup/D00174.obj had 12252 and now has 7500 vertices
+Cup/D00457.obj had 10801 and now has 7500 vertices
 Cup/D00550.obj had 12529 and now has 7500 vertices
 Cup/D00738.obj had 10318 and now has 7500 vertices
 Cup/D00457.obj had 10801 and now has 7500 vertices
@@ -1880,17 +1919,23 @@ DeskPhone/D00897.obj had 27047 and now has 7562 vertices
 DeskPhone/D00706.obj had 43899 and now has 7101 vertices
 DeskPhone/D00899.obj had 39869 and now has 7535 vertices
 DeskPhone/D00316.obj had 48061 and now has 7695 vertices
+DeskPhone/D00899.obj had 39869 and now has 7535 vertices
 FloorLamp/D00563.obj had 11136 and now has 7381 vertices
 FloorLamp/D00875.obj had 15152 and now has 7526 vertices
 FloorLamp/D00876.obj had 14464 and now has 7501 vertices
 FloorLamp/D00924.obj had 17582 and now has 7521 vertices
 Glasses/D00640.obj had 12793 and now has 7534 vertices
 FloorLamp/D00580.obj had 23655 and now has 7709 vertices
+FloorLamp/D00924.obj had 17582 and now has 7521 vertices
+FloorLamp/D00876.obj had 14464 and now has 7501 vertices
 Glasses/D00575.obj had 16468 and now has 7527 vertices
 Glasses/D00816.obj had 15152 and now has 7521 vertices
 Guitar/D00549.obj had 10265 and now has 7562 vertices
 Gun/D00207.obj had 16142 and now has 7505 vertices
 Gun/D00425.obj had 10850 and now has 7462 vertices
+Guitar/D00849.obj had 29451 and now has 7893 vertices
+Guitar/D00335.obj had 32764 and now has 7541 vertices
+Gun/D00819.obj had 17250 and now has 7567 vertices
 Gun/D00826.obj had 11855 and now has 7508 vertices
 Guitar/D00041.obj had 27260 and now has 7613 vertices
 Guitar/D00849.obj had 29451 and now has 7893 vertices
@@ -1939,6 +1984,7 @@ Humanoid/m180.obj had 15088 and now has 7664 vertices
 Humanoid/m178.obj had 14603 and now has 7500 vertices
 Humanoid/m170.obj had 16052 and now has 7516 vertices
 Humanoid/m223.obj had 10473 and now has 7494 vertices
+Humanoid/m220.obj had 12911 and now has 7550 vertices
 Humanoid/m221.obj had 10576 and now has 7505 vertices
 Humanoid/m220.obj had 12911 and now has 7550 vertices
 Humanoid/m195.obj had 22608 and now has 7506 vertices
@@ -1976,6 +2022,7 @@ MilitaryVehicle/D00529.obj had 38226 and now has 8807 vertices
 Monitor/D00978.obj had 16462 and now has 7447 vertices
 MilitaryVehicle/D00801.obj had 34333 and now has 7747 vertices
 Monitor/D00863.obj had 21133 and now has 7508 vertices
+Monitor/D01000.obj had 17106 and now has 7540 vertices
 Motorcycle/D00544.obj had 12101 and now has 7586 vertices
 Motorcycle/D00594.obj had 12160 and now has 7600 vertices
 Motorcycle/D00039.obj had 18315 and now has 7584 vertices
@@ -1985,6 +2032,9 @@ Motorcycle/m1479.obj had 12101 and now has 7586 vertices
 Motorcycle/D00521.obj had 16542 and now has 7563 vertices
 Motorcycle/m1482.obj had 15288 and now has 7298 vertices
 Motorcycle/D00886.obj had 15288 and now has 7340 vertices
+Motorcycle/m1479.obj had 12101 and now has 7586 vertices
+Motorcycle/D00039.obj had 18315 and now has 7584 vertices
+Motorcycle/m1482.obj had 15288 and now has 7298 vertices
 Motorcycle/D00476.obj had 25632 and now has 7889 vertices
 Mug/D00747.obj had 15266 and now has 7502 vertices
 Mug/D00227.obj had 19522 and now has 7519 vertices
@@ -2138,8 +2188,8 @@ ResamplingRecord(relative_path='Bicycle/D00904.obj', before_vertices=5354, after
 ResamplingRecord(relative_path='Bicycle/D00974.obj', before_vertices=6045, after_vertices=6045, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Bicycle/m1475.obj', before_vertices=6045, after_vertices=6045, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Biplane/D00246.obj', before_vertices=5022, after_vertices=5022, subdivision_methods=[], error=None)
-ResamplingRecord(relative_path='Biplane/D00373.obj', before_vertices=5941, after_vertices=5941, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Biplane/D00320.obj', before_vertices=9723, after_vertices=9723, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='Biplane/D00373.obj', before_vertices=5941, after_vertices=5941, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Biplane/D00515.obj', before_vertices=5379, after_vertices=5379, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Biplane/m1122.obj', before_vertices=6711, after_vertices=6711, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Bird/D00164.obj', before_vertices=8188, after_vertices=8188, subdivision_methods=[], error=None)
@@ -2152,7 +2202,6 @@ ResamplingRecord(relative_path='BuildingNonResidential/m399.obj', before_vertice
 ResamplingRecord(relative_path='BuildingNonResidential/m401.obj', before_vertices=6912, after_vertices=6912, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='BuildingNonResidential/m406.obj', before_vertices=7223, after_vertices=7223, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='BuildingNonResidential/m416.obj', before_vertices=7056, after_vertices=7056, subdivision_methods=[], error=None)
-ResamplingRecord(relative_path='BuildingNonResidential/m421.obj', before_vertices=6853, after_vertices=6853, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='BuildingNonResidential/m420.obj', before_vertices=7261, after_vertices=7261, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Bus/D00114.obj', before_vertices=7643, after_vertices=7643, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Bus/D00179.obj', before_vertices=5976, after_vertices=5976, subdivision_methods=[], error=None)
@@ -2169,6 +2218,7 @@ ResamplingRecord(relative_path='Car/D00377.obj', before_vertices=8260, after_ver
 ResamplingRecord(relative_path='Car/D00504.obj', before_vertices=5153, after_vertices=5153, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Car/D00785.obj', before_vertices=7061, after_vertices=7061, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Car/D00793.obj', before_vertices=5322, after_vertices=5322, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='Car/D00785.obj', before_vertices=7061, after_vertices=7061, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Car/m1485.obj', before_vertices=6149, after_vertices=6149, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Car/m1486.obj', before_vertices=5706, after_vertices=5706, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Car/m1487.obj', before_vertices=7454, after_vertices=7454, subdivision_methods=[], error=None)
@@ -2224,6 +2274,7 @@ ResamplingRecord(relative_path='Computer/m1778.obj', before_vertices=5026, after
 ResamplingRecord(relative_path='ComputerKeyboard/D00197.obj', before_vertices=6384, after_vertices=6384, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='ComputerKeyboard/D00360.obj', before_vertices=6193, after_vertices=6193, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='ComputerKeyboard/D00382.obj', before_vertices=8341, after_vertices=8341, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='ComputerKeyboard/D00420.obj', before_vertices=7131, after_vertices=7131, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='ComputerKeyboard/D00525.obj', before_vertices=8309, after_vertices=8309, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='ComputerKeyboard/D00420.obj', before_vertices=7131, after_vertices=7131, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='ComputerKeyboard/D00597.obj', before_vertices=8454, after_vertices=8454, subdivision_methods=[], error=None)
@@ -2295,6 +2346,7 @@ ResamplingRecord(relative_path='HumanHead/D00106.obj', before_vertices=5276, aft
 ResamplingRecord(relative_path='HumanHead/D00131.obj', before_vertices=5161, after_vertices=5161, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='HumanHead/D00313.obj', before_vertices=6146, after_vertices=6146, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='HumanHead/D00488.obj', before_vertices=6211, after_vertices=6211, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='HumanHead/D00578.obj', before_vertices=7968, after_vertices=7968, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='HumanHead/D00591.obj', before_vertices=5167, after_vertices=5167, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='HumanHead/D00578.obj', before_vertices=7968, after_vertices=7968, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='HumanHead/m348.obj', before_vertices=9151, after_vertices=9151, subdivision_methods=[], error=None)
@@ -2312,8 +2364,8 @@ ResamplingRecord(relative_path='Humanoid/m224.obj', before_vertices=9623, after_
 ResamplingRecord(relative_path='Humanoid/m226.obj', before_vertices=6368, after_vertices=6368, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Humanoid/m227.obj', before_vertices=7015, after_vertices=7015, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Humanoid/m249.obj', before_vertices=7970, after_vertices=7970, subdivision_methods=[], error=None)
-ResamplingRecord(relative_path='Humanoid/m252.obj', before_vertices=9698, after_vertices=9698, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Humanoid/m251.obj', before_vertices=8077, after_vertices=8077, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='Humanoid/m252.obj', before_vertices=9698, after_vertices=9698, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Humanoid/m256.obj', before_vertices=7303, after_vertices=7303, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Humanoid/m264.obj', before_vertices=8807, after_vertices=8807, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Insect/D00082.obj', before_vertices=6502, after_vertices=6502, subdivision_methods=[], error=None)
@@ -2325,6 +2377,7 @@ ResamplingRecord(relative_path='Insect/m26.obj', before_vertices=5266, after_ver
 ResamplingRecord(relative_path='Insect/m6.obj', before_vertices=9184, after_vertices=9184, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Jet/m1201.obj', before_vertices=6739, after_vertices=6739, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Jet/m1256.obj', before_vertices=9380, after_vertices=9380, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='Jet/m1257.obj', before_vertices=8795, after_vertices=8795, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Jet/m1259.obj', before_vertices=6739, after_vertices=6739, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Jet/m1257.obj', before_vertices=8795, after_vertices=8795, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Jet/m1260.obj', before_vertices=6906, after_vertices=6906, subdivision_methods=[], error=None)
@@ -2376,6 +2429,7 @@ ResamplingRecord(relative_path='PlantIndoors/m1008.obj', before_vertices=5383, a
 ResamplingRecord(relative_path='PlantIndoors/m1007.obj', before_vertices=7930, after_vertices=7930, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='PlantIndoors/m1009.obj', before_vertices=5331, after_vertices=5331, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='PlantIndoors/m1010.obj', before_vertices=6257, after_vertices=6257, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='PlantIndoors/m1008.obj', before_vertices=5383, after_vertices=5383, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='PlantIndoors/m1011.obj', before_vertices=7529, after_vertices=7529, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='PlantIndoors/m1013.obj', before_vertices=6365, after_vertices=6365, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='PlantIndoors/m1016.obj', before_vertices=5305, after_vertices=5305, subdivision_methods=[], error=None)
@@ -2458,7 +2512,6 @@ ResamplingRecord(relative_path='Train/m1585.obj', before_vertices=5303, after_ve
 ResamplingRecord(relative_path='Tree/m1050.obj', before_vertices=5410, after_vertices=5410, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Tree/m1086.obj', before_vertices=6425, after_vertices=6425, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Tree/m1090.obj', before_vertices=5482, after_vertices=5482, subdivision_methods=[], error=None)
-ResamplingRecord(relative_path='Truck/D00003.obj', before_vertices=6683, after_vertices=6683, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Truck/D00010.obj', before_vertices=6939, after_vertices=6939, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Truck/D00029.obj', before_vertices=5209, after_vertices=5209, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='Truck/D00112.obj', before_vertices=7853, after_vertices=7853, subdivision_methods=[], error=None)
@@ -2475,6 +2528,7 @@ ResamplingRecord(relative_path='TruckNonContainer/D00267.obj', before_vertices=6
 ResamplingRecord(relative_path='TruckNonContainer/D00275.obj', before_vertices=5492, after_vertices=5492, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='TruckNonContainer/D00283.obj', before_vertices=6979, after_vertices=6979, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='TruckNonContainer/D00553.obj', before_vertices=7248, after_vertices=7248, subdivision_methods=[], error=None)
+ResamplingRecord(relative_path='TruckNonContainer/D00283.obj', before_vertices=6979, after_vertices=6979, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='TruckNonContainer/D00608.obj', before_vertices=7080, after_vertices=7080, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='TruckNonContainer/D00619.obj', before_vertices=5231, after_vertices=5231, subdivision_methods=[], error=None)
 ResamplingRecord(relative_path='TruckNonContainer/D00699.obj', before_vertices=5071, after_vertices=5071, subdivision_methods=[], error=None)
