@@ -3,7 +3,7 @@
 ## analyze_and_plot
 This calculates the histogram descriptors for the first {number_of_classes} classes and plots them.
 
-```python -m src.step_3._2.histogram_descriptors.analyze_and_plot -i {input_3d_folder} -d {descriptor_to_compute} -s {number_of_samples} -cl {number_of_classes} -c {number_of_columns} -b {number_of_bins} -pdf```
+```python -m src.step_3._2.histogram_descriptors.analyze_and_plot -i {input_3d_folder} -d {descriptor_to_compute} -s {number_of_samples} -cl {number_of_classes} -c {number_of_columns} -b {number_of_bins} -ym {ymax} -pdf --seed {seed}```
   
 This script has many arguements. The only ones you really to bother are -i,-o,-d and maybe -cl. The others have good default values.  
 
@@ -20,10 +20,12 @@ number_of_classes = The number of shapes classes to compute the descriptor for a
 number_of_columns = The number of columns per row in the plot. Default is 4.  
 number_of_bins = The number of bins in the histogram. Default is 64.  
 number_of_samples = The number of samples to take for each descriptor. Default is 100,000.  
+ymax (-ym / --ymax) = Maximum value for the y-axis (e.g. 0.15). If omitted, each subplot dynamically scales to effectively use the vertical drawing space.  
+seed (--seed) = Random seed for reproducible sampling of random vertices. Default is 42.  
   
 Flag -pdf, if present will save the figure to a .pdf file
 
 ## analyze_and_save
 This calculates the histogram descriptors and saves them in {output}
 
-```python -m src.step_3._2.histogram_descriptors.analyze_and_save -i {input_3d_folder} -o {output} -s {number_of_samples} -b {number_of_bins}```
+```python -m src.step_3._2.histogram_descriptors.analyze_and_save -i {input_3d_folder} -o {output} -s {number_of_samples} -b {number_of_bins} --seed {seed}```

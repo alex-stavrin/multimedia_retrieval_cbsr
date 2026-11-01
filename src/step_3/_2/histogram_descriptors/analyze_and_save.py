@@ -8,6 +8,7 @@ from src.step_3._2.histogram_descriptors.histogram_descriptors import (
     calculate_distance_two_vertices,
     calculate_area_triangle,
     calculate_volume_tetrahedron,
+    DEFAULT_SEED,
 )
 from tqdm import tqdm
 import csv
@@ -19,9 +20,14 @@ _silence_vtk = silence_vtk
 _silence_vtk()
 
 
-def proccess_file(args: tuple[Path, Path, int, int]) -> list:
+def proccess_file(args: tuple) -> list:
     _silence_vtk()
-    file, input_root, n_samples, n_bins = args
+    if len(args) == 5:
+        file, input_root, n_samples, n_bins, seed = args
+    else:
+        file, input_root, n_samples, n_bins = args
+        seed = DEFAULT_SEED
+
     relative_path = file.relative_to(input_root).as_posix()
     mesh = vedo.Mesh(str(file))
 
@@ -29,25 +35,30 @@ def proccess_file(args: tuple[Path, Path, int, int]) -> list:
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
+        seed=seed,
     )
     D1, _ = calculate_distance_from_barycenter(
         mesh=mesh,
         n_bins_histogram=n_bins,
+        seed=seed,
     )
     D2, _ = calculate_distance_two_vertices(
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
+        seed=seed,
     )
     D3, _ = calculate_area_triangle(
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
+        seed=seed,
     )
     D4, _ = calculate_volume_tetrahedron(
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
+        seed=seed,
     )
 
     return [
@@ -66,6 +77,7 @@ def analyze_and_save(
     bins: int = 64,
     samples: int = 100_000,
     max_workers: int | None = None,
+    seed: int | None = DEFAULT_SEED,
 ):
     if isinstance(input, str):
         input = Path(input)
@@ -90,7 +102,7 @@ def analyze_and_save(
         writer = csv.writer(f)
         writer.writerow(header)
 
-        tasks = [(file, input, samples, bins) for file in files]
+        tasks = [(file, input, samples, bins, seed) for file in files]
         n_workers = max_workers or os.cpu_count() or 1
         print(f"Using {n_workers} worker processes")
 
@@ -130,6 +142,13 @@ def main():
         help="Number of worker processes (default: all CPU cores).",
     )
 
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=DEFAULT_SEED,
+        help="Random seed for reproducible descriptor sampling (default: 42).",
+    )
+
     arguements = parser.parse_args()
 
     analyze_and_save(
@@ -138,6 +157,7 @@ def main():
         samples=arguements.samples,
         bins=arguements.bins,
         max_workers=arguements.workers,
+        seed=arguements.seed,
     )
 
 

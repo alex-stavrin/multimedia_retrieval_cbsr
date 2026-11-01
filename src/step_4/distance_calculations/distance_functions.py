@@ -1,5 +1,6 @@
 import argparse
-from typing import Callable
+from dataclasses import dataclass, field
+from typing import Callable, Sequence
 
 from pathlib import Path
 import re
@@ -17,8 +18,161 @@ from src.step_4.distance_calculations.visualisations import (
 IDENTIFIER_COLUMN = "file_path"
 
 
+@dataclass
+class _DataFrameShapeLookup:
+    raw_identifiers: list[str]
+    exact_to_idx: dict[str, int]
+    filename_to_idx: dict[str, int | None]
+    stem_to_idx: dict[str, int | None]
+    batch_cache: dict[tuple[str, ...], tuple[np.ndarray, list[str]]] = field(
+        default_factory=dict
+    )
+
+    def resolve_index(self, shape_identifier: str) -> int:
+        idx = self.exact_to_idx.get(shape_identifier)
+        if idx is not None:
+            return idx
+
+        identifier = shape_identifier.replace("\\", "/").strip("/")
+        idx = self.exact_to_idx.get(identifier)
+        if idx is not None:
+            return idx
+
+        if "/" in identifier:
+            last_two = "/".join(identifier.rsplit("/", 2)[-2:])
+            idx = self.exact_to_idx.get(last_two)
+            if idx is not None:
+                return idx
+
+        filename = identifier.rsplit("/", 1)[-1]
+        if "." in filename:
+            if filename in self.filename_to_idx:
+                resolved = self.filename_to_idx[filename]
+                if resolved is None:
+                    raise ValueError(
+                        f"Ambiguous mesh identifier '{shape_identifier}'. "
+                        "Please provide its full relative file path."
+                    )
+                return resolved
+        else:
+            if filename in self.stem_to_idx:
+                resolved = self.stem_to_idx[filename]
+                if resolved is None:
+                    raise ValueError(
+                        f"Ambiguous mesh identifier '{shape_identifier}'. "
+                        "Please provide its full relative file path."
+                    )
+                return resolved
+
+        raise ValueError(f"Mesh not found in CSV database: {shape_identifier}")
+
+    def resolve_many(
+        self, shapes_to_compare: Sequence[str]
+    ) -> tuple[np.ndarray, list[str]]:
+        cache_key = tuple(shapes_to_compare)
+        cached = self.batch_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        indices = np.empty(len(shapes_to_compare), dtype=np.intp)
+        keys: list[str] = []
+        raw_ids = self.raw_identifiers
+
+        for i, shape in enumerate(shapes_to_compare):
+            idx = self.resolve_index(shape)
+            indices[i] = idx
+            keys.append(raw_ids[idx])
+
+        result = (indices, keys)
+        if len(self.batch_cache) < 16:
+            self.batch_cache[cache_key] = result
+        return result
+
+
+# Per-DataFrame caches keyed by id(df)
+_LOOKUP_CACHE: dict[tuple[int, str], tuple[pd.DataFrame, _DataFrameShapeLookup]] = {}
+_HISTOGRAM_GROUPS_CACHE: dict[int, tuple[pd.DataFrame, dict[str, list[str]]]] = {}
+_FEATURE_MATRIX_CACHE: dict[
+    tuple[int, str, bool, str],
+    tuple[pd.DataFrame, list[str], np.ndarray, np.ndarray],
+] = {}
+_EMD_CDF_CACHE: dict[
+    tuple[int, str, bool, str],
+    tuple[pd.DataFrame, np.ndarray, np.ndarray, np.ndarray],
+] = {}
+
+
+def _ensure_dataframe(csv_database: pd.DataFrame | str | Path) -> pd.DataFrame:
+    if isinstance(csv_database, pd.DataFrame):
+        return csv_database
+    csv_path = Path(csv_database)
+    if not csv_path.is_file():
+        raise FileNotFoundError(f"CSV database not found: {csv_database}")
+    return pd.read_csv(csv_path)
+
+
+def _get_shape_lookup(
+    df: pd.DataFrame,
+    identifier_column: str = IDENTIFIER_COLUMN,
+) -> _DataFrameShapeLookup:
+    cache_key = (id(df), identifier_column)
+    cached = _LOOKUP_CACHE.get(cache_key)
+    if cached is not None and cached[0] is df:
+        return cached[1]
+
+    if identifier_column not in df.columns:
+        raise ValueError(
+            f"Required identifier column '{identifier_column}' "
+            "not found in CSV database."
+        )
+
+    if df[identifier_column].duplicated().any():
+        duplicates = df.loc[
+            df[identifier_column].duplicated(keep=False),
+            identifier_column,
+        ].tolist()
+        raise ValueError(
+            f"Duplicate entries found in '{identifier_column}': {duplicates}"
+        )
+
+    raw_identifiers = df[identifier_column].astype(str).tolist()
+    exact_to_idx: dict[str, int] = {}
+    filename_to_idx: dict[str, int | None] = {}
+    stem_to_idx: dict[str, int | None] = {}
+
+    for idx, raw_id in enumerate(raw_identifiers):
+        exact_to_idx[raw_id] = idx
+        norm_id = raw_id.replace("\\", "/").strip("/")
+        exact_to_idx[norm_id] = idx
+
+        filename = norm_id.rsplit("/", 1)[-1]
+        if filename in filename_to_idx and filename_to_idx[filename] != idx:
+            filename_to_idx[filename] = None
+        else:
+            filename_to_idx[filename] = idx
+
+        stem = Path(filename).stem
+        if stem in stem_to_idx and stem_to_idx[stem] != idx:
+            stem_to_idx[stem] = None
+        else:
+            stem_to_idx[stem] = idx
+
+    lookup = _DataFrameShapeLookup(
+        raw_identifiers=raw_identifiers,
+        exact_to_idx=exact_to_idx,
+        filename_to_idx=filename_to_idx,
+        stem_to_idx=stem_to_idx,
+    )
+    _LOOKUP_CACHE[cache_key] = (df, lookup)
+    return lookup
+
+
 def _get_histogram_groups(df: pd.DataFrame) -> dict[str, list[str]]:
     """Automatically identify histogram families and sort their bins."""
+    cached = _HISTOGRAM_GROUPS_CACHE.get(id(df))
+    if cached is not None and cached[0] is df:
+        return cached[1]
+
     groups: dict[str, list[tuple[int, str]]] = {}
 
     for column in df.columns:
@@ -53,6 +207,7 @@ def _get_histogram_groups(df: pd.DataFrame) -> dict[str, list[str]]:
             "Expected names such as A3_0, A3_1, etc."
         )
 
+    _HISTOGRAM_GROUPS_CACHE[id(df)] = (df, result)
     return result
 
 
@@ -65,24 +220,36 @@ def _get_feature_columns(
     """
     Select the columns used for distance calculation.
 
-    When histogram=False, select a single descriptor column, e.g. 'convexity'.
+    When histogram=False, select a single descriptor column, e.g. 'convexity'
+    (falling back to histogram bin columns if the descriptor is stored as a
+    histogram family in the DataFrame).
 
     When histogram=True, select all bins for one histogram family,
     e.g. 'A3_0', 'A3_1', 'A3_2', etc.
     """
     if not histogram:
-        if descriptor not in df.columns:
-            raise ValueError(
-                f"Descriptor '{descriptor}' was not found in the CSV database."
-            )
+        if descriptor in df.columns:
+            return [descriptor]
 
-        return [descriptor]
+        try:
+            histogram_groups = _get_histogram_groups(df)
+            if descriptor in histogram_groups:
+                return histogram_groups[descriptor]
+        except ValueError:
+            pass
+
+        raise ValueError(
+            f"Descriptor '{descriptor}' was not found in the CSV database."
+        )
 
     # Histogram mode: descriptor must identify a histogram family,
     # such as A1, A3, D1, or D2.
     histogram_groups = _get_histogram_groups(df)
 
     if descriptor not in histogram_groups:
+        if descriptor in df.columns:
+            return [descriptor]
+
         available = ", ".join(sorted(histogram_groups))
 
         raise ValueError(
@@ -91,6 +258,33 @@ def _get_feature_columns(
         )
 
     return histogram_groups[descriptor]
+
+
+def _get_cached_feature_matrix(
+    df: pd.DataFrame,
+    descriptor: str,
+    histogram: bool,
+    identifier_column: str = IDENTIFIER_COLUMN,
+) -> tuple[list[str], np.ndarray, np.ndarray]:
+    """Extract and cache the numeric feature matrix for a descriptor."""
+    cache_key = (id(df), descriptor, histogram, identifier_column)
+    cached = _FEATURE_MATRIX_CACHE.get(cache_key)
+    if cached is not None and cached[0] is df:
+        return cached[1], cached[2], cached[3]
+
+    columns = _get_feature_columns(
+        df, descriptor, histogram, identifier_column
+    )
+    sub_df = df[columns]
+    matrix = np.empty((len(df), len(columns)), dtype=np.float64)
+    for col_idx, col_name in enumerate(columns):
+        matrix[:, col_idx] = pd.to_numeric(
+            sub_df[col_name], errors="coerce"
+        ).to_numpy(dtype=np.float64)
+
+    finite_mask = np.isfinite(matrix).all(axis=1)
+    _FEATURE_MATRIX_CACHE[cache_key] = (df, columns, matrix, finite_mask)
+    return columns, matrix, finite_mask
 
 
 def _get_numeric_vector(
@@ -116,52 +310,9 @@ def _find_shape(
     identifier_column=IDENTIFIER_COLUMN,
 ) -> pd.Series:
     """Find a mesh by its path, filename, or filename stem."""
-    identifier = shape_identifier.replace("\\", "/").strip("/")
-    identifier_path = Path(identifier)
-
-    # Attempt an exact match against file_path.
-    normalized_paths = (
-        df[identifier_column].astype(str).str.replace("\\", "/", regex=False)
-    )
-    matches = df[normalized_paths == identifier]
-
-    if len(matches) == 1:
-        return matches.iloc[0]
-
-    if len(matches) > 1:
-        raise ValueError(f"Multiple meshes found for: {shape_identifier}")
-
-    # Fall back to matching the filename or filename stem.
-    filenames = []
-
-    for path in df[identifier_column].astype(str):
-        normalized_path = path.replace("\\", "/")
-        filename = normalized_path.split("/")[-1]
-        filenames.append(filename)
-
-    if identifier_path.suffix:
-        matches = df[
-            pd.Series(filenames, index=df.index) == identifier_path.name
-        ]
-    else:
-        stems = []
-
-        for filename in filenames:
-            stem = Path(filename).stem
-            stems.append(stem)
-
-        matches = df[pd.Series(stems, index=df.index) == identifier]
-
-    if matches.empty:
-        raise ValueError(f"Mesh not found in CSV database: {shape_identifier}")
-
-    if len(matches) > 1:
-        raise ValueError(
-            f"Ambiguous mesh identifier '{shape_identifier}'. "
-            "Please provide its full relative file path."
-        )
-
-    return matches.iloc[0]
+    lookup = _get_shape_lookup(df, identifier_column)
+    idx = lookup.resolve_index(shape_identifier)
+    return df.iloc[idx]
 
 
 def euclidean_distance(
@@ -173,38 +324,39 @@ def euclidean_distance(
     identifier_column=IDENTIFIER_COLUMN,
 ) -> dict[str, float]:
     """Calculate Euclidean distances between meshes."""
-    if identifier_column not in df.columns:
-        raise ValueError(
-            f"Required identifier column '{identifier_column}' "
-            "not found in CSV database."
-        )
+    df = _ensure_dataframe(df)
 
     if not shapes_to_compare:
         raise ValueError("At least one comparison mesh must be provided.")
 
-    if df[identifier_column].duplicated().any():
-        raise ValueError(f"Duplicate entries found in '{identifier_column}'.")
-
-    columns = _get_feature_columns(
+    lookup = _get_shape_lookup(df, identifier_column)
+    _, matrix, finite_mask = _get_cached_feature_matrix(
         df, descriptor, histogram, identifier_column
     )
 
-    query_shape = _find_shape(df, query, identifier_column)
-    query_vector = _get_numeric_vector(query_shape, columns, query)
-
-    distances = {}
-
-    for shape in shapes_to_compare:
-        comparison_shape = _find_shape(df, shape, identifier_column)
-        comparison_vector = _get_numeric_vector(
-            comparison_shape, columns, shape
+    query_idx = lookup.resolve_index(query)
+    if not finite_mask[query_idx]:
+        raise ValueError(
+            f"Missing or non-finite feature values for mesh '{query}'."
         )
 
-        distance = float(euclidean(query_vector, comparison_vector))
-        mesh_path = str(comparison_shape[identifier_column])
-        distances[mesh_path] = distance
+    comp_indices, comp_keys = lookup.resolve_many(shapes_to_compare)
+    if not finite_mask[comp_indices].all():
+        bad_pos = int(np.flatnonzero(~finite_mask[comp_indices])[0])
+        raise ValueError(
+            f"Missing or non-finite feature values for mesh "
+            f"'{shapes_to_compare[bad_pos]}'."
+        )
 
-    return distances
+    query_vector = matrix[query_idx]
+    comp_matrix = matrix[comp_indices]
+
+    if comp_matrix.shape[1] == 1:
+        dists = np.abs(comp_matrix[:, 0] - query_vector[0])
+    else:
+        dists = np.linalg.norm(comp_matrix - query_vector, axis=1)
+
+    return dict(zip(comp_keys, dists.tolist()))
 
 
 def cosine_distance(
@@ -216,49 +368,49 @@ def cosine_distance(
     histogram: bool = False,
 ) -> dict[str, float]:
     """Calculate cosine distances between meshes."""
-    if identifier_column not in df.columns:
-        raise ValueError(
-            f"Required identifier column '{identifier_column}' "
-            "not found in CSV database."
-        )
+    df = _ensure_dataframe(df)
 
     if not shapes_to_compare:
         raise ValueError("At least one comparison mesh must be provided.")
 
-    if df[identifier_column].duplicated().any():
-        raise ValueError(f"Duplicate entries found in '{identifier_column}'.")
-
-    columns = _get_feature_columns(
+    lookup = _get_shape_lookup(df, identifier_column)
+    _, matrix, finite_mask = _get_cached_feature_matrix(
         df, descriptor, histogram, identifier_column
     )
 
-    query_shape = _find_shape(df, query, identifier_column)
-    query_vector = _get_numeric_vector(query_shape, columns, query)
+    query_idx = lookup.resolve_index(query)
+    if not finite_mask[query_idx]:
+        raise ValueError(
+            f"Missing or non-finite feature values for mesh '{query}'."
+        )
 
-    if np.linalg.norm(query_vector) == 0:
+    comp_indices, comp_keys = lookup.resolve_many(shapes_to_compare)
+    if not finite_mask[comp_indices].all():
+        bad_pos = int(np.flatnonzero(~finite_mask[comp_indices])[0])
+        raise ValueError(
+            f"Missing or non-finite feature values for mesh "
+            f"'{shapes_to_compare[bad_pos]}'."
+        )
+
+    query_vector = matrix[query_idx]
+    query_norm = float(np.linalg.norm(query_vector))
+    if query_norm == 0:
         raise ValueError(
             f"Cosine distance is undefined for zero vector: '{query}'."
         )
 
-    distances = {}
-
-    for shape in shapes_to_compare:
-        comparison_shape = _find_shape(df, shape, identifier_column)
-        comparison_vector = _get_numeric_vector(
-            comparison_shape, columns, shape
+    comp_matrix = matrix[comp_indices]
+    comp_norms = np.linalg.norm(comp_matrix, axis=1)
+    if np.any(comp_norms == 0):
+        bad_pos = int(np.flatnonzero(comp_norms == 0)[0])
+        raise ValueError(
+            f"Cosine distance is undefined for zero vector: "
+            f"'{shapes_to_compare[bad_pos]}'."
         )
 
-        if np.linalg.norm(comparison_vector) == 0:
-            raise ValueError(
-                f"Cosine distance is undefined for zero vector: '{shape}'."
-            )
-
-        distance = float(scipy_cosine(query_vector, comparison_vector))
-
-        mesh_path = str(comparison_shape[identifier_column])
-        distances[mesh_path] = distance
-
-    return distances
+    dots = comp_matrix @ query_vector
+    dists = 1.0 - (dots / (comp_norms * query_norm))
+    return dict(zip(comp_keys, dists.tolist()))
 
 
 def earth_movers_distance(
@@ -271,122 +423,93 @@ def earth_movers_distance(
 ) -> dict[str, float]:
     """
     Calculate Earth Mover's Distance (EMD) between a query mesh and
-    comparison meshes using scipy.stats.wasserstein_distance.
-
-    When histogram=False:
-        Compares a single elemental descriptor, e.g. 'convexity'.
-        For scalar values, the result is equivalent to the absolute
-        difference between the two values.
-
-    When histogram=True:
-        Compares the bins of one histogram, e.g. 'A3'.
-        The corresponding CSV columns must be named A3_0, A3_1, etc.
-
-    Returns:
-        Dictionary mapping each comparison mesh's identifier to its distance.
+    comparison meshes.
     """
-    if identifier_column not in df.columns:
-        raise ValueError(
-            f"Identifier column '{identifier_column}' "
-            "was not found in the CSV database."
-        )
+    df = _ensure_dataframe(df)
 
     if not shapes_to_compare:
         raise ValueError("No comparison meshes were provided.")
 
-    # Ensure identifiers are unique
-    if df[identifier_column].duplicated().any():
-        duplicates = df.loc[
-            df[identifier_column].duplicated(keep=False),
-            identifier_column,
-        ].tolist()
+    lookup = _get_shape_lookup(df, identifier_column)
+    _, matrix, finite_mask = _get_cached_feature_matrix(
+        df, descriptor, histogram, identifier_column
+    )
 
+    query_idx = lookup.resolve_index(query)
+    if not finite_mask[query_idx]:
         raise ValueError(
-            f"Duplicate mesh identifiers found in CSV: {duplicates}"
+            f"Missing or non-finite feature values for mesh '{query}'."
         )
 
-    # Select either one elemental descriptor or one histogram family
-    feature_columns = _get_feature_columns(
-        df=df,
-        descriptor=descriptor,
-        histogram=histogram,
-        identifier_column=identifier_column,
-    )
-
-    # Find the query mesh in the database
-    query_row = _find_shape(
-        df,
-        query,
-        identifier_column=identifier_column,
-    )
-
-    # Extract query values
-    query_values = _get_numeric_vector(
-        query_row,
-        feature_columns,
-        query,
-    )
-
-    # EMD requires non-negative histogram weights
+    query_values = matrix[query_idx]
     if (query_values < 0).any():
         raise ValueError(
             f"Query mesh '{query}' has negative values. "
             "EMD requires non-negative histogram weights."
         )
 
-    # Histogram bin positions
-    bin_positions = np.arange(len(feature_columns))
+    comp_indices, comp_keys = lookup.resolve_many(shapes_to_compare)
+    if not finite_mask[comp_indices].all():
+        bad_pos = int(np.flatnonzero(~finite_mask[comp_indices])[0])
+        raise ValueError(
+            f"Missing or non-finite feature values for mesh "
+            f"'{shapes_to_compare[bad_pos]}'."
+        )
 
-    distances: dict[str, float] = {}
-
-    for comparison in shapes_to_compare:
-        comparison_row = _find_shape(
+    # Check or build cached CDF matrix for EMD
+    emd_cache_key = (id(df), descriptor, histogram, identifier_column)
+    cached_emd = _EMD_CDF_CACHE.get(emd_cache_key)
+    if cached_emd is not None and cached_emd[0] is df:
+        _, non_neg_mask, row_sums, cdf_matrix = cached_emd
+    else:
+        non_neg_mask = (matrix >= 0).all(axis=1)
+        row_sums = matrix.sum(axis=1)
+        safe_sums = np.where(row_sums == 0, 1.0, row_sums)[:, np.newaxis]
+        if matrix.shape[1] > 1:
+            cdf_matrix = np.cumsum(matrix / safe_sums, axis=1)[:, :-1]
+        else:
+            cdf_matrix = np.zeros((len(df), 1), dtype=np.float64)
+        _EMD_CDF_CACHE[emd_cache_key] = (
             df,
-            comparison,
-            identifier_column=identifier_column,
+            non_neg_mask,
+            row_sums,
+            cdf_matrix,
         )
 
-        comparison_values = _get_numeric_vector(
-            comparison_row,
-            feature_columns,
-            comparison,
+    if not non_neg_mask[comp_indices].all():
+        bad_pos = int(np.flatnonzero(~non_neg_mask[comp_indices])[0])
+        raise ValueError(
+            f"Comparison mesh '{shapes_to_compare[bad_pos]}' has negative values. "
+            "EMD requires non-negative histogram weights."
         )
 
-        if (comparison_values < 0).any():
-            raise ValueError(
-                f"Comparison mesh '{comparison}' has negative values. "
-                "EMD requires non-negative histogram weights."
-            )
+    query_sum = float(row_sums[query_idx])
+    comp_sums = row_sums[comp_indices]
 
-        query_sum = query_values.sum()
-        comparison_sum = comparison_values.sum()
-
-        # Handle empty distributions explicitly
-        if query_sum == 0 and comparison_sum == 0:
-            distance = 0.0
-
-        elif query_sum == 0 or comparison_sum == 0:
+    if query_sum == 0:
+        if np.any(comp_sums != 0):
+            bad_pos = int(np.flatnonzero(comp_sums != 0)[0])
             raise ValueError(
                 f"Cannot compare a zero distribution with a non-zero "
-                f"distribution: '{query}' vs '{comparison}'."
+                f"distribution: '{query}' vs '{shapes_to_compare[bad_pos]}'."
             )
+        return dict.fromkeys(comp_keys, 0.0)
 
-        else:
-            # For a scalar descriptor, this compares the values as
-            # single-point distributions. For histograms, it compares
-            # the weights across their bin positions.
-            distance = float(
-                wasserstein_distance(
-                    bin_positions,
-                    bin_positions,
-                    u_weights=query_values,
-                    v_weights=comparison_values,
-                )
-            )
+    if np.any(comp_sums == 0):
+        bad_pos = int(np.flatnonzero(comp_sums == 0)[0])
+        raise ValueError(
+            f"Cannot compare a zero distribution with a non-zero "
+            f"distribution: '{query}' vs '{shapes_to_compare[bad_pos]}'."
+        )
 
-        distances[str(comparison_row[identifier_column])] = distance
+    if matrix.shape[1] == 1:
+        return dict.fromkeys(comp_keys, 0.0)
 
-    return distances
+    query_cdf = cdf_matrix[query_idx]
+    comp_cdfs = cdf_matrix[comp_indices]
+    dists = np.sum(np.abs(comp_cdfs - query_cdf), axis=1)
+
+    return dict(zip(comp_keys, dists.tolist()))
 
 
 DISTANCE_FUNCTIONS: dict[str, Callable] = {
