@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from shutil import copy2
 from typing import Final
+import numpy
+import trimesh.remesh
 
 from tqdm import tqdm
 import vedo
@@ -12,6 +14,8 @@ MIN_VERTEX_COUNT: Final = 5_000
 TARGET_VERTEX_COUNT: Final = 7_500
 MAX_VERTEX_COUNT: Final = 10_000
 MAX_RESAMPLING_ATTEMPTS: Final = 15
+TARGET_SUBDIV_FACES: Final = 20_000
+MAX_TOP_1PCT_AREA_SHARE: Final = 0.10
 
 SUBDIVISION_METHOD_NAMES: Final = {
     0: "Loop",
@@ -39,33 +43,163 @@ class ResamplingRecord:
     error: str | None = None
 
 
+def _compute_triangle_areas(
+    vertices: numpy.ndarray, faces: numpy.ndarray
+) -> numpy.ndarray:
+    if len(faces) == 0:
+        return numpy.empty(0, dtype=numpy.float64)
+    v_0 = vertices[faces[:, 0]]
+    v_1 = vertices[faces[:, 1]]
+    v_2 = vertices[faces[:, 2]]
+    return 0.5 * numpy.linalg.norm(numpy.cross(v_1 - v_0, v_2 - v_0), axis=1)
+
+
+def _spatial_decimate(
+    mesh: vedo.Mesh,
+    min_vertices: int = MIN_VERTEX_COUNT,
+    target_vertices: int = TARGET_VERTEX_COUNT,
+    max_vertices: int = MAX_VERTEX_COUNT,
+) -> vedo.Mesh:
+    lo, hi = 15, 220
+    best_mesh: vedo.Mesh | None = None
+    best_diff = float("inf")
+
+    for _ in range(10):
+        mid = (lo + hi) // 2
+        canditate = mesh.clone().decimate_binned(divisions=(mid, mid, mid))
+        canditate.clean()
+        n_pts = canditate.npoints
+
+        if min_vertices <= n_pts <= max_vertices:
+            diff = abs(n_pts - target_vertices)
+            if diff < best_diff:
+                best_diff = diff
+                best_mesh = canditate
+            if diff < 350:
+                return canditate
+
+        if n_pts < target_vertices:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+
+        if lo > hi:
+            break
+
+    if best_mesh is not None:
+        return best_mesh
+
+    fallback = mesh.clone()
+    fallback.decimate(n=target_vertices)
+    fallback.clean()
+    return fallback
+
+
+def _is_area_distribution_uneven(
+    mesh: vedo.Mesh, threshold=MAX_TOP_1PCT_AREA_SHARE
+) -> bool:
+    faces = numpy.asarray(mesh.cells, dtype=numpy.int64)
+    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
+        return True
+    areas = _compute_triangle_areas(
+        numpy.asarray(mesh.vertices, dtype=numpy.float64), faces
+    )
+    total_area = float(areas.sum())
+    if total_area <= 1e-12:
+        return False
+
+    top_1pct_count = max(1, len(areas) // 100)
+    top_1pct_area = float(numpy.sort(areas)[-top_1pct_count:].sum())
+    return (top_1pct_area / total_area) > threshold
+
+
+def _adaptive_subdivide(
+    mesh: vedo.Mesh,
+    target_faces: int = TARGET_SUBDIV_FACES,
+    subdivision_methods: list[str] | None = None,
+):
+    vertices = numpy.asarray(mesh.vertices, dtype=numpy.float64)
+    faces = numpy.asarray(mesh.cells, dtype=numpy.int64)
+
+    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
+        return mesh
+
+    areas = _compute_triangle_areas(vertices, faces)
+    total_area = float(areas.sum())
+    if total_area <= 1e-12:
+        return mesh
+
+    target_edge = float(
+        numpy.sqrt((4.0 * (total_area / target_faces)) / numpy.sqrt(3.0))
+    )
+    if target_edge <= 1e-12:
+        return mesh
+
+    for attempt_edge in [target_edge, target_edge * 1.5, target_edge * 2.0]:
+        try:
+            new_vertices, new_faces = trimesh.remesh.subdivide_to_size(  # type: ignore
+                vertices, faces, max_edge=attempt_edge, max_iter=8
+            )
+            break
+        except ValueError:
+            continue
+    else:
+        return mesh
+
+    if len(new_faces) > len(faces) and subdivision_methods is not None:
+        subdivision_methods.append("AdaptiveEdge")
+
+    result = vedo.Mesh([new_vertices, new_faces])
+    result.clean()
+    return result
+
+
 def resample_mesh(
     mesh: vedo.Mesh,
     max_iterations: int = MAX_RESAMPLING_ATTEMPTS,
     subdivision_methods: list[str] | None = None,
 ) -> vedo.Mesh:
+
+    needs_vertices_count_fix = not (
+        MIN_VERTEX_COUNT <= mesh.npoints <= MAX_VERTEX_COUNT
+    )
+    needs_area_fix = _is_area_distribution_uneven(mesh)
+
+    if not needs_vertices_count_fix and not needs_area_fix:
+        return mesh
+
+    if mesh.npoints < MIN_VERTEX_COUNT or needs_area_fix:
+        mesh = _adaptive_subdivide(
+            mesh,
+            target_faces=TARGET_SUBDIV_FACES,
+            subdivision_methods=subdivision_methods,
+        )
+
     for _ in range(max_iterations):
         before_vertices = mesh.npoints
-        if MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT:
+        if before_vertices >= MIN_VERTEX_COUNT:
             break
 
-        if before_vertices < MIN_VERTEX_COUNT:
-            if mesh.is_manifold():
-                method_id = 1
-            else:
-                method_id = 4
+        method_id = 1 if mesh.is_manifold() else 4
+        method_name = SUBDIVISION_METHOD_NAMES.get(method_id, f"method {method_id}")
+        if subdivision_methods is not None:
+            subdivision_methods.append(f"{method_name} (method {method_id})")
 
-            method_name = SUBDIVISION_METHOD_NAMES.get(method_id, f"method {method_id}")
-            if subdivision_methods is not None:
-                subdivision_methods.append(f"{method_name} (method {method_id})")
-
-            mesh.subdivide(n=1, method=method_id)
-        else:
-            mesh.decimate(n=TARGET_VERTEX_COUNT)
+        mesh.subdivide(n=1, method=method_id)
+        mesh.clean()
 
         if mesh.npoints == before_vertices:
             break
 
+    if mesh.npoints > MAX_VERTEX_COUNT:
+        mesh = _spatial_decimate(
+            mesh,
+            min_vertices=MIN_VERTEX_COUNT,
+            target_vertices=TARGET_VERTEX_COUNT,
+            max_vertices=MAX_VERTEX_COUNT,
+        )
+
+    mesh.clean()
     return mesh
 
 
@@ -89,8 +223,11 @@ def resample_mesh_file(
 
         subdivision_methods: list[str] = []
 
-        if MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT:
-            copy2(mesh_path, destination)
+        if (
+            MIN_VERTEX_COUNT <= before_vertices <= MAX_VERTEX_COUNT
+            and not _is_area_distribution_uneven(mesh)
+        ):
+            mesh.write(str(destination))
             return "fine", ResamplingRecord(
                 relative_path=str(relative_path.as_posix()),
                 before_vertices=before_vertices,
