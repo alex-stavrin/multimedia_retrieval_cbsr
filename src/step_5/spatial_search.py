@@ -7,14 +7,16 @@ from scipy.spatial import KDTree
 
 from src.step_4.distance_calculations.calculate_total_distance import (
     IDENTIFIER_COLUMN,
-    EUCLIDEAN_DESCRIPTORS,
-    EMD_DESCRIPTORS,
+    ELEMENTAL_DESCRIPTORS,
+    HISTOGRAM_DESCRIPTORS,
 )
 
 
 class SpatialSearchEngine:
 
-    def _load_and_merge_features(self) -> tuple[list[str], list[str], numpy.ndarray]:
+    def _load_and_merge_features(
+        self,
+    ) -> tuple[list[str], list[str], numpy.ndarray]:
         elementary_data_frame = pandas.read_csv(self.elementary_csv)
         histogram_data_frame = pandas.read_csv(self.histogram_csv)
 
@@ -34,10 +36,12 @@ class SpatialSearchEngine:
         )
 
         elementary_columns = [
-            col for col in EUCLIDEAN_DESCRIPTORS if col in merged_data_frame.columns
+            col
+            for col in ELEMENTAL_DESCRIPTORS
+            if col in merged_data_frame.columns
         ]
         histogram_columns: list[str] = []
-        for histogram_prefix in EMD_DESCRIPTORS:
+        for histogram_prefix in HISTOGRAM_DESCRIPTORS:
             bins = [
                 col
                 for col in merged_data_frame.columns
@@ -50,7 +54,9 @@ class SpatialSearchEngine:
         feature_columns = elementary_columns + histogram_columns
 
         # make the matrix NxM. Where N is the number of shapes and M is the number of descriptor columns (elementary + histogram)
-        matrix = merged_data_frame[feature_columns].to_numpy(dtype=numpy.float64)
+        matrix = merged_data_frame[feature_columns].to_numpy(
+            dtype=numpy.float64
+        )
         shape_ids = merged_data_frame["_norm_id"].astype(str).tolist()
         return shape_ids, feature_columns, matrix
 
@@ -112,7 +118,8 @@ def main() -> None:
     arguments = parser.parse_args()
 
     spatial_search_engine = SpatialSearchEngine(
-        elementary_csv=arguments.elementary_csv, histogram_csv=arguments.histogram_csv
+        elementary_csv=arguments.elementary_csv,
+        histogram_csv=arguments.histogram_csv,
     )
 
 

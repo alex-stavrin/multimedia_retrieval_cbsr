@@ -7,7 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from src.step_4.distance_calculations.calculate_total_distance import (
-    DISTANCE_CONFIG,
+    DISTANCE_CONFIG_MIXED,
     DistanceConfig,
 )
 
@@ -15,7 +15,7 @@ from src.step_4.distance_calculations.calculate_total_distance import (
 def calculate_weights(
     csv_path: str,
     output_path: str,
-    distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG,
+    distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG_MIXED,
     chunksize: int = 50_000,
 ) -> pd.DataFrame:
     """

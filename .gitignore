@@ -14,9 +14,11 @@ uv.lock
 3d_models**
 **.obj
 test**
+!src/step_4/distance_calculations/testing/
+!src/step_4/distance_calculations/testing/*.py
+src/step_4/distance_calculations/testing/*.csv
 
 # Ignore JSON files and pairwise calculation CSVs
-**/*.json
 **/*pairwise*.csv
 **/*.pkl
 
