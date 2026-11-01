@@ -205,8 +205,9 @@ def prepare_database(
     # Analysing raw database (optional)
 
     if analyze:
-        raw_analysis_csv = analysis_path / "raw_shape_analysis.csv"
-        os.makedirs(os.path.dirname(raw_analysis_csv), exist_ok=True)
+        raw_analysis_dir = analysis_path / "0_raw"
+        raw_analysis_dir.mkdir(parents=True, exist_ok=True)
+        raw_analysis_csv = raw_analysis_dir / "raw_shape_analysis.csv"
         _run_step(
             "analyze_raw_database",
             lambda: shape_analyzer.analyze_database(
@@ -234,8 +235,9 @@ def prepare_database(
     # Analysing repairment (optional)
 
     if analyze:
-        repair_csv = analysis_path / "reparation_analysis.csv"
-        os.makedirs(os.path.dirname(repair_csv), exist_ok=True)
+        reparation_analysis_dir = analysis_path / "1_models_reparation"
+        reparation_analysis_dir.mkdir(parents=True, exist_ok=True)
+        repair_csv = reparation_analysis_dir / "reparation_analysis.csv"
         _run_step(
             "analyze_reparation",
             lambda: rep_analyser.compare_hole_fill_stats(
@@ -246,8 +248,9 @@ def prepare_database(
             raw_path,
         )
 
-        reperation_shape_analysis_csv = analysis_path / "reparation_shape_analysis.csv"
-        os.makedirs(os.path.dirname(reperation_shape_analysis_csv), exist_ok=True)
+        reperation_shape_analysis_csv = (
+            reparation_analysis_dir / "reparation_shape_analysis.csv"
+        )
         _run_step(
             "reparation_shape_analysis",
             lambda: shape_analyzer.analyze_database(
@@ -275,8 +278,9 @@ def prepare_database(
     )
 
     if analyze:
-        resampled_analysis_csv = analysis_path / "resampled_shape_analysis.csv"
-        os.makedirs(os.path.dirname(resampled_analysis_csv), exist_ok=True)
+        resampled_analysis_dir = analysis_path / "2_models_resampled"
+        resampled_analysis_dir.mkdir(parents=True, exist_ok=True)
+        resampled_analysis_csv = resampled_analysis_dir / "resampled_shape_analysis.csv"
         _run_step(
             "analyze_resampled_database",
             lambda: shape_analyzer.analyze_database(
@@ -303,10 +307,11 @@ def prepare_database(
     )
 
     if analyze:
+        normalized_analysis_dir = analysis_path / "3_models_fully_normalized"
+        normalized_analysis_dir.mkdir(parents=True, exist_ok=True)
         fully_normalized_shape_analysis_csv = (
-            analysis_path / "fully_normalized_shape_analysis.csv"
+            normalized_analysis_dir / "fully_normalized_shape_analysis.csv"
         )
-        os.makedirs(os.path.dirname(fully_normalized_shape_analysis_csv), exist_ok=True)
         _run_step(
             "fully_normalized_shape_analysis",
             lambda: shape_analyzer.analyze_database(
@@ -321,8 +326,9 @@ def prepare_database(
     # ---
     # Calculating simple descriptors
 
-    descriptors_csv = analysis_path / "simple_descriptors.csv"
-    os.makedirs(os.path.dirname(descriptors_csv), exist_ok=True)
+    descriptors_analysis_dir = analysis_path / "4_descriptors"
+    descriptors_analysis_dir.mkdir(parents=True, exist_ok=True)
+    descriptors_csv = descriptors_analysis_dir / "simple_descriptors.csv"
     _run_step(
         "calculate_descriptors",
         lambda: descriptor_analyzer.calculate_database(
@@ -337,8 +343,7 @@ def prepare_database(
     # ---
     # Calculate histogram descriptors
 
-    hist_descriptors_csv = analysis_path / "histogram_descriptors.csv"
-    os.makedirs(os.path.dirname(hist_descriptors_csv), exist_ok=True)
+    hist_descriptors_csv = descriptors_analysis_dir / "histogram_descriptors.csv"
     _run_step(
         "calculate_histogram_descriptor",
         lambda: histogram_descriptor_analyzer.analyze_and_save(
