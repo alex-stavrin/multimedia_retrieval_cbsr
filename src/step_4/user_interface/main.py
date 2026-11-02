@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QListWidget,
     QListWidgetItem,
+    QComboBox,
+    QSpinBox,
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
@@ -21,11 +23,14 @@ from src.step_4.user_interface.class_colors import (
     get_shape_class,
 )
 import os
+import time
 from src.step_4.distance_calculations.calculate_total_distance import (
     ShapeDistanceCalculator,
     DISTANCE_CONFIG_L2,
     DISTANCE_CONFIG_MIXED,
 )
+from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
+from src.step_5.ANN import shape_query
 
 if sys.platform == "win32":
     ctypes.OleDLL("shell32").SetCurrentProcessExplicitAppUserModelID(
@@ -55,9 +60,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        app_icon_path = (
-            Path(__file__).resolve().parents[3] / "assets" / "icon.png"
-        )
+        app_icon_path = Path(__file__).resolve().parents[3] / "assets" / "icon.png"
         app_icon = QIcon(str(app_icon_path))
         self.setWindowIcon(app_icon)
         app = QApplication.instance()
@@ -88,7 +91,12 @@ class MainWindow(QMainWindow):
                 "analysis_output/descriptors/histogram_descriptors.csv",
                 "analysis_output/distances/weights_emd_descriptors.csv",
             ],
-            distance_config=DISTANCE_CONFIG_MIXED
+            distance_config=DISTANCE_CONFIG_MIXED,
+        )
+        # the KD-tree of Step 5, built on the same descriptors
+        self.search_engine = SpatialSearchEngine(
+            elementary_csv="analysis_output/descriptors/simple_descriptors_normalized.csv",
+            histogram_csv="analysis_output/descriptors/histogram_descriptors.csv",
         )
 
         main_layout = QHBoxLayout(central_widget)
@@ -141,6 +149,22 @@ class MainWindow(QMainWindow):
 
         left_layout.addLayout(button_holder)
 
+        # how the results are found, and how many of them are shown
+        option_holder = QHBoxLayout()
+        self.method_box = QComboBox()
+        self.method_box.addItems(["Exact (Step 4 distance)", "ANN (KD-tree)"])
+        option_holder.addWidget(self.method_box)
+        option_holder.addWidget(QLabel("K:"))
+        self.k_box = QSpinBox()
+        self.k_box.setRange(1, 100)
+        self.k_box.setValue(20)
+        option_holder.addWidget(self.k_box)
+        left_layout.addLayout(option_holder)
+
+        self.status_label = QLabel("")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        left_layout.addWidget(self.status_label)
+
         self.left_viewer = EmbeddedViewer(left_panel)
         left_layout.addWidget(self.left_viewer, stretch=1)
 
@@ -148,9 +172,7 @@ class MainWindow(QMainWindow):
         self.results_list.setViewMode(QListWidget.ViewMode.IconMode)
         self.results_list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self.results_list.setMovement(QListWidget.Movement.Static)
-        self.results_list.setSelectionMode(
-            QListWidget.SelectionMode.NoSelection
-        )
+        self.results_list.setSelectionMode(QListWidget.SelectionMode.NoSelection)
         self.results_list.setSpacing(10)
         main_layout.addWidget(left_panel, stretch=1)
         main_layout.addWidget(self.results_list, stretch=2)
@@ -166,9 +188,7 @@ class MainWindow(QMainWindow):
             self.query_button.setEnabled(True)
 
     def open_database_picker(self) -> None:
-        folder = QFileDialog.getExistingDirectory(
-            self, "Select 3D Database Directory"
-        )
+        folder = QFileDialog.getExistingDirectory(self, "Select 3D Database Directory")
         if folder:
             self.database_directory = folder
             self.database_label.setText(f"Database: {folder}")
@@ -180,11 +200,27 @@ class MainWindow(QMainWindow):
         if not self.database_directory:
             return
 
-        results = self.shape_distance_calculator.calculate_total_distance(
-            self.selected_file, shapes_to_compare=[str(self.database_directory)]
-        )
+        k = self.k_box.value()
+        start_time = time.perf_counter()
+        if self.method_box.currentIndex() == 1:
+            results = shape_query.search(
+                self.search_engine,
+                self.shape_distance_calculator,
+                self.selected_file,
+                k,
+            )
+        else:
+            results = self.shape_distance_calculator.calculate_total_distance(
+                self.selected_file,
+                shapes_to_compare=[str(self.database_directory)],
+            )
+        elapsed_time = time.perf_counter() - start_time
 
-        matches = list(results.items())[:20]
+        matches = list(results.items())[:k]
+        self.status_label.setText(
+            f"{self.method_box.currentText()}: {len(matches)} shapes in "
+            f"{elapsed_time:.2f} s"
+        )
 
         for viewer in self.result_viewers:
             viewer.cleanup()
@@ -202,21 +238,15 @@ class MainWindow(QMainWindow):
 
             class_pill = QLabel()
             style_class_pill(class_pill, full_shape_path)
-            card_layout.addWidget(
-                class_pill, alignment=Qt.AlignmentFlag.AlignCenter
-            )
+            card_layout.addWidget(class_pill, alignment=Qt.AlignmentFlag.AlignCenter)
 
-            label = QLabel(
-                f"{os.path.basename(shape_path)}\ndist: {distance:.3f}"
-            )
+            label = QLabel(f"{os.path.basename(shape_path)}\ndist: {distance:.3f}")
             label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             card_layout.addWidget(label)
             viewer = EmbeddedViewer(card)
             viewer.setFixedSize(viewer_width, viewer_height)
             viewer.load_mesh(full_shape_path)
-            card_layout.addWidget(
-                viewer, alignment=Qt.AlignmentFlag.AlignCenter
-            )
+            card_layout.addWidget(viewer, alignment=Qt.AlignmentFlag.AlignCenter)
             card_layout.activate()
             item = QListWidgetItem(self.results_list)
             item.setSizeHint(card.sizeHint())
