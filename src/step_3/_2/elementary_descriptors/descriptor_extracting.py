@@ -6,9 +6,14 @@ import numpy as np
 import pandas as pd
 
 import vedo
+import vtk
 
 from dataclasses import dataclass
-from step_1.model_viewer import QApplication, ModelViewer
+from src.step_1.model_viewer import QApplication, ModelViewer
+from src.helper.silence_vtk import silence_vtk
+
+_silence_vtk = silence_vtk
+_silence_vtk()
 
 DATABASE: pd.DataFrame | None = None
 
@@ -24,8 +29,7 @@ def __prepare_and_check_file_path(shape: str) -> vedo.Mesh:
     # Type check
     if not isinstance(shape, str):
         raise TypeError(
-            "Shape argument must be of type string "
-            f"{shape} with type: {type(shape)}"
+            "Shape argument must be of type string " f"{shape} with type: {type(shape)}"
         )
 
     if not shape.endswith(".obj"):
@@ -65,9 +69,7 @@ def __calculate_pca(shape: vedo.Mesh) -> PCA:
     points = np.asarray(shape.points)
 
     if points.ndim != 2 or points.shape[1] != 3:
-        raise ValueError(
-            f"Expected points with shape (N, 3), got {points.shape}"
-        )
+        raise ValueError(f"Expected points with shape (N, 3), got {points.shape}")
 
     if len(points) < 2:
         raise ValueError("PCA requires at least two points")
@@ -152,9 +154,7 @@ def __oriented_bounding_box(
         corners = center + corners_local @ axes.T
 
         # Connect corners differing in exactly one bit.
-        edges = [
-            (i, i | bit) for i in range(8) for bit in (1, 2, 4) if not i & bit
-        ]
+        edges = [(i, i | bit) for i in range(8) for bit in (1, 2, 4) if not i & bit]
 
         starts = corners[[i for i, _ in edges]]
         ends = corners[[j for _, j in edges]]
@@ -169,7 +169,7 @@ def __oriented_bounding_box(
     return box_center, axes, extents
 
 
-def calculate_surface_area(shape: vedo.Mesh) -> float:
+def calculate_surface_area(shape: vedo.Mesh | str) -> float:
     """
     Calculates the provided shapes's surface area.
 
@@ -180,25 +180,22 @@ def calculate_surface_area(shape: vedo.Mesh) -> float:
 
     Only accurate for comparison if shapes have been size normalized.
     """
-
-    # Type check
-    if shape is None:
-        shape = __prepare_and_check_file_path(file_path)
+    if isinstance(shape, str):
+        shape = __prepare_and_check_file_path(shape)
 
     return shape.area()
 
 
 def calculate_compactness(
-    shape: vedo.Mesh,
+    shape: vedo.Mesh | str,
     volume: float | None = None,
     area: float | None = None,
 ) -> float:
-
-    # Check if not None, it is correct class
-    if shape is not None and not isinstance(shape, vedo.Mesh):
+    if isinstance(shape, str):
+        shape = __prepare_and_check_file_path(shape)
+    elif shape is not None and not isinstance(shape, vedo.Mesh):
         raise ValueError(
-            "shape must be of type vedo.mesh: "
-            f"{shape} with type {type(shape)}"
+            "shape must be of type vedo.mesh: " f"{shape} with type {type(shape)}"
         )
 
     if volume is None:
@@ -210,7 +207,7 @@ def calculate_compactness(
 
 
 def calculate_rectangularity(
-    shape: vedo.Mesh,
+    shape: vedo.Mesh | str,
     shape_volume: float | None = None,
 ) -> float:
     """
@@ -219,8 +216,8 @@ def calculate_rectangularity(
     1.0 means the shape fills its box completely (e.g. a cuboid); lower
     values mean more empty space inside the box.
     """
-    if shape is None:
-        shape = __prepare_and_check_file_path(file_path)
+    if isinstance(shape, str):
+        shape = __prepare_and_check_file_path(shape)
 
     if shape_volume is None:
         shape_volume = __approx_volume(shape)
@@ -237,7 +234,7 @@ def calculate_rectangularity(
 
 
 def calculate_diameter(
-    shape: vedo.Mesh,
+    shape: vedo.Mesh | str,
     convex_hull: vedo.ConvexHull | None = None,
 ) -> float:
     """
@@ -246,8 +243,8 @@ def calculate_diameter(
 
     Uses the convex hull for optimization.
     """
-    if shape is None:
-        shape = __prepare_and_check_file_path(file_path)
+    if isinstance(shape, str):
+        shape = __prepare_and_check_file_path(shape)
 
     if convex_hull is None:
         convex_hull = vedo.ConvexHull(shape)
@@ -268,12 +265,12 @@ def calculate_diameter(
 
 
 def calculate_convexity(
-    shape: vedo.Mesh,
+    shape: vedo.Mesh | str,
     volume: float | None = None,
     convex_hull: vedo.ConvexHull | None = None,
 ) -> float:
-    if shape is None:
-        shape = vedo.Mesh(file_path)
+    if isinstance(shape, str):
+        shape = __prepare_and_check_file_path(shape)
 
     if volume is None:
         volume = __approx_volume(shape)
@@ -287,9 +284,11 @@ def calculate_convexity(
 
 
 def calculate_eccentricity(
-    shape: vedo.Mesh,
+    shape: vedo.Mesh | str,
     pca: PCA | None = None,
 ) -> float:
+    if isinstance(shape, str):
+        shape = __prepare_and_check_file_path(shape)
 
     if pca is None:
         pca = __calculate_pca(shape)
@@ -326,23 +325,20 @@ def main():
 
     if args.visualize:
         if os.path.isdir(args.input):
-            raise ValueError(
-                f"Visualising only works for directories: {args.input}"
-            )
+            raise ValueError(f"Visualising only works for directories: {args.input}")
 
         __oriented_bounding_box(vedo.Mesh(args.input), visualize)
     else:
-        mesh: vedo.Mesh = vedo.Mesh(str(args.input))
         shape = __prepare_and_check_file_path(args.input)
-        area = calculate_surface_area(args.input)
-        compactness = calculate_compactness(args.input, shape)
-        rectangularity = calculate_rectangularity(args.input, shape)
-        diameter = calculate_diameter(args.input, shape)
-        convexity = calculate_convexity(args.input, shape)
-        eccentricity = calculate_eccentricity(args.input, shape)
+        area = calculate_surface_area(shape)
+        compactness = calculate_compactness(shape)
+        rectangularity = calculate_rectangularity(shape)
+        diameter = calculate_diameter(shape)
+        convexity = calculate_convexity(shape)
+        eccentricity = calculate_eccentricity(shape)
 
         print(
-            f"Was closed: {vedo.Mesh(args.input).is_closed()}\n"
+            f"Was closed: {shape.is_closed()}\n"
             f"Area: {round(area, 3)}\n"
             f"Compactness: {round(compactness, 3)}\n"
             f"Rectangularity: {round(rectangularity, 3)}\n"

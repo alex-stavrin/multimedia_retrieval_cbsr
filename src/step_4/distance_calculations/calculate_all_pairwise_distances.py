@@ -3,10 +3,13 @@ import pickle
 from pathlib import Path
 
 import pandas as pd
+from tqdm import tqdm
 
-from step_4.distance_calculations.calculate_total_distance import (
+from src.step_4.distance_calculations.calculate_total_distance import (
     ShapeDistanceCalculator,
-    DISTANCE_CONFIG,
+    DISTANCE_CONFIG_MIXED,
+    DISTANCE_CONFIG_L2,
+    DISTANCE_CONFIG_COSINE,
     IDENTIFIER_COLUMN,
 )
 
@@ -117,7 +120,7 @@ def calculate_all_pairwise_distances(
     """Calculate unique mesh pairs and resume safely from saved progress."""
 
     if distance_config is None:
-        distance_config = DISTANCE_CONFIG
+        distance_config = DISTANCE_CONFIG_MIXED
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -137,9 +140,6 @@ def calculate_all_pairwise_distances(
         raise ValueError("At least two unique meshes are required.")
 
     total_pairs = total_meshes * (total_meshes - 1) // 2
-
-    print(f"Found {total_meshes:,} unique meshes.")
-    print(f"Total unique pairs: {total_pairs:,}")
 
     # Recover progress from both the checkpoint and the CSV.
     checkpoint_queries = load_checkpoint(
@@ -175,10 +175,6 @@ def calculate_all_pairwise_distances(
         if mesh in completed_queries
     )
 
-    print(f"Already completed queries: {len(completed_queries):,}")
-    print(f"Queries remaining: {len(remaining_queries):,}")
-    print(f"Pairs accounted for: {completed_pairs:,}/{total_pairs:,}")
-
     if not remaining_queries:
         print("All query meshes have already been processed.")
         return
@@ -193,28 +189,38 @@ def calculate_all_pairwise_distances(
     # Initialize the calculator once so its CSV databases are loaded once.
     calculator = ShapeDistanceCalculator(
         csv_databases=csv_paths,
-        query=remaining_queries[0],
-        shapes_to_compare=[],
         distance_config=distance_config,
         identifier_column=identifier_column,
     )
 
     queries_since_checkpoint = 0
 
-    for query_index, query_mesh in enumerate(remaining_queries, start=1):
+    progress = tqdm(
+        remaining_queries,
+        total=len(query_meshes),
+        initial=len(completed_queries),
+        desc="Pairwise distances",
+        unit="query",
+        dynamic_ncols=True,
+    )
+    for query_mesh in progress:
         mesh_index = meshes.index(query_mesh)
         comparison_meshes = meshes[mesh_index + 1 :]
 
-        calculator.query = query_mesh
-        calculator.shapes_to_compare = comparison_meshes
-
-        results = calculator.calculate_all_distances()
+        results = calculator.calculate_all_distances(
+            query=query_mesh,
+            shapes_to_compare=comparison_meshes,
+        )
+        comparison_mesh_set = set(comparison_meshes)
 
         batch_rows = []
 
         for function_name, descriptor_results in results.items():
             for descriptor, distances in descriptor_results.items():
                 for comparison_mesh, distance in distances.items():
+                    if comparison_mesh not in comparison_mesh_set:
+                        continue
+
                     batch_rows.append(
                         {
                             "mesh_a": query_mesh,
@@ -239,9 +245,9 @@ def calculate_all_pairwise_distances(
 
         completed_pairs += len(comparison_meshes)
 
-        print(
-            f"Query {query_index}/{len(remaining_queries)}: {query_mesh} | "
-            f"{completed_pairs:,}/{total_pairs:,} pairs accounted for"
+        progress.set_postfix_str(
+            f"{completed_pairs:,}/{total_pairs:,} pairs",
+            refresh=False,
         )
 
         # Save progress every two completed query meshes.
@@ -252,7 +258,6 @@ def calculate_all_pairwise_distances(
                 total_meshes,
             )
             queries_since_checkpoint = 0
-            print(f"Checkpoint saved: {checkpoint_path}")
 
     # Always save the final progress, even if fewer than two queries
     # have been processed since the last checkpoint.
@@ -262,7 +267,7 @@ def calculate_all_pairwise_distances(
         total_meshes,
     )
 
-    print("\nDistance collection complete.")
+    print("Distance collection complete.")
     print(f"Results: {output_path}")
     print(f"Checkpoint: {checkpoint_path}")
 
@@ -272,15 +277,34 @@ def main():
         description="Calculate all unique pairwise mesh distances."
     )
 
+    available_configs = {
+        "emd": DISTANCE_CONFIG_MIXED,
+        "emd-equal": DISTANCE_CONFIG_MIXED,
+        "l2": DISTANCE_CONFIG_L2,
+        "l2-equal": DISTANCE_CONFIG_L2,
+        "cosine": DISTANCE_CONFIG_COSINE,
+        "cosine-equal": DISTANCE_CONFIG_COSINE,
+    }
     parser.add_argument(
+        "-c",
+        "--config",
+        choices=tuple(available_configs),
+        default="mixed",
+        help="Distance configuration to use (default: mixed).",
+    )
+
+    parser.add_argument(
+        "-i",
         "--csv_paths",
+        "--input",
         nargs="+",
         required=True,
-        metavar="CSV",
+        metavar="CSV's",
         help="Descriptor CSV files.",
     )
 
     parser.add_argument(
+        "-o",
         "--output",
         default="all_pairwise_distances.csv",
         help="Output CSV path.",
@@ -291,6 +315,7 @@ def main():
     calculate_all_pairwise_distances(
         csv_paths=args.csv_paths,
         output_path=args.output,
+        distance_config=available_configs[args.config],
     )
 
 

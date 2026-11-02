@@ -3,7 +3,7 @@ import os
 import numpy as np
 import vedo
 
-from src.helper.normalization_utils import run_cli
+from src.helper.normalization_utils import run_cli, run_on_database
 from src.step_2._5.normalizer import center, scale_to_unit_cube
 
 
@@ -37,17 +37,24 @@ def flip(mesh):
         mesh.reverse()
 
 
-def full_normalize_file(input_path, output_path):
-    mesh = vedo.Mesh(input_path)
-
+def full_normalize(mesh):
     center(mesh)
     align(mesh)
     flip(mesh)
     # scaling is last because the bounding box depends on the rotation
     scale_to_unit_cube(mesh)
 
+
+def full_normalize_file(input_path, output_path):
+    mesh = vedo.Mesh(input_path)
+    full_normalize(mesh)
+
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     mesh.write(output_path)
+
+
+def full_normalize_database(input_root, output_root, max_workers=None):
+    run_on_database(input_root, output_root, full_normalize_file, max_workers)
 
 
 def main():

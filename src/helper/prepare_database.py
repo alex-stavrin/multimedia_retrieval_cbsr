@@ -15,61 +15,31 @@ import shutil
 from pathlib import Path
 from typing import Callable, Any
 
+import src.helper.silence_vtk  # noqa: F401
 import src.step_2._3.resampling as resampling
 import src.step_2._1.shapes_analyzer as shape_analyzer
-import src.step_2._5.normalizer as normalizer
 import src.step_2._3.repairment.repair_wireframe as reparation
 import src.step_2._3.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 import src.step_3._2.histogram_descriptors.analyze_and_save as histogram_descriptor_analyzer
+from src.helper.database_functions import verify_database_complete
 
 CHECKPOINT_VERSION = 1
 
 # Keep this order synchronized with the steps in prepare_database().
 STEP_ORDER = [
     "analyze_raw_database",
+    "repair_database",
+    "analyze_reparation",
+    "reparation_shape_analysis",
     "resample_database",
     "analyze_resampled_database",
-    "standardize_database",
-    "analyze_standardization",
-    "normalize_database",
     "fully_normalize_database",
+    "fully_normalized_shape_analysis",
     "calculate_descriptors",
+    "calculate_histogram_descriptor",
 ]
-
-
-def _obj_files_under(root: Path) -> set[Path]:
-    """Return .obj files below a directory, relative to that directory."""
-    if not root.is_dir():
-        return set()
-    return {
-        p.relative_to(root)
-        for p in root.rglob("*")
-        if p.is_file() and p.suffix.lower() == ".obj"
-    }
-
-
-def verify_database_complete(
-    raw_path: Path, processed_path: Path, step_name: str
-) -> None:
-    """Require every raw file to exist in the processed database."""
-    raw_files = _obj_files_under(raw_path)
-    processed_files = _obj_files_under(processed_path)
-    if not raw_files:
-        raise RuntimeError(f"No files found in raw database: {raw_path}")
-
-    missing = sorted(raw_files - processed_files, key=str)
-    if missing:
-        preview = "\n".join(f"  - {p}" for p in missing[:25])
-        if len(missing) > 25:
-            preview += f"\n  ... and {len(missing) - 25} more"
-        raise RuntimeError(
-            f"Step '{step_name}' produced an incomplete database. "
-            f"Missing {len(missing)} of {len(raw_files)} raw files in "
-            f"{processed_path}:\n{preview}"
-        )
-    print(f"[CHECK] {step_name}: all {len(raw_files)} raw files are present.")
 
 
 def _save_checkpoint(state: dict, path: Path) -> None:
@@ -122,7 +92,9 @@ def _reset_last_step(state: dict, checkpoint_path: Path) -> None:
         target_index = STEP_ORDER.index(current_step)
     else:
         completed_indices = [
-            STEP_ORDER.index(name) for name in STEP_ORDER if completed.get(name) is True
+            STEP_ORDER.index(name)
+            for name in STEP_ORDER
+            if completed.get(name) is True
         ]
         if not completed_indices:
             print("[RESET] No completed step found; nothing to reset.")
@@ -173,7 +145,9 @@ def _run_step(
     # Remove partial output before retrying a database-producing step.
     if output_database_path is not None:
         if output_database_path.exists():
-            print(f"[CLEAN] Removing incomplete output: {output_database_path}")
+            print(
+                f"[CLEAN] Removing incomplete output: {output_database_path}"
+            )
             shutil.rmtree(output_database_path)
         output_database_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -194,23 +168,31 @@ def prepare_database(
     database_path: str,
     output_path: str = "3d_models_prepared",
     *,
+    analyze: bool = False,
     reset_checkpoint: bool = False,
     reset_last_step: bool = False,
+    seed: int = 42,
 ) -> None:
     if reset_checkpoint and reset_last_step:
-        raise ValueError("Choose either reset_checkpoint or reset_last_step, not both.")
+        raise ValueError(
+            "Choose either reset_checkpoint or reset_last_step, not both."
+        )
 
     raw_path = Path(database_path).expanduser().resolve()
     if not raw_path.is_dir():
-        raise NotADirectoryError(f"Raw database directory not found: {raw_path}")
+        raise NotADirectoryError(
+            f"Raw database directory not found: {raw_path}"
+        )
 
     output_root = Path(output_path).expanduser().resolve()
     if output_root == raw_path or raw_path in output_root.parents:
-        raise ValueError("output_path must be outside the raw database directory.")
+        raise ValueError(
+            "output_path must be outside the raw database directory."
+        )
 
-    repair_path = output_root / "analysis"
+    analysis_path = output_root / "analysis"
     databases_path = output_root / "3d_models_steps"
-    repair_path.mkdir(parents=True, exist_ok=True)
+    analysis_path.mkdir(parents=True, exist_ok=True)
     databases_path.mkdir(parents=True, exist_ok=True)
 
     checkpoint_path = output_root / "pipeline_checkpoint.pkl"
@@ -230,30 +212,77 @@ def prepare_database(
     _save_checkpoint(state, checkpoint_path)
 
     # ---
-    # Analysing raw database
+    # Analysing raw database (optional)
 
-    raw_analysis_csv = repair_path / "raw_shape_analysis.csv"
-    os.makedirs(os.path.dirname(raw_analysis_csv), exist_ok=True)
+    if analyze:
+        raw_analysis_dir = analysis_path / "0_raw"
+        raw_analysis_dir.mkdir(parents=True, exist_ok=True)
+        raw_analysis_csv = raw_analysis_dir / "raw_shape_analysis.csv"
+        _run_step(
+            "analyze_raw_database",
+            lambda: shape_analyzer.analyze_database(
+                str(raw_path), str(raw_analysis_csv)
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+    # ---
+    # Repairing database
+
+    repaired = databases_path / "1_models_reparation"
     _run_step(
-        "analyze_raw_database",
-        lambda: shape_analyzer.analyze_database(str(raw_path), str(raw_analysis_csv)),
+        "repair_database",
+        lambda: reparation.repair_directory(str(raw_path), str(repaired)),
         state,
         checkpoint_path,
         raw_path,
+        repaired,
     )
+
+    # ---
+    # Analysing repairment (optional)
+
+    if analyze:
+        reparation_analysis_dir = analysis_path / "1_models_reparation"
+        reparation_analysis_dir.mkdir(parents=True, exist_ok=True)
+        repair_csv = reparation_analysis_dir / "reparation_analysis.csv"
+        _run_step(
+            "analyze_reparation",
+            lambda: rep_analyser.compare_hole_fill_stats(
+                str(raw_path),
+                str(repaired),
+                str(repair_csv),
+                show_progress=True,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+        reperation_shape_analysis_csv = (
+            reparation_analysis_dir / "reparation_shape_analysis.csv"
+        )
+        _run_step(
+            "reparation_shape_analysis",
+            lambda: shape_analyzer.analyze_database(
+                str(repaired), str(reperation_shape_analysis_csv)
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
 
     # ---
     # Resampling database
 
-    repaired = databases_path / "1_models_reparation"
     resampled = databases_path / "2_models_resampled"
     _run_step(
         "resample_database",
         lambda: resampling.resample_meshes(
-            models_path=raw_path,
-            input_csv_path=raw_analysis_csv,
+            input_path=repaired,
             output_path=resampled,
-            repaired_output_path=repaired,
         ),
         state,
         checkpoint_path,
@@ -261,57 +290,28 @@ def prepare_database(
         resampled,
     )
 
-    # ---
-    # Analysing repairment
-
-    repair_csv = repair_path / "reparation_analysis.csv"
-    os.makedirs(os.path.dirname(repair_csv), exist_ok=True)
-    _run_step(
-        "analyze_reparation",
-        lambda: rep_analyser.compare_hole_fill_stats(
-            str(resampled), str(repaired), str(repair_csv)
-        ),
-        state,
-        checkpoint_path,
-        raw_path,
-    )
-
-    # ---
-    # Shape analysis after standardisation
-
-    reperation_shape_analysis_csv = repair_path / "reparation_shape_analysis.csv"
-    os.makedirs(os.path.dirname(reperation_shape_analysis_csv), exist_ok=True)
-    _run_step(
-        "reparation_shape_analysis",
-        lambda: shape_analyzer.analyze_database(
-            str(repaired), str(reperation_shape_analysis_csv)
-        ),
-        state,
-        checkpoint_path,
-        raw_path,
-    )
-
-    # ---
-    # Normalising database
-
-    normalized = databases_path / "3_models_normalized"
-    _run_step(
-        "normalize_database",
-        lambda: normalizer.center_and_scale_database(str(repaired), str(normalized)),
-        state,
-        checkpoint_path,
-        raw_path,
-        normalized,
-    )
+    if analyze:
+        resampled_analysis_dir = analysis_path / "2_models_resampled"
+        resampled_analysis_dir.mkdir(parents=True, exist_ok=True)
+        resampled_analysis_csv = resampled_analysis_dir / "resampled_shape_analysis.csv"
+        _run_step(
+            "analyze_resampled_database",
+            lambda: shape_analyzer.analyze_database(
+                str(resampled), str(resampled_analysis_csv)
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
 
     # ---
     # Fully normalising database
 
-    fully_normalized = databases_path / "4_models_fully_normalized"
+    fully_normalized = databases_path / "3_models_fully_normalized"
     _run_step(
         "fully_normalize_database",
         lambda: full_normalisation.full_normalize_database(
-            input_root=str(normalized), output_root=str(fully_normalized)
+            input_root=str(resampled), output_root=str(fully_normalized)
         ),
         state,
         checkpoint_path,
@@ -319,25 +319,29 @@ def prepare_database(
         fully_normalized,
     )
 
-    fully_normalized_shape_analysis_csv = (
-        repair_path / "fully_normalized_shape_analysis.csv"
-    )
-    _run_step(
-        "fully_normalized_shape_analysis",
-        lambda: shape_analyzer.analyze_database(
-            root_dir=str(fully_normalized),
-            output_path=str(fully_normalized_shape_analysis_csv),
-        ),
-        state,
-        checkpoint_path,
-        raw_path,
-    )
+    if analyze:
+        normalized_analysis_dir = analysis_path / "3_models_fully_normalized"
+        normalized_analysis_dir.mkdir(parents=True, exist_ok=True)
+        fully_normalized_shape_analysis_csv = (
+            normalized_analysis_dir / "fully_normalized_shape_analysis.csv"
+        )
+        _run_step(
+            "fully_normalized_shape_analysis",
+            lambda: shape_analyzer.analyze_database(
+                root_dir=str(fully_normalized),
+                output_path=str(fully_normalized_shape_analysis_csv),
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
 
     # ---
     # Calculating simple descriptors
 
-    descriptors_csv = fully_normalized / "simple_descriptors.csv"
-    os.makedirs(os.path.dirname(descriptors_csv), exist_ok=True)
+    descriptors_analysis_dir = analysis_path / "4_descriptors"
+    descriptors_analysis_dir.mkdir(parents=True, exist_ok=True)
+    descriptors_csv = descriptors_analysis_dir / "simple_descriptors.csv"
     _run_step(
         "calculate_descriptors",
         lambda: descriptor_analyzer.calculate_database(
@@ -351,12 +355,12 @@ def prepare_database(
 
     # ---
     # Calculate histogram descriptors
-    hist_descriptors_csv = fully_normalized / "histogram_descriptors.csv"
-    os.makedirs(os.path.dirname(hist_descriptors_csv), exist_ok=True)
+
+    hist_descriptors_csv = descriptors_analysis_dir / "histogram_descriptors.csv"
     _run_step(
         "calculate_histogram_descriptor",
         lambda: histogram_descriptor_analyzer.analyze_and_save(
-            input=fully_normalized, output=hist_descriptors_csv
+            input=fully_normalized, output=hist_descriptors_csv, seed=seed
         ),
         state,
         checkpoint_path,
@@ -383,18 +387,30 @@ def main() -> None:
         help="Output path to the directory containing all analysis and "
         "processing steps",
     )
+    parser.add_argument(
+        "-a",
+        "--analyze",
+        action="store_true",
+        help="Run optional shape and reparation analysis steps.",
+    )
     reset_group = parser.add_mutually_exclusive_group()
     reset_group.add_argument(
         "--reset_checkpoint",
         "--reset_pickle",
         dest="reset_checkpoint",
         action="store_true",
-        help="Delete the checkpoint and rerun the entire pipeline from " "scratch.",
+        help="Delete the checkpoint and rerun the entire pipeline from scratch.",
     )
     reset_group.add_argument(
         "--reset_last_step",
         action="store_true",
-        help="Rerun the last unfinished/completed step and all steps " "after it.",
+        help="Rerun the last unfinished/completed step and all steps after it.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="Random seed for histogram descriptors sampling (default: 42).",
     )
     args = parser.parse_args()
 
@@ -407,8 +423,10 @@ def main() -> None:
     prepare_database(
         args.input,
         args.output,
+        analyze=args.analyze,
         reset_checkpoint=args.reset_checkpoint,
         reset_last_step=args.reset_last_step,
+        seed=args.seed,
     )
 
 

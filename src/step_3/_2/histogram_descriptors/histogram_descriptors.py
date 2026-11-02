@@ -1,17 +1,34 @@
 import numpy
 import vedo
 
+DEFAULT_SEED: int = 42
+
+
+def _normalize_histogram_area(
+    histogram: numpy.ndarray,
+    bin_edges: numpy.ndarray,
+) -> numpy.ndarray:
+    """Scale bin heights so their integral across the bin edges is one."""
+    area = float(numpy.sum(histogram * numpy.diff(bin_edges)))
+    if area <= 0 or not numpy.isfinite(area):
+        raise ValueError("Cannot normalize an empty or invalid histogram.")
+    return histogram / area
+
 
 def calculate_angle_histogram(
-    mesh: vedo.Mesh, n_samples: int, n_bins_histogram: int
+    mesh: vedo.Mesh,
+    n_samples: int,
+    n_bins_histogram: int,
+    seed: int | numpy.random.Generator | None = DEFAULT_SEED,
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
 
     # --- 1. Take n_samples triplets of vertices ---
+    rng = numpy.random.default_rng(seed)
 
     # turn vertices to an array
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)
     # take random samples of 3 (vertex_1, vertex_2, vertex_3)
-    samples_indices: numpy.ndarray = numpy.random.randint(
+    samples_indices: numpy.ndarray = rng.integers(
         low=0, high=len(vertices), size=(n_samples, 3)
     )
 
@@ -46,9 +63,10 @@ def calculate_angle_histogram(
     angles = numpy.arccos(numpy.clip(cosines, -1.0, 1.0)) / numpy.pi
 
     # --- 4. Make the histogram from the angles ---
-    histogram, bin_edges = numpy.histogram(angles, bins=n_bins_histogram, range=(0, 1))
-    # normalize the histogram
-    histogram = histogram / histogram.sum()
+    histogram, bin_edges = numpy.histogram(
+        angles, bins=n_bins_histogram, range=(0, 1)
+    )
+    histogram = _normalize_histogram_area(histogram, bin_edges)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
@@ -56,7 +74,9 @@ def calculate_angle_histogram(
 
 
 def calculate_distance_from_barycenter(
-    mesh: vedo.Mesh, n_bins_histogram: int
+    mesh: vedo.Mesh,
+    n_bins_histogram: int,
+    seed: int | numpy.random.Generator | None = None,
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)
     barycenter: numpy.ndarray = numpy.mean(vertices, axis=0)
@@ -75,8 +95,7 @@ def calculate_distance_from_barycenter(
         distances, bins=n_bins_histogram, range=(0, 1)
     )
 
-    # normalize histogram
-    histogram = histogram / histogram.sum()
+    histogram = _normalize_histogram_area(histogram, bin_edges)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
@@ -84,12 +103,15 @@ def calculate_distance_from_barycenter(
 
 
 def calculate_distance_two_vertices(
-    mesh: vedo.Mesh, n_samples: int, n_bins_histogram: int
+    mesh: vedo.Mesh,
+    n_samples: int,
+    n_bins_histogram: int,
+    seed: int | numpy.random.Generator | None = DEFAULT_SEED,
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
-
+    rng = numpy.random.default_rng(seed)
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)
 
-    samples_indices: numpy.ndarray = numpy.random.randint(
+    samples_indices: numpy.ndarray = rng.integers(
         low=0, high=len(vertices), size=(n_samples, 2)
     )
 
@@ -110,7 +132,7 @@ def calculate_distance_two_vertices(
         distances, bins=n_bins_histogram, range=(0, 1)
     )
 
-    histogram = histogram / histogram.sum()
+    histogram = _normalize_histogram_area(histogram, bin_edges)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
@@ -118,13 +140,16 @@ def calculate_distance_two_vertices(
 
 
 def calculate_area_triangle(
-    mesh: vedo.Mesh, n_samples: int, n_bins_histogram: int
+    mesh: vedo.Mesh,
+    n_samples: int,
+    n_bins_histogram: int,
+    seed: int | numpy.random.Generator | None = DEFAULT_SEED,
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
-
+    rng = numpy.random.default_rng(seed)
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)
 
     # here we take 3 vertices per sample
-    samples_indices: numpy.ndarray = numpy.random.randint(
+    samples_indices: numpy.ndarray = rng.integers(
         low=0, high=len(vertices), size=(n_samples, 3)
     )
 
@@ -136,14 +161,18 @@ def calculate_area_triangle(
     vectors_2: numpy.ndarray = third_vertices - first_vertices
 
     cross_products: numpy.ndarray = numpy.cross(vectors_1, vectors_2)
-    areas: numpy.ndarray = numpy.sqrt(0.5 * numpy.linalg.norm(cross_products, axis=1))
+    areas: numpy.ndarray = numpy.sqrt(
+        0.5 * numpy.linalg.norm(cross_products, axis=1)
+    )
 
     areas = areas[areas > 0]
     maximum_possible_area: float = numpy.sqrt(numpy.sqrt(3) / 2)
     areas = numpy.clip(areas / maximum_possible_area, 0.0, 1.0)
 
-    histogram, bin_edges = numpy.histogram(areas, bins=n_bins_histogram, range=(0, 1))
-    histogram = histogram / histogram.sum()
+    histogram, bin_edges = numpy.histogram(
+        areas, bins=n_bins_histogram, range=(0, 1)
+    )
+    histogram = _normalize_histogram_area(histogram, bin_edges)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 
@@ -151,11 +180,15 @@ def calculate_area_triangle(
 
 
 def calculate_volume_tetrahedron(
-    mesh: vedo.Mesh, n_samples: int, n_bins_histogram: int
+    mesh: vedo.Mesh,
+    n_samples: int,
+    n_bins_histogram: int,
+    seed: int | numpy.random.Generator | None = DEFAULT_SEED,
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
+    rng = numpy.random.default_rng(seed)
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)
 
-    sample_indices: numpy.ndarray = numpy.random.randint(
+    sample_indices: numpy.ndarray = rng.integers(
         low=0, high=len(vertices), size=(n_samples, 4)
     )
 
@@ -178,8 +211,10 @@ def calculate_volume_tetrahedron(
     maximum_possible_volume: float = numpy.cbrt(1.0 / 3.0)
     volumes = numpy.clip(volumes / maximum_possible_volume, 0.0, 1.0)
 
-    histogram, bin_edges = numpy.histogram(volumes, bins=n_bins_histogram, range=(0, 1))
-    histogram = histogram / histogram.sum()
+    histogram, bin_edges = numpy.histogram(
+        volumes, bins=n_bins_histogram, range=(0, 1)
+    )
+    histogram = _normalize_histogram_area(histogram, bin_edges)
 
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
 

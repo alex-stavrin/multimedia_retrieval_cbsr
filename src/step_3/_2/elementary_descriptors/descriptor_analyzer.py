@@ -4,6 +4,7 @@ import argparse
 import vedo
 from tqdm import tqdm
 import vtk
+from concurrent.futures import ProcessPoolExecutor
 
 from src.step_3._2.elementary_descriptors.descriptor_extracting import (
     calculate_surface_area,
@@ -16,6 +17,7 @@ from src.step_3._2.elementary_descriptors.descriptor_extracting import (
     __approx_volume,
     __calculate_pca,
 )
+from src.helper.silence_vtk import silence_vtk
 
 DESCRIPTOR_FIELDS = [
     "file_path",
@@ -29,29 +31,8 @@ DESCRIPTOR_FIELDS = [
     "reason",
 ]
 
-
-#   FIX LATER
-class VTKWarningCapture(vtk.vtkOutputWindow):
-    """Capture VTK warning messages for the current mesh."""
-
-    def __init__(self):
-        super().__init__()
-        self.warnings = []
-
-    def DisplayWarningText(self, text):
-        message = text.strip()
-        if message:
-            self.warnings.append(message)
-
-    def DisplayErrorText(self, text):
-        message = text.strip()
-        if message:
-            self.warnings.append(f"VTK ERROR: {message}")
-
-    def DisplayGenericWarningText(self, text):
-        message = text.strip()
-        if message:
-            self.warnings.append(message)
+_silence_vtk = silence_vtk
+_silence_vtk()
 
 
 def retrieve_all_shape_files(input_dir_path: str) -> list[str]:
@@ -67,6 +48,7 @@ def retrieve_all_shape_files(input_dir_path: str) -> list[str]:
 
 
 def calculate_mesh_descriptors(shape: vedo.Mesh) -> dict:
+    _silence_vtk()
     # Calculate shared quantities once.
     volume = __approx_volume(shape)
     area = calculate_surface_area(
@@ -120,9 +102,39 @@ def calculate_file_descriptors(file_path: str) -> dict:
     return calculate_mesh_descriptors(shape)
 
 
+def _process_shape_worker(args: tuple[str, str]) -> tuple[dict, list[str]]:
+    """Worker task for multiprocessing descriptor calculation."""
+    shape_file, root_abs = args
+    relative_path = os.path.relpath(shape_file, root_abs)
+    row = {"file_path": relative_path}
+    warnings: list[str] = []
+
+    _silence_vtk()
+
+    try:
+        descriptors = calculate_file_descriptors(shape_file)
+        row.update(descriptors)
+    except Exception as e:
+        row.update(
+            {
+                "was_closed": "",
+                "surface_area": "",
+                "compactness": "",
+                "rectangularity": "",
+                "diameter": "",
+                "convexity": "",
+                "eccentricity": "",
+                "reason": f"{type(e).__name__}: {e}",
+            }
+        )
+
+    return row, warnings
+
+
 def calculate_database(
     input_dir_path: str,
     output_path: str,
+    max_workers: int | None = None,
 ) -> None:
     """
     Calculate all descriptors for every OBJ file in a directory.
@@ -141,7 +153,8 @@ def calculate_database(
 
     root_abs = os.path.abspath(input_dir_path)
     output_dir = os.path.dirname(os.path.abspath(output_path))
-    os.makedirs(output_dir, exist_ok=True)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
 
     warnings_path = os.path.splitext(output_path)[0] + "_warnings.csv"
 
@@ -149,85 +162,78 @@ def calculate_database(
     n_errors = 0
     n_warnings = 0
 
-    warning_capture = VTKWarningCapture()
-    previous_output_window = vtk.vtkOutputWindow.GetInstance()
-    #           FIX LATER
-    vtk.vtkOutputWindow.SetInstance(warning_capture)
+    _silence_vtk()
 
-    try:
-        with (
-            open(output_path, "w", newline="", encoding="utf-8") as f,
-            open(warnings_path, "w", newline="", encoding="utf-8") as wf,
-        ):
-            writer = csv.DictWriter(
-                f,
-                fieldnames=DESCRIPTOR_FIELDS,
-            )
-            writer.writeheader()
+    tasks = [(shape_file, root_abs) for shape_file in shape_files]
+    n_workers = max_workers or os.cpu_count() or 1
 
-            warning_writer = csv.DictWriter(
-                wf,
-                fieldnames=["file_path", "warning"],
-            )
-            warning_writer.writeheader()
+    with (
+        open(output_path, "w", newline="", encoding="utf-8") as f,
+        open(warnings_path, "w", newline="", encoding="utf-8") as wf,
+    ):
+        writer = csv.DictWriter(
+            f,
+            fieldnames=DESCRIPTOR_FIELDS,
+        )
+        writer.writeheader()
 
-            for shape_file in tqdm(
-                shape_files,
-                desc="Calculating descriptors",
-            ):
-                relative_path = os.path.relpath(shape_file, root_abs)
-                row = {"file_path": relative_path}
+        warning_writer = csv.DictWriter(
+            wf,
+            fieldnames=["file_path", "warning"],
+        )
+        warning_writer.writeheader()
 
-                # Clear warnings from the previous mesh.
-                warning_capture.warnings.clear()
-
-                try:
-                    descriptors = calculate_file_descriptors(
-                        shape_file,
-                    )
-                    row.update(descriptors)
+        if n_workers == 1 or len(tasks) <= 1:
+            for task in tqdm(tasks, desc="Calculating descriptors"):
+                row, warnings = _process_shape_worker(task)
+                if row.get("reason"):
+                    n_errors += 1
+                else:
                     n_success += 1
 
-                except Exception as e:
-                    row.update(
+                for warning in warnings:
+                    warning_writer.writerow(
                         {
-                            "was_closed": "",
-                            "surface_area": "",
-                            "compactness": "",
-                            "rectangularity": "",
-                            "diameter": "",
-                            "convexity": "",
-                            "eccentricity": "",
-                            "reason": f"{type(e).__name__}: {e}",
+                            "file_path": row["file_path"],
+                            "warning": warning,
                         }
                     )
-                    n_errors += 1
+                    n_warnings += 1
 
-                finally:
-                    # Associate each captured warning with this mesh.
-                    for warning in warning_capture.warnings:
+                writer.writerow(row)
+        else:
+            print(f"Using {n_workers} worker processes")
+            with ProcessPoolExecutor(max_workers=max_workers) as executor:
+                chunksize = max(1, min(16, len(tasks) // (n_workers * 2)))
+                for row, warnings in tqdm(
+                    executor.map(_process_shape_worker, tasks, chunksize=chunksize),
+                    total=len(tasks),
+                    desc="Calculating descriptors",
+                ):
+                    if row.get("reason"):
+                        n_errors += 1
+                    else:
+                        n_success += 1
+
+                    for warning in warnings:
                         warning_writer.writerow(
                             {
-                                "file_path": relative_path,
+                                "file_path": row["file_path"],
                                 "warning": warning,
                             }
                         )
                         n_warnings += 1
 
-                writer.writerow(row)
-
-    finally:
-        # Restore the original VTK output window.
-        vtk.vtkOutputWindow.SetInstance(previous_output_window)
+                    writer.writerow(row)
 
     summary = (
-        f"Descriptor calculation complete.\\n"
-        f"Total meshes: {len(shape_files)}\\n"
-        f"Successful: {n_success}\\n"
-        f"Errors: {n_errors}\\n"
-        f"VTK warnings/errors captured: {n_warnings}\\n"
-        f"Output CSV: {output_path}\\n"
-        f"Warnings CSV: {warnings_path}\\n"
+        f"Descriptor calculation complete.\n"
+        f"Total meshes: {len(shape_files)}\n"
+        f"Successful: {n_success}\n"
+        f"Errors: {n_errors}\n"
+        f"VTK warnings/errors captured: {n_warnings}\n"
+        f"Output CSV: {output_path}\n"
+        f"Warnings CSV: {warnings_path}\n"
     )
 
     summary_path = os.path.splitext(output_path)[0] + "_conclusion.txt"
@@ -257,11 +263,20 @@ def main():
         help="Output CSV path (default: shape_descriptors.csv).",
     )
 
+    parser.add_argument(
+        "-w",
+        "--workers",
+        type=int,
+        default=None,
+        help="Number of worker processes (default: all CPU cores).",
+    )
+
     args = parser.parse_args()
 
     calculate_database(
         input_dir_path=args.input,
         output_path=args.output,
+        max_workers=args.workers,
     )
 
 
