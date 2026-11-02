@@ -23,6 +23,7 @@ import src.step_2._3.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 import src.step_3._2.histogram_descriptors.analyze_and_save as histogram_descriptor_analyzer
+import src.step_4.distance_calculations.normalize_descriptors as normalize_descriptors
 from src.helper.database_functions import verify_database_complete
 
 CHECKPOINT_VERSION = 1
@@ -38,6 +39,7 @@ STEP_ORDER = [
     "fully_normalize_database",
     "fully_normalized_shape_analysis",
     "calculate_descriptors",
+    "normalize_descriptors",
     "calculate_histogram_descriptor",
 ]
 
@@ -347,6 +349,23 @@ def prepare_database(
         lambda: descriptor_analyzer.calculate_database(
             input_dir_path=str(fully_normalized),
             output_path=str(descriptors_csv),
+        ),
+        state,
+        checkpoint_path,
+        raw_path,
+    )
+
+    # ---
+    # Normalizing simple descriptors
+
+    descriptors_normalized_csv = (
+        descriptors_analysis_dir / "simple_descriptors_normalized.csv"
+    )
+    _run_step(
+        "normalize_descriptors",
+        lambda: normalize_descriptors.process_descriptors(
+            csv_path=str(descriptors_csv),
+            output_path=str(descriptors_normalized_csv),
         ),
         state,
         checkpoint_path,

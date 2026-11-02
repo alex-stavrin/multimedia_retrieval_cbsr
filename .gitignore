@@ -6,6 +6,8 @@ ShapeData
 **.pdf
 **.tex
 
+3d_f
+
 # UV ignore
 pyproject.toml
 .python-version
