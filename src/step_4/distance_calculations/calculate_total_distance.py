@@ -21,6 +21,9 @@ import pandas as pd
 import numpy as np
 
 IDENTIFIER_COLUMN = "file_path"
+# files with these endings contain raw descriptors that were transformed,
+# a query shape has to get the same transform
+TRANSFORMED_SUFFIXES = ("_processed", "_normalized")
 
 DistanceFunction = Callable[..., dict[str, float]]
 
@@ -263,7 +266,7 @@ class ShapeDistanceCalculator:
             if is_histogram or len(columns) != 1:
                 continue
             source_path = self._descriptor_source_paths[key]
-            if not source_path.stem.endswith("_processed"):
+            if not source_path.stem.endswith(TRANSFORMED_SUFFIXES):
                 continue
             descriptor = columns[0]
             raw_sources = [
@@ -272,11 +275,12 @@ class ShapeDistanceCalculator:
                 if path != source_path
                 and descriptor in df.columns
                 and self.identifier_column in df.columns
-                and not path.stem.endswith("_processed")
+                and not path.stem.endswith(TRANSFORMED_SUFFIXES)
             ]
-            sibling_path = source_path.with_name(
-                f"{source_path.stem.removesuffix('_processed')}.csv"
-            )
+            raw_stem = source_path.stem
+            for suffix in TRANSFORMED_SUFFIXES:
+                raw_stem = raw_stem.removesuffix(suffix)
+            sibling_path = source_path.with_name(f"{raw_stem}.csv")
             if sibling_path.is_file():
                 raw_df = pd.read_csv(sibling_path)
             elif len(raw_sources) == 1:
@@ -508,7 +512,7 @@ class ShapeDistanceCalculator:
                 not is_histogram
                 and len(columns) == 1
                 and self._descriptor_source_paths[key].stem.endswith(
-                    "_processed"
+                    TRANSFORMED_SUFFIXES
                 )
             )
         }
