@@ -5,13 +5,22 @@ from pathlib import Path
 from PySide6.QtWidgets import QApplication
 import numpy
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 
 def main():
 
     import argparse
 
-    arguements_parser = argparse.ArgumentParser()
-    arguements_parser.add_argument("mesh_paths", nargs="+")
+    arguements_parser = argparse.ArgumentParser(
+        description="View 3D shapes. Shapes can also be opened from the "
+        "content browser inside the viewer."
+    )
+    arguements_parser.add_argument(
+        "mesh_paths",
+        nargs="*",
+        help="Shapes to show at the start (optional)",
+    )
     arguements_parser.add_argument(
         "--delta",
         "-d",
@@ -19,17 +28,20 @@ def main():
         type=float,
         default=[0.0, 0.0, 0.0],
         metavar=("X", "Y", "Z"),
+        help="Distance between the shapes",
+    )
+    arguements_parser.add_argument(
+        "--browse",
+        "-b",
+        type=str,
+        default=None,
+        help="Folder shown in the content browser (default: ./3d_models)",
     )
 
     arguements = arguements_parser.parse_args()
 
-    mesh_path_names = arguements.mesh_paths
-
-    if not mesh_path_names:
-        raise ValueError("Please provide at least one 3d shape")
-
     meshes: list[Mesh] = []
-    for mesh_path_name in mesh_path_names:
+    for mesh_path_name in arguements.mesh_paths:
         mesh_path = Path(mesh_path_name).resolve()
 
         if not mesh_path.is_file():
@@ -37,9 +49,18 @@ def main():
 
         meshes.append(Mesh(mesh_path))
 
+    browse_root = Path(arguements.browse) if arguements.browse else None
+    if browse_root is None:
+        browse_root = PROJECT_ROOT / "3d_models"
+    if not browse_root.is_dir():
+        browse_root = None
+
     app = QApplication(sys.argv)
     model_viewer: ModelViewer = ModelViewer(
-        qt_app=app, meshes=meshes, models_delta=numpy.array(arguements.delta)
+        qt_app=app,
+        meshes=meshes,
+        models_delta=numpy.array(arguements.delta),
+        browse_root=browse_root,
     )
 
     return model_viewer.exec()
