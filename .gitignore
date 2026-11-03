@@ -6,6 +6,8 @@ ShapeData
 **.pdf
 **.tex
 
+3d_f
+
 # UV ignore
 pyproject.toml
 .python-version
@@ -31,3 +33,5 @@ __pycache__/
 3d_models_reduced_normalized/
 
 resampled_models
+
+*.png
