@@ -15,6 +15,7 @@ TARGET_VERTEX_COUNT: Final = 7_500
 MAX_VERTEX_COUNT: Final = 10_000
 MAX_RESAMPLING_ATTEMPTS: Final = 15
 MAX_TOP_1PCT_AREA_SHARE: Final = 0.10
+DECIMATE_REGULARIZATION: Final = 1e-3
 
 SUBDIVISION_METHOD_NAMES: Final = {
     0: "Loop",
@@ -175,11 +176,39 @@ def _adaptive_subdivide(
     return result
 
 
+def _deduplicate_faces(mesh: vedo.Mesh) -> vedo.Mesh:
+    """Remove duplicate and degenerate triangles that `vedo.Mesh.clean()` leaves behind."""
+    faces = numpy.asarray(mesh.cells, dtype=numpy.int64)
+    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
+        return mesh
+
+    non_degenerate = (
+        (faces[:, 0] != faces[:, 1])
+        & (faces[:, 1] != faces[:, 2])
+        & (faces[:, 0] != faces[:, 2])
+    )
+    valid_faces = faces[non_degenerate]
+    if len(valid_faces) == 0:
+        return mesh
+
+    unique_idx, _ = grouping.unique_rows(numpy.sort(valid_faces, axis=1))
+    if len(unique_idx) == len(faces):
+        return mesh
+
+    unique_faces = valid_faces[numpy.sort(unique_idx)]
+    cleaned = vedo.Mesh(
+        [numpy.asarray(mesh.vertices, dtype=numpy.float64), unique_faces]
+    )
+    cleaned.clean()
+    return cleaned
+
+
 def resample_mesh(
     mesh: vedo.Mesh,
     max_iterations: int = MAX_RESAMPLING_ATTEMPTS,
     subdivision_methods: list[str] | None = None,
 ) -> vedo.Mesh:
+    mesh = _deduplicate_faces(mesh)
 
     needs_vertices_count_fix = not (
         MIN_VERTEX_COUNT <= mesh.npoints <= MAX_VERTEX_COUNT
@@ -190,7 +219,7 @@ def resample_mesh(
         return mesh
 
     if mesh.npoints > MAX_VERTEX_COUNT:
-        mesh.decimate(n=6_500)
+        mesh.decimate(n=6_500, regularization=DECIMATE_REGULARIZATION)
         mesh.clean()
         needs_area_fix = _is_area_distribution_uneven(mesh)
 
@@ -219,9 +248,16 @@ def resample_mesh(
         if mesh.npoints == before_vertices:
             break
 
-    if mesh.npoints > MAX_VERTEX_COUNT:
-        mesh.decimate(n=TARGET_VERTEX_COUNT)
+    for _ in range(5):
+        if mesh.npoints <= MAX_VERTEX_COUNT:
+            break
+        before_vertices = mesh.npoints
+        mesh.decimate(
+            n=TARGET_VERTEX_COUNT, regularization=DECIMATE_REGULARIZATION
+        )
         mesh.clean()
+        if mesh.npoints == before_vertices:
+            break
 
     return mesh
 
@@ -241,7 +277,7 @@ def resample_mesh_file(
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        mesh = vedo.Mesh(str(mesh_path))
+        mesh = _deduplicate_faces(vedo.Mesh(str(mesh_path)))
         before_vertices = mesh.npoints
 
         subdivision_methods: list[str] = []
@@ -372,6 +408,11 @@ def resample_meshes(
             )
 
             methods_str = format_subdivision_methods(record.subdivision_methods)
+            should_print = (
+                (category == "subdivided" and print_subdivision_logs)
+                or (category == "decimated" and print_decimating_logs)
+                or (category == "fine" and print_outlier_stats)
+            )
 
             if outside_range:
                 if category == "subdivided":
@@ -397,7 +438,7 @@ def resample_meshes(
                             f"{record.before_vertices} -> {record.after_vertices} "
                             f"(outside range [{MIN_VERTEX_COUNT}, {MAX_VERTEX_COUNT}]{methods_info})"
                         )
-                elif should_print:  # type: ignore
+                elif should_print:
                     if category == "subdivided":
                         tqdm.write(
                             f"{record.relative_path} (subdivision method: {methods_str}): "
@@ -409,12 +450,6 @@ def resample_meshes(
                             f"{record.before_vertices} -> {record.after_vertices}"
                         )
             else:
-                should_print = (
-                    (category == "subdivided" and print_subdivision_logs)
-                    or (category == "decimated" and print_decimating_logs)
-                    or (category == "fine" and print_outlier_stats)
-                )
-
                 if should_print:
                     if category == "subdivided":
                         tqdm.write(

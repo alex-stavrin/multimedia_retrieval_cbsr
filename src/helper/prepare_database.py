@@ -23,6 +23,7 @@ import src.step_2._3.repairment.repair_analyzer as rep_analyser
 import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 import src.step_3._2.histogram_descriptors.analyze_and_save as histogram_descriptor_analyzer
+import src.step_4.distance_calculations.normalize_descriptors as normalize_descriptors
 from src.helper.database_functions import verify_database_complete
 
 CHECKPOINT_VERSION = 1
@@ -38,6 +39,7 @@ STEP_ORDER = [
     "fully_normalize_database",
     "fully_normalized_shape_analysis",
     "calculate_descriptors",
+    "normalize_descriptors",
     "calculate_histogram_descriptor",
 ]
 
@@ -172,6 +174,7 @@ def prepare_database(
     reset_checkpoint: bool = False,
     reset_last_step: bool = False,
     seed: int = 42,
+    normalize_by_sum: bool = False,
 ) -> None:
     if reset_checkpoint and reset_last_step:
         raise ValueError(
@@ -293,7 +296,9 @@ def prepare_database(
     if analyze:
         resampled_analysis_dir = analysis_path / "2_models_resampled"
         resampled_analysis_dir.mkdir(parents=True, exist_ok=True)
-        resampled_analysis_csv = resampled_analysis_dir / "resampled_shape_analysis.csv"
+        resampled_analysis_csv = (
+            resampled_analysis_dir / "resampled_shape_analysis.csv"
+        )
         _run_step(
             "analyze_resampled_database",
             lambda: shape_analyzer.analyze_database(
@@ -354,13 +359,35 @@ def prepare_database(
     )
 
     # ---
+    # Normalizing simple descriptors
+
+    descriptors_normalized_csv = (
+        descriptors_analysis_dir / "simple_descriptors_normalized.csv"
+    )
+    _run_step(
+        "normalize_descriptors",
+        lambda: normalize_descriptors.process_descriptors(
+            csv_path=str(descriptors_csv),
+            output_path=str(descriptors_normalized_csv),
+        ),
+        state,
+        checkpoint_path,
+        raw_path,
+    )
+
+    # ---
     # Calculate histogram descriptors
 
-    hist_descriptors_csv = descriptors_analysis_dir / "histogram_descriptors.csv"
+    hist_descriptors_csv = (
+        descriptors_analysis_dir / "histogram_descriptors.csv"
+    )
     _run_step(
         "calculate_histogram_descriptor",
         lambda: histogram_descriptor_analyzer.analyze_and_save(
-            input=fully_normalized, output=hist_descriptors_csv, seed=seed
+            input=fully_normalized,
+            output=hist_descriptors_csv,
+            seed=seed,
+            normalize_by_sum=normalize_by_sum,
         ),
         state,
         checkpoint_path,
@@ -412,6 +439,13 @@ def main() -> None:
         default=42,
         help="Random seed for histogram descriptors sampling (default: 42).",
     )
+    parser.add_argument(
+        "--normalize_by_sum",
+        "--normalize-by-sum",
+        action="store_true",
+        default=False,
+        help="Normalize histogram descriptors by sum (sum = 1) instead of area (integral = 1).",
+    )
     args = parser.parse_args()
 
     if args.reset_checkpoint or args.reset_last_step:
@@ -427,6 +461,7 @@ def main() -> None:
         reset_checkpoint=args.reset_checkpoint,
         reset_last_step=args.reset_last_step,
         seed=args.seed,
+        normalize_by_sum=args.normalize_by_sum,
     )
 
 

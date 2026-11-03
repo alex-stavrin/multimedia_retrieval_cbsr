@@ -22,11 +22,15 @@ _silence_vtk()
 
 def proccess_file(args: tuple) -> list:
     _silence_vtk()
-    if len(args) == 5:
+    if len(args) == 6:
+        file, input_root, n_samples, n_bins, seed, normalize_by_sum = args
+    elif len(args) == 5:
         file, input_root, n_samples, n_bins, seed = args
+        normalize_by_sum = False
     else:
         file, input_root, n_samples, n_bins = args
         seed = DEFAULT_SEED
+        normalize_by_sum = False
 
     relative_path = file.relative_to(input_root).as_posix()
     mesh = vedo.Mesh(str(file))
@@ -36,29 +40,34 @@ def proccess_file(args: tuple) -> list:
         n_samples=n_samples,
         n_bins_histogram=n_bins,
         seed=seed,
+        normalize_by_sum=normalize_by_sum,
     )
     D1, _ = calculate_distance_from_barycenter(
         mesh=mesh,
         n_bins_histogram=n_bins,
         seed=seed,
+        normalize_by_sum=normalize_by_sum,
     )
     D2, _ = calculate_distance_two_vertices(
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
         seed=seed,
+        normalize_by_sum=normalize_by_sum,
     )
     D3, _ = calculate_area_triangle(
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
         seed=seed,
+        normalize_by_sum=normalize_by_sum,
     )
     D4, _ = calculate_volume_tetrahedron(
         mesh=mesh,
         n_samples=n_samples,
         n_bins_histogram=n_bins,
         seed=seed,
+        normalize_by_sum=normalize_by_sum,
     )
 
     return [
@@ -78,6 +87,7 @@ def analyze_and_save(
     samples: int = 100_000,
     max_workers: int | None = None,
     seed: int | None = DEFAULT_SEED,
+    normalize_by_sum: bool = False,
 ):
     if isinstance(input, str):
         input = Path(input)
@@ -102,7 +112,10 @@ def analyze_and_save(
         writer = csv.writer(f)
         writer.writerow(header)
 
-        tasks = [(file, input, samples, bins, seed) for file in files]
+        tasks = [
+            (file, input, samples, bins, seed, normalize_by_sum)
+            for file in files
+        ]
         n_workers = max_workers or os.cpu_count() or 1
         print(f"Using {n_workers} worker processes")
 
@@ -149,6 +162,14 @@ def main():
         help="Random seed for reproducible descriptor sampling (default: 42).",
     )
 
+    parser.add_argument(
+        "--normalize_by_sum",
+        "--normalize-by-sum",
+        action="store_true",
+        default=False,
+        help="Normalize histograms by sum (sum of bins = 1) instead of area (integral = 1).",
+    )
+
     arguements = parser.parse_args()
 
     analyze_and_save(
@@ -158,6 +179,7 @@ def main():
         bins=arguements.bins,
         max_workers=arguements.workers,
         seed=arguements.seed,
+        normalize_by_sum=arguements.normalize_by_sum,
     )
 
 

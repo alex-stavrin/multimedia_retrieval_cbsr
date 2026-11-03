@@ -56,6 +56,14 @@ def main():
         help="Random seed for reproducible descriptor sampling (default: 42).",
     )
 
+    parser.add_argument(
+        "--normalize_by_sum",
+        "--normalize-by-sum",
+        action="store_true",
+        default=False,
+        help="Normalize histograms by sum (sum of bins = 1) instead of area (integral = 1).",
+    )
+
     arguements = parser.parse_args()
 
     # get all 3D files (.obj)
@@ -117,12 +125,14 @@ def main():
                 n_samples=arguements.samples,
                 n_bins_histogram=arguements.bins,
                 seed=arguements.seed,
+                normalize_by_sum=arguements.normalize_by_sum,
             )
         elif arguements.descriptor == "D1":
             histogram, bin_centers = calculate_distance_from_barycenter(
                 mesh=mesh,
                 n_bins_histogram=arguements.bins,
                 seed=arguements.seed,
+                normalize_by_sum=arguements.normalize_by_sum,
             )
         elif arguements.descriptor == "D2":
             histogram, bin_centers = calculate_distance_two_vertices(
@@ -130,6 +140,7 @@ def main():
                 n_samples=arguements.samples,
                 n_bins_histogram=arguements.bins,
                 seed=arguements.seed,
+                normalize_by_sum=arguements.normalize_by_sum,
             )
         elif arguements.descriptor == "D3":
             histogram, bin_centers = calculate_area_triangle(
@@ -137,6 +148,7 @@ def main():
                 n_samples=arguements.samples,
                 n_bins_histogram=arguements.bins,
                 seed=arguements.seed,
+                normalize_by_sum=arguements.normalize_by_sum,
             )
         elif arguements.descriptor == "D4":
             histogram, bin_centers = calculate_volume_tetrahedron(
@@ -144,6 +156,7 @@ def main():
                 n_samples=arguements.samples,
                 n_bins_histogram=arguements.bins,
                 seed=arguements.seed,
+                normalize_by_sum=arguements.normalize_by_sum,
             )
         else:
             raise ValueError(f"Unsupported descriptor: {arguements.descriptor}")
