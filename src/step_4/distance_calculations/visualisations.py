@@ -1,6 +1,16 @@
+import colorsys
 from pathlib import Path
+
 import vedo
 import numpy as np
+
+
+def _distance_color(normalized_error: float) -> tuple[float, float, float]:
+    """Map low-to-high distances onto a fixed-hue blue gradient."""
+    error = float(np.clip(normalized_error, 0.0, 1.0))
+    saturation = 0.95 - 0.87 * error
+    value = 0.35 + 0.64 * error
+    return colorsys.hsv_to_rgb(0.58, saturation, value)
 
 
 def visualize_mesh_distances(
@@ -43,6 +53,9 @@ def visualize_mesh_distances(
         else:
             distance = distances[distance_key]
 
+        if distance is not None and np.isclose(distance, 0.0, atol=1e-12):
+            continue
+
         comparison_meshes.append((shape, distance))
 
     # Sort available distances first; missing distances go last.
@@ -58,14 +71,18 @@ def visualize_mesh_distances(
     for shape, distance in comparison_meshes:
         mesh_paths.append(shape)
 
-    available_distances = []
-
-    for shape, distance in comparison_meshes:
-        if distance is not None:
-            available_distances.append(distance)
-
-    min_distance = min(available_distances, default=0.0)
-    max_distance = max(available_distances, default=1.0)
+    positive_distances = [
+        distance
+        for distance in distances.values()
+        if np.isfinite(distance) and distance > 1e-12
+    ]
+    color_scale = (
+        float(np.percentile(positive_distances, 95))
+        if positive_distances
+        else 1.0
+    )
+    if color_scale <= 0:
+        color_scale = 1.0
 
     meshes = []
     labels = []
@@ -101,18 +118,9 @@ def visualize_mesh_distances(
                 mesh.color("lightgray")
                 label_text = f"MESH {index}\nDistance: N/A"
             else:
-                if max_distance == min_distance:
-                    normalized = 0.0
-                else:
-                    normalized = (distance - min_distance) / (
-                        max_distance - min_distance
-                    )
+                normalized = min(distance / color_scale, 1.0)
 
-                # Green means closer; red means farther.
-                red = normalized
-                green = 1.0 - normalized
-
-                mesh.color((red, green, 0.0))
+                mesh.color(_distance_color(normalized))
                 mesh_label = mesh_path.split("/")[-2:]
                 label_text = (
                     f"CLASS: {mesh_label[0]}\nOBJECT: {mesh_label[1]}\n"

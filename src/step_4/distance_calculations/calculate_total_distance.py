@@ -517,7 +517,8 @@ class ShapeDistanceCalculator:
             raise ValueError(
                 "Cannot transform query descriptors to match the supplied "
                 "processed database. Could not infer raw-to-database "
-                f"transforms for: {sorted(missing_transforms)}. Supply matching raw "
+                f"transforms for: {sorted(missing_transforms)}. "
+                "Supply matching raw "
                 "descriptor data or query descriptors in the database's "
                 "transformed space."
             )
@@ -719,6 +720,12 @@ class ShapeDistanceCalculator:
                         normalize_path_separators(shape): float(distance)
                         for shape, distance in distances.items()
                     }
+                if query_key in distances:
+                    distances[query_key] = 0.0
+                else:
+                    normalized_query = normalize_path_separators(query_key)
+                    if normalized_query in distances:
+                        distances[normalized_query] = 0.0
                 all_distances[function_name][descriptor] = distances
 
         self.all_distances = all_distances
@@ -921,11 +928,13 @@ def main():
             config=(
                 "Euclidean (equal weights)"
                 if args.config == "l2-equal"
-                else "Euclidean"
-                if args.config.startswith("l2")
-                else "Cosine"
-                if args.config.startswith("cosine")
-                else "EMD"
+                else (
+                    "Euclidean"
+                    if args.config.startswith("l2")
+                    else (
+                        "Cosine" if args.config.startswith("cosine") else "EMD"
+                    )
+                )
             ),
         )
 

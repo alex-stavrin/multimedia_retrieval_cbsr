@@ -293,7 +293,9 @@ def prepare_database(
     if analyze:
         resampled_analysis_dir = analysis_path / "2_models_resampled"
         resampled_analysis_dir.mkdir(parents=True, exist_ok=True)
-        resampled_analysis_csv = resampled_analysis_dir / "resampled_shape_analysis.csv"
+        resampled_analysis_csv = (
+            resampled_analysis_dir / "resampled_shape_analysis.csv"
+        )
         _run_step(
             "analyze_resampled_database",
             lambda: shape_analyzer.analyze_database(
@@ -356,7 +358,9 @@ def prepare_database(
     # ---
     # Calculate histogram descriptors
 
-    hist_descriptors_csv = descriptors_analysis_dir / "histogram_descriptors.csv"
+    hist_descriptors_csv = (
+        descriptors_analysis_dir / "histogram_descriptors.csv"
+    )
     _run_step(
         "calculate_histogram_descriptor",
         lambda: histogram_descriptor_analyzer.analyze_and_save(
