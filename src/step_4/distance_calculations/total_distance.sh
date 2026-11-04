@@ -50,7 +50,7 @@ fi
 case "$config" in
     l2) weights_csv="3d_models_prepared/analysis/L2_weights_descriptors.csv" ;;
     l2-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;
-    emd) weights_csv="3d_models_prepared/analysis/weights_emd_descriptors.csv" ;;
+    emd) weights_csv="3d_models_prepared/analysis/weights_emd_raw_descriptors.csv" ;;
     emd-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;
     cosine) weights_csv="3d_models_prepared/analysis/weights_cosine_descriptors.csv" ;;
     cosine-equal) weights_csv="analysis_output/distances/weights_equal.csv" ;;

@@ -11,7 +11,9 @@ import pandas as pd
 from tqdm import tqdm
 
 from src.step_4.distance_calculations.calculate_total_distance import (
-    DISTANCE_CONFIG_MIXED,
+    DISTANCE_CONFIG_EMD,
+    DISTANCE_CONFIG_COSINE,
+    DISTANCE_CONFIG_L2,
     DistanceConfig,
 )
 
@@ -33,9 +35,7 @@ class RunningStatistics:
             return
 
         batch_mean = float(values.mean())
-        batch_squared_deviations = float(
-            np.square(values - batch_mean).sum()
-        )
+        batch_squared_deviations = float(np.square(values - batch_mean).sum())
 
         if self.count == 0:
             self.count = batch_count
@@ -134,7 +134,7 @@ def _output_csv_path(output_path: str | Path) -> Path:
 def calculate_weights(
     csv_path: str | Path,
     output_path: str | Path,
-    distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG_MIXED,
+    distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG_EMD,
     chunksize: int = 50_000,
 ) -> pd.DataFrame:
     """Calculate descriptor statistics and weights from a pairwise CSV.
@@ -151,9 +151,7 @@ def calculate_weights(
         raise ValueError("chunksize must be positive.")
 
     expected_pairs = _expected_descriptor_pairs(distance_config)
-    statistics = {
-        pair: RunningStatistics() for pair in expected_pairs
-    }
+    statistics = {pair: RunningStatistics() for pair in expected_pairs}
     rows_processed = 0
     reader = pd.read_csv(
         input_path,
@@ -177,6 +175,15 @@ def calculate_weights(
 
 
 def main() -> None:
+    available_configs = {
+        "emd": DISTANCE_CONFIG_EMD,
+        "emd-equal": DISTANCE_CONFIG_EMD,
+        "l2": DISTANCE_CONFIG_L2,
+        "l2-equal": DISTANCE_CONFIG_L2,
+        "cosine": DISTANCE_CONFIG_COSINE,
+        "cosine-equal": DISTANCE_CONFIG_COSINE,
+    }
+
     parser = argparse.ArgumentParser(
         description=(
             "Calculate descriptor statistics and weights from "
@@ -188,6 +195,14 @@ def main() -> None:
         type=Path,
         required=True,
         help="Path to the pairwise-distance CSV.",
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        required=True,
+        type=str,
+        help="The distance config used to calculate the pairwise differences."
+        f"\nConfigs available: {available_configs.keys()}",
     )
     parser.add_argument(
         "-o",
@@ -202,12 +217,14 @@ def main() -> None:
         default=500_000,
         help="Number of CSV rows to process per chunk.",
     )
+
     args = parser.parse_args()
 
     calculate_weights(
         csv_path=args.csv_path,
         output_path=args.output,
         chunksize=args.chunksize,
+        distance_config=available_configs[args.config]
     )
 
 

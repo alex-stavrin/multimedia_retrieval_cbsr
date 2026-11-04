@@ -7,13 +7,14 @@ from tqdm import tqdm
 
 from src.step_4.distance_calculations.calculate_total_distance import (
     ShapeDistanceCalculator,
-    DISTANCE_CONFIG_MIXED,
     DISTANCE_CONFIG_L2,
     DISTANCE_CONFIG_COSINE,
+    DISTANCE_CONFIG_EMD,
     IDENTIFIER_COLUMN,
+    DistanceConfig,
 )
 
-CHECKPOINT_INTERVAL = 2
+CHECKPOINT_INTERVAL = 100
 
 OUTPUT_COLUMNS = [
     "mesh_a",
@@ -111,16 +112,20 @@ def get_completed_queries_from_csv(
         )
 
 
+# REFORMAT, CALCLATE_TOTAL_DISTANCES CANNOT CALCULATE DISTANCE TO SPECIFIC
+# OBJECT ANYMORE
+
+
 def calculate_all_pairwise_distances(
     csv_paths: list[str | Path],
     output_path: str | Path = "all_pairwise_distances.csv",
-    distance_config=None,
+    distance_config: dict[str, DistanceConfig] | None = DISTANCE_CONFIG_EMD,
     identifier_column: str = IDENTIFIER_COLUMN,
 ) -> None:
     """Calculate unique mesh pairs and resume safely from saved progress."""
 
     if distance_config is None:
-        distance_config = DISTANCE_CONFIG_MIXED
+        raise ValueError("No distance config given")
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -195,6 +200,9 @@ def calculate_all_pairwise_distances(
 
     queries_since_checkpoint = 0
 
+    print(f"Calculating pair-wise distances using\n: {distance_config}\n\n"
+          f"With descriptor csv files\n: {csv_paths}\n")
+
     progress = tqdm(
         remaining_queries,
         total=len(query_meshes),
@@ -205,11 +213,12 @@ def calculate_all_pairwise_distances(
     )
     for query_mesh in progress:
         mesh_index = meshes.index(query_mesh)
+        # No longer valid:
         comparison_meshes = meshes[mesh_index + 1 :]
 
         results = calculator.calculate_all_distances(
             query=query_mesh,
-            shapes_to_compare=comparison_meshes,
+            # comparable_meshes=comparison_meshes,
         )
         comparison_mesh_set = set(comparison_meshes)
 
@@ -278,8 +287,8 @@ def main():
     )
 
     available_configs = {
-        "emd": DISTANCE_CONFIG_MIXED,
-        "emd-equal": DISTANCE_CONFIG_MIXED,
+        "emd": DISTANCE_CONFIG_EMD,
+        "emd-equal": DISTANCE_CONFIG_EMD,
         "l2": DISTANCE_CONFIG_L2,
         "l2-equal": DISTANCE_CONFIG_L2,
         "cosine": DISTANCE_CONFIG_COSINE,

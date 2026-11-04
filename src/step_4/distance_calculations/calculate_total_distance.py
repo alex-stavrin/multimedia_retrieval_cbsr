@@ -43,7 +43,7 @@ ELEMENTAL_DESCRIPTORS = [
 
 HISTOGRAM_DESCRIPTORS = ["A3", "D1", "D2", "D3", "D4"]
 
-DISTANCE_CONFIG_MIXED = {
+DISTANCE_CONFIG_EMD = {
     "euclidean": DistanceConfig(
         euclidean_distance, ELEMENTAL_DESCRIPTORS, histogram=False
     ),
@@ -81,7 +81,7 @@ class ShapeDistanceCalculator:
     def __init__(
         self,
         csv_databases: list[str | Path],
-        distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG_MIXED,
+        distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG_EMD,
         identifier_column: str = IDENTIFIER_COLUMN,
     ) -> None:
         self.csv_databases = [Path(path) for path in csv_databases]
@@ -671,7 +671,6 @@ class ShapeDistanceCalculator:
     def calculate_all_distances(
         self,
         query: str,
-        shapes_to_compare: list[str] | None = None,
     ) -> dict[str, dict[str, dict[str, float]]]:
         """Calculate distances using the active distance configuration."""
         self.last_query = query
@@ -835,9 +834,9 @@ class ShapeDistanceCalculator:
 def main():
 
     available_configs = {
-        "emd": DISTANCE_CONFIG_MIXED,
-        "emd-equal": DISTANCE_CONFIG_MIXED,
-        "emd-rec": DISTANCE_CONFIG_MIXED,
+        "emd": DISTANCE_CONFIG_EMD,
+        "emd-equal": DISTANCE_CONFIG_EMD,
+        "emd-rec": DISTANCE_CONFIG_EMD,
         "l2": DISTANCE_CONFIG_L2,
         "l2-equal": DISTANCE_CONFIG_L2,
         "l2-rec": DISTANCE_CONFIG_L2,
