@@ -77,3 +77,40 @@ class RetrievalEvaluator:
             )
 
         data_frame_queries = pd.DataFrame(query_records)
+
+        per_class = (
+            data_frame_queries.groupby("class")
+            .agg(
+                number_of_queries=("query_id", "count"),
+                mean_retrieved=("retrieved_count", "mean"),
+                precision=("precision", "mean"),
+                recall=("recall", "mean"),
+                f1=("f1", "mean"),
+                is_first_correct=("is_first_correct", "mean"),
+            )
+            .reset_index()
+            .sort_values("f1", ascending=False)
+        )
+
+        total_stats = {
+            "method": method_name,
+            "total_queries": len(data_frame_queries),
+            "macro_precision": float(per_class["precision"].mean()),
+            "macro_recall": float(per_class["recall"].mean()),
+            "macro_f1": float(per_class["f1"].mean()),
+            "micro_precision": float(data_frame_queries["precision"].mean()),
+            "micro_recall": float(data_frame_queries["recall"].mean()),
+            "micro_f1": float(data_frame_queries["f1"].mean()),
+            "is_first_correct_accuracy": float(
+                data_frame_queries["is_first_correct"].mean()
+            ),
+        }
+
+        confusion_data_frame = pd.DataFrame(confusion_matrix).fillna(0).T
+
+        return {
+            "per_class": per_class,
+            "total_stats": total_stats,
+            "queries": data_frame_queries,
+            "confusion_matrix": confusion_data_frame,
+        }
