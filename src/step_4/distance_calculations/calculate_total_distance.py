@@ -228,32 +228,6 @@ class ShapeDistanceCalculator:
                     if len(matches) == 1:
                         self.weights[key] = matches[0]
 
-        # Pairwise descriptor distances have very different units (for
-        # example, scalar z-score distances versus histogram-bin distances).
-        # Use the pairwise mean from the same calibration CSV as a scale so a
-        # typical distance for each descriptor is approximately one.
-        self._distance_scales: dict[tuple[str, str], float] = {}
-        if self.weights_df is not None and "mean" in self.weights_df.columns:
-            for _, row in self.weights_df.iterrows():
-                key = (str(row["distance_function"]), str(row["descriptor"]))
-                scale = pd.to_numeric(row["mean"], errors="coerce")
-                if pd.notna(scale) and np.isfinite(scale) and scale > 0:
-                    self._distance_scales[key] = float(scale)
-        for function_name, config in self.distance_config.items():
-            for descriptor in config.descriptors:
-                key = (function_name, descriptor)
-                if key not in self._distance_scales:
-                    matches = [
-                        scale
-                        for (
-                            _,
-                            candidate,
-                        ), scale in self._distance_scales.items()
-                        if candidate == descriptor
-                    ]
-                    if len(matches) == 1:
-                        self._distance_scales[key] = matches[0]
-
         self._query_transforms: dict[str, tuple[float, float]] = {}
         for key, (
             _,
@@ -609,27 +583,13 @@ class ShapeDistanceCalculator:
                         "Missing weight for configured descriptor "
                         f"('{function_name}', '{descriptor}')."
                     )
-                scale = self._distance_scales.get(
-                    (function_name, descriptor), 1.0
-                )
-                source = self._descriptor_sources.get(
-                    (function_name, descriptor)
-                )
-                histogram_bin_count = 1
-                if source is not None:
-                    _, columns, is_histogram = source
-                    config = self.distance_config[function_name]
-                    if is_histogram and config.function is euclidean_distance:
-                        histogram_bin_count = len(columns)
                 for shape in totals:
                     if shape not in distances:
                         raise ValueError(
                             f"No distance for '{shape}' and descriptor "
                             f"'{descriptor}'."
                         )
-                    totals[shape] += weight * (
-                        distances[shape] / scale / histogram_bin_count
-                    )
+                    totals[shape] += weight * distances[shape]
         return dict(sorted(totals.items(), key=lambda item: item[1]))
 
     @staticmethod
