@@ -8,9 +8,6 @@ import re
 import numpy as np
 import pandas as pd
 
-from scipy.spatial.distance import euclidean, cosine as scipy_cosine
-from scipy.stats import wasserstein_distance
-
 from src.step_4.distance_calculations.visualisations import (
     visualize_mesh_distances,
 )
@@ -90,8 +87,12 @@ class _DataFrameShapeLookup:
 
 
 # Per-DataFrame caches keyed by id(df)
-_LOOKUP_CACHE: dict[tuple[int, str], tuple[pd.DataFrame, _DataFrameShapeLookup]] = {}
-_HISTOGRAM_GROUPS_CACHE: dict[int, tuple[pd.DataFrame, dict[str, list[str]]]] = {}
+_LOOKUP_CACHE: dict[
+    tuple[int, str], tuple[pd.DataFrame, _DataFrameShapeLookup]
+] = {}
+_HISTOGRAM_GROUPS_CACHE: dict[
+    int, tuple[pd.DataFrame, dict[str, list[str]]]
+] = {}
 _FEATURE_MATRIX_CACHE: dict[
     tuple[int, str, bool, str],
     tuple[pd.DataFrame, list[str], np.ndarray, np.ndarray],
@@ -287,34 +288,6 @@ def _get_cached_feature_matrix(
     return columns, matrix, finite_mask
 
 
-def _get_numeric_vector(
-    row: pd.Series,
-    columns: list[str],
-    mesh_identifier: str,
-) -> np.ndarray:
-    """Extract a validated numeric feature vector from one mesh row."""
-    values = pd.to_numeric(row[columns], errors="coerce").to_numpy(dtype=float)
-
-    if not np.isfinite(values).all():
-        raise ValueError(
-            f"Missing or non-finite feature values for mesh "
-            f"'{mesh_identifier}'."
-        )
-
-    return values
-
-
-def _find_shape(
-    df: pd.DataFrame,
-    shape_identifier: str,
-    identifier_column=IDENTIFIER_COLUMN,
-) -> pd.Series:
-    """Find a mesh by its path, filename, or filename stem."""
-    lookup = _get_shape_lookup(df, identifier_column)
-    idx = lookup.resolve_index(shape_identifier)
-    return df.iloc[idx]
-
-
 def euclidean_distance(
     df: pd.DataFrame,
     query: str,
@@ -413,6 +386,19 @@ def cosine_distance(
     return dict(zip(comp_keys, dists.tolist()))
 
 
+def cdf_earth_movers_distance(
+    cdf_a: np.ndarray,
+    cdf_b: np.ndarray,
+    number_of_bins: int,
+) -> np.ndarray:
+    """Compute 1D EMD on the descriptors' uniform [0, 1] support."""
+    # Adjacent bins are 1 / number_of_bins apart on [0, 1]. Multiplying
+    # the CDF difference sum by this spacing expresses EMD in support units
+    # rather than bin steps.
+    bin_width = 1.0 / number_of_bins
+    return np.sum(np.abs(cdf_a - cdf_b), axis=-1) * bin_width
+
+
 def earth_movers_distance(
     df: pd.DataFrame,
     query: str,
@@ -479,7 +465,8 @@ def earth_movers_distance(
     if not non_neg_mask[comp_indices].all():
         bad_pos = int(np.flatnonzero(~non_neg_mask[comp_indices])[0])
         raise ValueError(
-            f"Comparison mesh '{shapes_to_compare[bad_pos]}' has negative values. "
+            f"Comparison mesh '{shapes_to_compare[bad_pos]}' "
+            "has negative values. "
             "EMD requires non-negative histogram weights."
         )
 
@@ -507,7 +494,11 @@ def earth_movers_distance(
 
     query_cdf = cdf_matrix[query_idx]
     comp_cdfs = cdf_matrix[comp_indices]
-    dists = np.sum(np.abs(comp_cdfs - query_cdf), axis=1)
+    dists = cdf_earth_movers_distance(
+        comp_cdfs,
+        query_cdf,
+        number_of_bins=matrix.shape[1],
+    )
 
     return dict(zip(comp_keys, dists.tolist()))
 
