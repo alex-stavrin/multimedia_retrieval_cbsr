@@ -2,12 +2,13 @@
 set -euo pipefail
 
 usage() {
-    echo "Usage: $0 --config <l2|emd|cosine|l2-equal|emd-equal|cosine-equal|l2-rec|emd-rec|cosine-rec> --query <query-mesh-path> [-o <output-path>] [--visualise]" >&2
+    echo "Usage: $0 --config <l2|emd|cosine|l2-equal|emd-equal|cosine-equal|l2-rec|emd-rec|cosine-rec> --query <query-mesh-path> [--weights <weights.csv>] [-o <output-path>] [--visualise]" >&2
 }
 
 config=""
 query_path=""
 output_path="test.json"
+weights_override=""
 visualise=false
 
 while [[ $# -gt 0 ]]; do
@@ -27,6 +28,15 @@ while [[ $# -gt 0 ]]; do
                 exit 2
             fi
             output_path="$2"
+            shift 2
+            ;;
+        -w|--weights|--weights-file)
+            if [[ $# -lt 2 ]]; then
+                echo "Missing weights CSV path after $1" >&2
+                usage
+                exit 2
+            fi
+            weights_override="$2"
             shift 2
             ;;
         -v|--visualise|--visualize)
@@ -59,6 +69,10 @@ case "$config" in
     cosine-rec) weights_csv="analysis_output/distances/cosine_recommended_weights.csv" ;;
     *) echo "Unknown config: $config" >&2; usage; exit 2 ;;
 esac
+
+if [[ -n "$weights_override" ]]; then
+    weights_csv="$weights_override"
+fi
 
 if [[ ! -f "$weights_csv" ]]; then
     echo "Weights CSV does not exist: $weights_csv" >&2

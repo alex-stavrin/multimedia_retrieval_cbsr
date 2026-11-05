@@ -1,4 +1,5 @@
 from src.step_4.distance_calculations.distance_functions import (
+    cdf_earth_movers_distance,
     euclidean_distance,
     earth_movers_distance,
     cosine_distance,
@@ -16,6 +17,7 @@ from dataclasses import dataclass
 from typing import Callable, Sequence, Any
 import json
 import vedo
+import random
 
 import pandas as pd
 import numpy as np
@@ -212,6 +214,20 @@ class ShapeDistanceCalculator:
                 )
                 for _, r in self.weights_df.iterrows()
             }
+        self.distance_scales: dict[tuple[str, str], float] = {}
+        if self.weights_df is not None and "distance_scale" in self.weights_df:
+            for _, row in self.weights_df.iterrows():
+                key = (
+                    str(row["distance_function"]),
+                    str(row["descriptor"]),
+                )
+                scale = pd.to_numeric(row["distance_scale"], errors="coerce")
+                if pd.isna(scale) or not np.isfinite(scale) or scale <= 0:
+                    raise ValueError(
+                        "Invalid distance_scale for "
+                        f"('{key[0]}', '{key[1]}'): {row['distance_scale']}"
+                    )
+                self.distance_scales[key] = float(scale)
 
         # A distance-function change should not require editing the config
         # and weights CSV in lockstep. Reuse a descriptor weight only when
@@ -227,6 +243,17 @@ class ShapeDistanceCalculator:
                     ]
                     if len(matches) == 1:
                         self.weights[key] = matches[0]
+                if key not in self.distance_scales:
+                    matches = [
+                        scale
+                        for (
+                            _,
+                            candidate,
+                        ), scale in self.distance_scales.items()
+                        if candidate == descriptor
+                    ]
+                    if len(matches) == 1:
+                        self.distance_scales[key] = matches[0]
 
         self._query_transforms: dict[str, tuple[float, float]] = {}
         for key, (
@@ -374,7 +401,11 @@ class ShapeDistanceCalculator:
                 :, :-1
             ]
             query_cdf = np.cumsum(query_vector / query_sum)[:-1]
-            values = np.abs(candidate_cdfs - query_cdf).sum(axis=1)
+            values = cdf_earth_movers_distance(
+                candidate_cdfs,
+                query_cdf,
+                number_of_bins=candidates.shape[1],
+            )
             return dict(zip(self.shape_identifiers, values.astype(float)))
 
         if config.function is cosine_distance:
@@ -583,13 +614,21 @@ class ShapeDistanceCalculator:
                         "Missing weight for configured descriptor "
                         f"('{function_name}', '{descriptor}')."
                     )
+                distance_scale = self.distance_scales.get(
+                    (function_name, descriptor), 1.0
+                )
+                print(
+                    f"Descriptor: {descriptor}\n"
+                    f"Distance scale: {distance_scale}\n"
+                    f"Wieght: {weight}\n\n"
+                )
                 for shape in totals:
                     if shape not in distances:
                         raise ValueError(
                             f"No distance for '{shape}' and descriptor "
                             f"'{descriptor}'."
                         )
-                    totals[shape] += weight * distances[shape]
+                    totals[shape] += weight * distance_scale * distances[shape]
         return dict(sorted(totals.items(), key=lambda item: item[1]))
 
     @staticmethod
@@ -740,8 +779,22 @@ class ShapeDistanceCalculator:
                 "descriptor_distances": descriptor_distances,
             }
 
+        weighting = {
+            function_name: {
+                descriptor: {
+                    "weight": self.weights.get((function_name, descriptor)),
+                    "distance_scale": self.distance_scales.get(
+                        (function_name, descriptor), 1.0
+                    ),
+                }
+                for descriptor in config.descriptors
+            }
+            for function_name, config in self.distance_config.items()
+        }
+
         return {
             "query": query_path,
+            "weighting": weighting,
             "results": results,
         }
 
@@ -830,6 +883,7 @@ def main():
         help="Comparison mesh identifiers or paths.",
     )
     parser.add_argument(
+        "-c",
         "--config",
         choices=tuple(available_configs.keys()),
         default="mixed",
@@ -852,6 +906,12 @@ def main():
         type=str,
         help="Output file directory for json file storing calculation result",
     )
+    parser.add_argument(
+        "--max_top_results_printing",
+        type=int,
+        default=10,
+        help="The final result printing in CLI"
+    )
 
     args = parser.parse_args()
 
@@ -864,8 +924,8 @@ def main():
     total_distances = calculator.calculate_total_distance(
         args.query, args.shapes, run_pipeline=True
     )
-    print("Total distances calculated. Top 10:")
-    for k, v in list(total_distances.items())[:10]:
+    print(f"Total distances calculated. Top {args.max_top_results_printing}:")
+    for k, v in list(total_distances.items())[:args.max_top_results_printing]:
         print(f"  {k}: {v:.4f}")
 
     if args.output:

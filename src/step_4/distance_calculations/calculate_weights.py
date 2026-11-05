@@ -112,17 +112,81 @@ def _build_statistics_frame(
     return pd.DataFrame(records)
 
 
-def _add_inverse_std_weights(stats: pd.DataFrame) -> pd.DataFrame:
-    """Assign global weights proportional to inverse standard deviation."""
-    stats = stats.copy()
-    stats["weight"] = 0.0
-    valid = stats["std"].notna() & np.isfinite(stats["std"])
-    valid &= stats["std"] > 0
+def _histogram_pairs(
+    distance_config: dict[str, DistanceConfig],
+) -> set[tuple[str, str]]:
+    """Return the configured function/descriptor pairs that are histograms."""
+    return {
+        (function_name, descriptor)
+        for function_name, config in distance_config.items()
+        if config.histogram
+        for descriptor in config.descriptors
+    }
 
-    if valid.any():
-        inverse_std = 1.0 / stats.loc[valid, "std"]
-        stats.loc[valid, "weight"] = inverse_std / inverse_std.sum()
-    return stats
+
+def calculate_weights(stats: pd.DataFrame) -> pd.DataFrame:
+    """Calculate equal descriptor weights independently of distance scales."""
+    if stats.empty:
+        raise ValueError("No descriptor statistics were calculated.")
+
+    number_of_descriptors = len(stats)
+    return stats[["distance_function", "descriptor"]].assign(
+        weight=1.0 / number_of_descriptors
+    )
+
+
+def calculate_distance_scales(
+    stats: pd.DataFrame,
+    distance_config: dict[str, DistanceConfig],
+) -> pd.DataFrame:
+    """Scale histogram-distance spread to the median scalar-distance spread.
+
+    Scalar descriptors already use standardized values, so their distance
+    scales remain one. This calculation does not read or modify weights.
+    """
+    if stats.empty:
+        raise ValueError("No descriptor statistics were calculated.")
+
+    histogram_pairs = _histogram_pairs(distance_config)
+    scales = stats[["distance_function", "descriptor"]].copy()
+    scales["distance_scale"] = 1.0
+    if not histogram_pairs:
+        return scales
+
+    is_histogram = pd.Series(
+        [
+            (str(row.distance_function), str(row.descriptor))
+            in histogram_pairs
+            for row in stats.itertuples(index=False)
+        ],
+        index=stats.index,
+    )
+    scalar_stds = pd.to_numeric(
+        stats.loc[~is_histogram, "std"], errors="coerce"
+    )
+    scalar_stds = scalar_stds[np.isfinite(scalar_stds) & (scalar_stds > 0)]
+    if scalar_stds.empty:
+        raise ValueError(
+            "Cannot scale histogram distances: no positive scalar-distance "
+            "standard deviations are available."
+        )
+
+    reference_std = float(scalar_stds.median())
+    for index in stats.index[is_histogram]:
+        histogram_std = pd.to_numeric(stats.at[index, "std"], errors="coerce")
+        if pd.isna(histogram_std) or not np.isfinite(histogram_std):
+            raise ValueError(
+                "Cannot scale histogram distance for "
+                f"('{stats.at[index, 'distance_function']}', "
+                f"'{stats.at[index, 'descriptor']}'): "
+                "invalid standard deviation."
+            )
+        if histogram_std > 0:
+            scales.at[index, "distance_scale"] = reference_std / float(
+                histogram_std
+            )
+
+    return scales
 
 
 def _output_csv_path(output_path: str | Path) -> Path:
@@ -131,19 +195,12 @@ def _output_csv_path(output_path: str | Path) -> Path:
     return path if path.suffix.lower() == ".csv" else path.with_suffix(".csv")
 
 
-def calculate_weights(
+def _calculate_pairwise_statistics(
     csv_path: str | Path,
-    output_path: str | Path,
     distance_config: dict[str, DistanceConfig] = DISTANCE_CONFIG_EMD,
     chunksize: int = 50_000,
-) -> pd.DataFrame:
-    """Calculate descriptor statistics and weights from a pairwise CSV.
-
-    Weights are inversely proportional to each descriptor's pairwise-distance
-    standard deviation, then normalized globally to sum to one. The mean is
-    saved as ``pairwise_mean`` for reference; it is not used as a distance
-    scale by the query calculator.
-    """
+) -> tuple[pd.DataFrame, int]:
+    """Calculate pairwise means and standard deviations from a CSV."""
     input_path = Path(csv_path)
     if not input_path.is_file():
         raise ValueError(f"CSV path '{input_path}' does not exist.")
@@ -163,15 +220,7 @@ def calculate_weights(
         rows_processed += len(chunk)
         _update_statistics_from_chunk(chunk, expected_pairs, statistics)
 
-    stats = _add_inverse_std_weights(_build_statistics_frame(statistics))
-    output_file = _output_csv_path(output_path)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    stats.to_csv(output_file, index=False)
-
-    print(f"Processed {rows_processed:,} CSV rows.")
-    print(f"Saved statistics and weights to: {output_file}")
-    print(stats.to_string(index=False))
-    return stats
+    return _build_statistics_frame(statistics), rows_processed
 
 
 def main() -> None:
@@ -220,12 +269,31 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    calculate_weights(
+    distance_config = available_configs[args.config]
+    pairwise_stats, rows_processed = _calculate_pairwise_statistics(
         csv_path=args.csv_path,
-        output_path=args.output,
         chunksize=args.chunksize,
-        distance_config=available_configs[args.config]
+        distance_config=distance_config,
     )
+    weights = calculate_weights(pairwise_stats)
+    distance_scales = calculate_distance_scales(
+        pairwise_stats,
+        distance_config,
+    )
+    stats = pairwise_stats.merge(
+        weights,
+        on=["distance_function", "descriptor"],
+    ).merge(
+        distance_scales,
+        on=["distance_function", "descriptor"],
+    )
+
+    output_file = _output_csv_path(args.output)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    stats.to_csv(output_file, index=False)
+    print(f"Processed {rows_processed:,} CSV rows.")
+    print(f"Saved statistics and weights to: {output_file}")
+    print(stats.to_string(index=False))
 
 
 if __name__ == "__main__":
