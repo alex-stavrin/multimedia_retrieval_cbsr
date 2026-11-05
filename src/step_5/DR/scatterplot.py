@@ -12,8 +12,9 @@ from src.step_4.user_interface.class_colors import get_class_color
 from src.step_5.DR.tsne_engine import DEFAULT_OUTPUT, load_embedding
 
 BACKGROUND = "#111111"
-# how close (in pixels) the mouse has to be to a point to select it
-PICK_DISTANCE = 8
+# how close (in points, so the same on a screen with a scaled display) the mouse
+# has to be to a point to select it
+PICK_RADIUS = 8
 DIMMED_ALPHA = 0.08
 
 
@@ -69,7 +70,8 @@ class Scatterplot:
         pixels = self.axes.transData.transform(self.points)
         distances = numpy.hypot(pixels[:, 0] - event.x, pixels[:, 1] - event.y)
         index = int(distances.argmin())
-        return index if distances[index] <= PICK_DISTANCE else None
+        pick_distance = PICK_RADIUS * self.figure.dpi / 72
+        return index if distances[index] <= pick_distance else None
 
     def on_hover(self, event: MouseEvent) -> None:
         index = self.nearest_point(event)
@@ -89,13 +91,13 @@ class Scatterplot:
         # a click while zooming or panning is not a selection
         toolbar = self.figure.canvas.toolbar
         if toolbar is not None and toolbar.mode != "":
+            self.title.set_text("zoom or pan is on, switch it off to select a class")
+            self.figure.canvas.draw_idle()
             return
         index = self.nearest_point(event)
-        clicked_class = None if index is None else str(self.shape_classes[index])
-        # clicking the selected class again, or empty space, clears the selection
-        self.selected_class = (
-            None if clicked_class == self.selected_class else clicked_class
-        )
+        # clicking empty space clears the selection, and clicking the selected
+        # class again keeps it, so a double click does not undo itself
+        self.selected_class = None if index is None else str(self.shape_classes[index])
         self.highlight()
 
     def highlight(self) -> None:

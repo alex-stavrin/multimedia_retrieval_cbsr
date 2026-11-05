@@ -6,8 +6,6 @@ from pathlib import Path
 
 import numpy
 import pandas
-from sklearn.manifold import TSNE
-from sklearn.neighbors import NearestNeighbors
 
 from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
 
@@ -60,6 +58,10 @@ class DimensionalityReductionEngine:
         balance: bool = True,
     ) -> numpy.ndarray:
         """t-SNE of all shapes as an (N, 2) array, in the order of shape_ids."""
+        # imported here so that the scatterplot, which only reads the csv file
+        # of the points, does not need scikit-learn
+        from sklearn.manifold import TSNE
+
         features = self.balanced_features() if balance else self.feature_matrix
         tsne = TSNE(
             n_components=2,
@@ -73,6 +75,8 @@ class DimensionalityReductionEngine:
         """Share of the k nearest neighbours of a point that have the same class,
         averaged over all points. It tells how well the classes are kept
         together, and is used to compare the 2D plot with the full vectors."""
+        from sklearn.neighbors import NearestNeighbors
+
         neighbour_indices = (
             NearestNeighbors(n_neighbors=k + 1)
             .fit(points)
