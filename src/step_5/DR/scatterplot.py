@@ -56,6 +56,11 @@ class Scatterplot:
         self.figure.canvas.mpl_connect("motion_notify_event", self.on_hover)
         self.figure.canvas.mpl_connect("button_press_event", self.on_click)
 
+    def show(self) -> None:
+        # matplotlib only keeps weak references to the handlers, so this object has
+        # to stay alive while the window is open, or hovering and clicking stop working
+        pyplot.show()
+
     def _title(self) -> str:
         if self.selected_class is None:
             return f"{len(self.points)} shapes, click a point to show its class"
@@ -114,8 +119,7 @@ def main() -> None:
     parser.add_argument("-i", "--input", type=str, default=DEFAULT_OUTPUT)
     arguments = parser.parse_args()
 
-    Scatterplot(arguments.input)
-    pyplot.show()
+    Scatterplot(arguments.input).show()
 
 
 if __name__ == "__main__":
