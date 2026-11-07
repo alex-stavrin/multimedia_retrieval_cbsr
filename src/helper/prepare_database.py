@@ -24,6 +24,8 @@ import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 import src.step_3._2.histogram_descriptors.analyze_and_save as histogram_descriptor_analyzer
 import src.step_4.distance_calculations.normalize_descriptors as normalize_descriptors
+import src.step_5.DR.tsne_engine as dr_engine
+from src.step_5.DR.scatterplot import Scatterplot
 import src.step_6.run_and_evaluate_knn as evaluate_knn
 import src.step_6.run_and_evaluate_rnn as evaluate_rnn
 import src.step_6.run_and_evaluate_weighted as evaluate_weighted
@@ -45,6 +47,7 @@ STEP_ORDER = [
     "calculate_descriptors",
     "normalize_descriptors",
     "calculate_histogram_descriptor",
+    "dimensionality_reduction_tsne",
     "run_and_evaluate_knn",
     "run_and_evaluate_rnn",
     "run_and_evaluate_weighted",
@@ -174,17 +177,50 @@ def _run_step(
     print(f"[DONE] {name}: checkpoint saved.")
 
 
+def _run_tsne(
+    elementary_csv: Path,
+    histogram_csv: Path,
+    output_csv: Path,
+    output_image: Path | None = None,
+    perplexity: float = 30.0,
+    seed: int = 0,
+) -> None:
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    engine = dr_engine.DimensionalityReductionEngine(
+        elementary_csv=elementary_csv,
+        histogram_csv=histogram_csv,
+    )
+    points = engine.reduce(
+        perplexity=perplexity,
+        random_state=seed,
+        balance=True,
+    )
+    engine.save(points, output_csv)
+    features = engine.balanced_features()
+    print(
+        f"[t-SNE] Saved {len(points)} 2D embedding points to: {output_csv}\n"
+        f"[t-SNE] 10 nearest neighbours class agreement: "
+        f"{engine.class_agreement(features):.3f} (feature space), "
+        f"{engine.class_agreement(points):.3f} (2D plot)"
+    )
+    if output_image is not None:
+        plot = Scatterplot(str(output_csv))
+        plot.save_image(output_image)
+
+
 def prepare_database(
     database_path: str,
     output_path: str = "3d_models_prepared",
     *,
     analyze: bool = False,
     evaluate: bool = True,
+    run_dr: bool = True,
     reset_checkpoint: bool = False,
     reset_last_step: bool = False,
     seed: int = 42,
     normalize_by_sum: bool = True,
     weights_csv: str | Path | None = None,
+    tsne_perplexity: float = 30.0,
     knn_k: int = 10,
     rnn_radius: float = 0.5,
     weighted_k: int = 10,
@@ -409,6 +445,28 @@ def prepare_database(
     )
 
     # ---
+    # Dimensionality Reduction (t-SNE 2D embedding for scatterplot)
+
+    if run_dr:
+        embeddings_dir = output_root / "embeddings"
+        tsne_csv = embeddings_dir / "tsne.csv"
+        tsne_png = embeddings_dir / "tsne_scatterplot.png"
+        _run_step(
+            "dimensionality_reduction_tsne",
+            lambda: _run_tsne(
+                elementary_csv=descriptors_normalized_csv,
+                histogram_csv=hist_descriptors_csv,
+                output_csv=tsne_csv,
+                output_image=tsne_png,
+                perplexity=tsne_perplexity,
+                seed=seed,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+    # ---
     # Retrieval evaluations (kNN, rNN, weighted, and combined comparison)
 
     if evaluate:
@@ -570,6 +628,20 @@ def main() -> None:
         help="Normalize histogram descriptors by area (integral = 1) instead of sum.",
     )
     parser.add_argument(
+        "--dr",
+        "--run_dr",
+        dest="run_dr",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Run dimensionality reduction (t-SNE) and save 2D embeddings (default: True).",
+    )
+    parser.add_argument(
+        "--tsne_perplexity",
+        type=float,
+        default=30.0,
+        help="Perplexity parameter for t-SNE (default: 30.0).",
+    )
+    parser.add_argument(
         "--evaluate",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -619,11 +691,13 @@ def main() -> None:
         args.output,
         analyze=args.analyze,
         evaluate=args.evaluate,
+        run_dr=args.run_dr,
         reset_checkpoint=args.reset_checkpoint,
         reset_last_step=args.reset_last_step,
         seed=args.seed,
         normalize_by_sum=args.normalize_by_sum,
         weights_csv=args.weights_csv,
+        tsne_perplexity=args.tsne_perplexity,
         knn_k=args.knn_k,
         rnn_radius=args.rnn_radius,
         weighted_k=args.weighted_k,
