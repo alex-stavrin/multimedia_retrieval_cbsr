@@ -13,7 +13,11 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QIcon
 from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+import vedo
 from vedo import Plotter, Mesh, Points, Line
+
+# Disable VTK sphere point impostors to prevent driver shader clipping
+vedo.settings.enable_rendering_points_as_spheres = False
 import ctypes
 import sys
 import os
@@ -76,6 +80,7 @@ class ModelViewer(QMainWindow):
 
             # make vertices of mesh stand out
             points: Points = Points(mesh.vertices, r=10, c="#000000")
+            points.properties.RenderPointsAsSpheresOff()
             self.points.append(points)
 
         self.world_origin = Points([(0, 0, 0)], r=12, c="red").clone2d(size=1)
