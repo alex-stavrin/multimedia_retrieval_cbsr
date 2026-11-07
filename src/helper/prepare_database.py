@@ -27,6 +27,7 @@ import src.step_4.distance_calculations.normalize_descriptors as normalize_descr
 import src.step_6.run_and_evaluate_knn as evaluate_knn
 import src.step_6.run_and_evaluate_rnn as evaluate_rnn
 import src.step_6.run_and_evaluate_weighted as evaluate_weighted
+import src.step_6.run_and_evaluate_all as evaluate_all
 from src.helper.database_functions import verify_database_complete
 
 CHECKPOINT_VERSION = 1
@@ -47,6 +48,7 @@ STEP_ORDER = [
     "run_and_evaluate_knn",
     "run_and_evaluate_rnn",
     "run_and_evaluate_weighted",
+    "run_and_evaluate_all",
 ]
 
 
@@ -407,7 +409,7 @@ def prepare_database(
     )
 
     # ---
-    # Retrieval evaluations (kNN, rNN, weighted)
+    # Retrieval evaluations (kNN, rNN, weighted, and combined comparison)
 
     if evaluate:
         evaluation_path = output_root / "evaluation"
@@ -490,6 +492,24 @@ def prepare_database(
                 "no weights CSV found. Specify with --weights_csv."
             )
 
+        _run_step(
+            "run_and_evaluate_all",
+            lambda: evaluate_all.run_and_evaluate_all(
+                elementary_csv=str(descriptors_normalized_csv),
+                histogram_csv=str(hist_descriptors_csv),
+                weights_csv=str(resolved_weights_csv) if resolved_weights_csv else None,
+                output_dir=str(evaluation_path),
+                weighted_configs=[weighted_config],
+                knn_k=knn_k,
+                rnn_radius=rnn_radius,
+                weighted_k=weighted_k,
+                reuse_existing=True,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
     print(f"Pipeline complete. Checkpoint: {checkpoint_path}")
 
 
@@ -553,7 +573,7 @@ def main() -> None:
         "--evaluate",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Run retrieval evaluations (kNN, rNN, weighted) (default: True).",
+        help="Run retrieval evaluations (kNN, rNN, weighted, and combined comparison) (default: True).",
     )
     parser.add_argument(
         "--weights_csv",

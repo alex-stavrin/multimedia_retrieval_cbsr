@@ -1,6 +1,6 @@
-from pathlib import Path
-import json
 import argparse
+import json
+from pathlib import Path
 from tqdm import tqdm
 
 from src.step_4.distance_calculations.calculate_total_distance import (
@@ -10,6 +10,7 @@ from src.step_4.distance_calculations.calculate_total_distance import (
     DISTANCE_CONFIG_COSINE,
 )
 from src.step_6.retrieval_evalulator import RetrievalEvaluator
+from src.step_6.roc_evaluator import ROCEvaluator
 
 CONFIG_MAP = {
     "emd": DISTANCE_CONFIG_EMD,
@@ -19,13 +20,14 @@ CONFIG_MAP = {
 
 
 def run_and_evaluate_weighted(
-    elementary_csv: str,
-    histogram_csv: str,
-    weights_csv: str,
-    output_dir: str,
+    elementary_csv: str | Path,
+    histogram_csv: str | Path,
+    weights_csv: str | Path,
+    output_dir: str | Path,
     config: str = "emd",
     k: int = 10,
     exclude_self: bool = True,
+    eval_roc: bool = True,
 ) -> dict:
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -37,7 +39,7 @@ def run_and_evaluate_weighted(
 
     distance_config = CONFIG_MAP[config]
     calculator = ShapeDistanceCalculator(
-        csv_databases=[elementary_csv, histogram_csv, weights_csv],
+        csv_databases=[str(elementary_csv), str(histogram_csv), str(weights_csv)],
         distance_config=distance_config,
     )
 
@@ -48,7 +50,10 @@ def run_and_evaluate_weighted(
     evaluator = RetrievalEvaluator(ground_truth=ground_truth)
 
     results: dict[str, list[str]] = {}
-    print(f"Calculating weighted distances ({config}) for {len(calculator.shape_identifiers)} shapes...")
+    full_rankings: dict[str, list[str]] = {}
+    print(
+        f"Calculating weighted distances ({config}) for {len(calculator.shape_identifiers)} shapes..."
+    )
     for shape_id in tqdm(calculator.shape_identifiers, desc="Evaluating Queries"):
         total_distances = calculator.calculate_total_distance(
             query=shape_id,
@@ -61,11 +66,39 @@ def run_and_evaluate_weighted(
             if not (exclude_self and sid == shape_id)
         ]
         results[shape_id] = ranked[:k]
+        full_rankings[shape_id] = ranked
 
     eval_results = evaluator.evaluate(
         results=results,
         method_name=f"Weighted ({config}, k={k})",
+        full_rankings=full_rankings,
     )
+
+    if eval_roc:
+        roc_eval = ROCEvaluator(ground_truth=ground_truth)
+        roc_res = roc_eval.evaluate_method(
+            full_rankings, method_name=f"Weighted ({config.upper()})"
+        )
+        roc_res["operating_point"] = (
+            eval_results["total_stats"]["macro_recall"],
+            eval_results["total_stats"]["macro_specificity"],
+            f"k={k}",
+        )
+        eval_results["total_stats"]["macro_auroc"] = roc_res["macro_auroc"]
+        eval_results["total_stats"]["micro_auroc"] = roc_res["micro_auroc"]
+        eval_results["per_class"]["auroc"] = eval_results["per_class"]["class"].map(
+            roc_res["per_class_auroc"]
+        )
+        eval_results["roc"] = roc_res
+
+        ROCEvaluator.save_roc_results(
+            roc_res, out_path, prefix=f"weighted_{config}_k{k}"
+        )
+        ROCEvaluator.plot_roc_curves(
+            [roc_res],
+            out_path / f"weighted_{config}_k{k}_roc.png",
+            title=f"ROC Curve - Weighted ({config.upper()})",
+        )
 
     per_class_file = out_path / f"weighted_{config}_k{k}_per_class.csv"
     queries_file = out_path / f"weighted_{config}_k{k}_queries.csv"
@@ -141,6 +174,12 @@ def main() -> None:
         action="store_true",
         help="Include query shape itself in retrieved results (default: excluded).",
     )
+    parser.add_argument(
+        "--eval_roc",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Compute full ROC curve, AUROC and plot (default: True).",
+    )
 
     args = parser.parse_args()
 
@@ -152,6 +191,7 @@ def main() -> None:
         config=args.config,
         k=args.k,
         exclude_self=not args.include_self,
+        eval_roc=args.eval_roc,
     )
 
 

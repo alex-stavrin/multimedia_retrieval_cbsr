@@ -1,19 +1,22 @@
+import argparse
+import json
 from pathlib import Path
+
 from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
 from src.step_6.retrieval_evalulator import RetrievalEvaluator
-import json
-import argparse
+from src.step_6.roc_evaluator import ROCEvaluator
+
 
 def run_and_evaluate_knn(
-    elementary_csv: str,
-    histogram_csv: str,
-    output_dir: str,
+    elementary_csv: str | Path,
+    histogram_csv: str | Path,
+    output_dir: str | Path,
     k: int = 10,
     p: float = 2.0,
     eps: float = 0.0,
-    exclude_self : bool = True
+    exclude_self: bool = True,
+    eval_roc: bool = True,
 ) -> dict:
-
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
@@ -28,22 +31,71 @@ def run_and_evaluate_knn(
     }
     evaluator = RetrievalEvaluator(ground_truth=ground_truth)
 
-    # Query KNN for every shape in the data base
-    results : dict[str, list[str]] = {}
-    for shape_id in spatial_search_engine.shape_ids:
-        knn_matches = spatial_search_engine.query_knn(
-            query=shape_id,
-            k=k,
-            eps=eps,
-            p=p,
-            exclude_self=exclude_self
-        )
-        results[shape_id] = list(knn_matches.keys())
+    total_db_shapes = len(spatial_search_engine.shape_ids)
+    results: dict[str, list[str]] = {}
+    full_rankings: dict[str, list[str]] = {}
 
+    for shape_id in spatial_search_engine.shape_ids:
+        if eval_roc and eps == 0.0:
+            full_matches = spatial_search_engine.query_knn(
+                query=shape_id,
+                k=total_db_shapes,
+                eps=eps,
+                p=p,
+                exclude_self=exclude_self,
+            )
+            ranked_all = list(full_matches.keys())
+            full_rankings[shape_id] = ranked_all
+            results[shape_id] = ranked_all[:k]
+        else:
+            knn_matches = spatial_search_engine.query_knn(
+                query=shape_id,
+                k=k,
+                eps=eps,
+                p=p,
+                exclude_self=exclude_self,
+            )
+            results[shape_id] = list(knn_matches.keys())
+            if eval_roc:
+                full_matches = spatial_search_engine.query_knn(
+                    query=shape_id,
+                    k=total_db_shapes,
+                    eps=eps,
+                    p=p,
+                    exclude_self=exclude_self,
+                )
+                full_rankings[shape_id] = list(full_matches.keys())
+
+    method_label = f"KNN (k={k}, p={p}, eps={eps})"
     eval_results = evaluator.evaluate(
         results=results,
-        method_name=f"KNN k={k}, p={p}, eps={eps}"
+        method_name=method_label,
+        full_rankings=full_rankings if full_rankings else None,
     )
+
+    if eval_roc:
+        roc_eval = ROCEvaluator(ground_truth=ground_truth)
+        roc_res = roc_eval.evaluate_method(
+            full_rankings, method_name=f"kNN (p={p}, eps={eps})"
+        )
+        roc_res["operating_point"] = (
+            eval_results["total_stats"]["macro_recall"],
+            eval_results["total_stats"]["macro_specificity"],
+            f"k={k}",
+        )
+        eval_results["total_stats"]["macro_auroc"] = roc_res["macro_auroc"]
+        eval_results["total_stats"]["micro_auroc"] = roc_res["micro_auroc"]
+        eval_results["per_class"]["auroc"] = eval_results["per_class"]["class"].map(
+            roc_res["per_class_auroc"]
+        )
+        eval_results["roc"] = roc_res
+
+        ROCEvaluator.save_roc_results(roc_res, out_path, prefix=f"knn_k{k}")
+        ROCEvaluator.plot_roc_curves(
+            [roc_res],
+            out_path / f"knn_k{k}_roc.png",
+            title=f"ROC Curve - kNN (p={p}, eps={eps})",
+        )
 
     # Save all results to disk
     per_class_file = out_path / f"knn_k{k}_per_class.csv"
@@ -69,6 +121,7 @@ def run_and_evaluate_knn(
     print("=" * 60)
     print(f"Saved results to: {out_path.resolve()}")
     return eval_results
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -116,6 +169,12 @@ def main() -> None:
         action="store_true",
         help="Include query shape itself in retrieved results (default: excluded).",
     )
+    parser.add_argument(
+        "--eval_roc",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Compute full ROC curve, AUROC and plot (default: True).",
+    )
     args = parser.parse_args()
     run_and_evaluate_knn(
         elementary_csv=args.elementary_csv,
@@ -125,6 +184,9 @@ def main() -> None:
         p=args.p,
         eps=args.eps,
         exclude_self=not args.include_self,
+        eval_roc=args.eval_roc,
     )
+
+
 if __name__ == "__main__":
     main()
