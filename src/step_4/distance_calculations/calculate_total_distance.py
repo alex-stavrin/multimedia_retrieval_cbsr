@@ -26,7 +26,6 @@ IDENTIFIER_COLUMN = "file_path"
 
 DistanceFunction = Callable[..., dict[str, float]]
 
-
 @dataclass(frozen=True)
 class DistanceConfig:
     function: DistanceFunction
@@ -94,7 +93,14 @@ class ShapeDistanceCalculator:
         for path in self.csv_databases:
             if not path.is_file():
                 raise FileNotFoundError(f"CSV database not found: {path}")
-            self.databases[path] = pd.read_csv(path)
+            df = pd.read_csv(path)
+            if self.identifier_column in df.columns:
+                df[self.identifier_column] = (
+                    df[self.identifier_column]
+                    .astype(str)
+                    .map(normalize_path_separators)
+                )
+            self.databases[path] = df
 
         self.simple_df: pd.DataFrame | None = None
         self.hist_df: pd.DataFrame | None = None
@@ -617,11 +623,11 @@ class ShapeDistanceCalculator:
                 distance_scale = self.distance_scales.get(
                     (function_name, descriptor), 1.0
                 )
-                print(
-                    f"Descriptor: {descriptor}\n"
-                    f"Distance scale: {distance_scale}\n"
-                    f"Wieght: {weight}\n\n"
-                )
+                # print(
+                #     f"Descriptor: {descriptor}\n"
+                #     f"Distance scale: {distance_scale}\n"
+                #     f"Wieght: {weight}\n\n"
+                # )
                 for shape in totals:
                     if shape not in distances:
                         raise ValueError(

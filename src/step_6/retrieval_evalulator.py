@@ -34,7 +34,7 @@ class RetrievalEvaluator:
             true_positive = 0
             is_first_correct = False
 
-            for rank, retrieved_id in enumerate(retrieved_id):  # type: ignore
+            for rank, retrieved_id in enumerate(retrieval_ids):
                 retrieved_class = self.ground_truth.get(retrieved_id)
                 confusion_matrix[query_class][retrieved_class] += 1
 
@@ -82,7 +82,7 @@ class RetrievalEvaluator:
             data_frame_queries.groupby("class")
             .agg(
                 number_of_queries=("query_id", "count"),
-                mean_retrieved=("retrieved_count", "mean"),
+                mean_retrieved=("retrieval_count", "mean"),
                 precision=("precision", "mean"),
                 recall=("recall", "mean"),
                 f1=("f1", "mean"),
