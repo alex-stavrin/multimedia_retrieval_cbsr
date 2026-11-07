@@ -11,7 +11,7 @@ def run_and_evaluate_rnn(
     elementary_csv: str | Path,
     histogram_csv: str | Path,
     output_dir: str | Path,
-    radius: float = 0.5,
+    radius: float = 0.85,
     p: float = 2.0,
     eps: float = 0.0,
     exclude_self: bool = True,
@@ -142,8 +142,8 @@ def main() -> None:
         "-r",
         "--radius",
         type=float,
-        default=0.5,
-        help="Search radius distance threshold (default: 0.5).",
+        default=0.85,
+        help="Search radius distance threshold (default: 0.85).",
     )
     parser.add_argument(
         "-p",

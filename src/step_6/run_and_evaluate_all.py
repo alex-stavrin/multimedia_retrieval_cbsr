@@ -76,13 +76,13 @@ def run_and_evaluate_all(
     output_dir: str | Path = "analysis_output/evaluation",
     methods: list[str] | None = None,
     weighted_configs: list[str] | None = None,
-    knn_k: int = 10,
+    knn_k: int = 6,
     knn_p: float = 2.0,
     knn_eps: float = 0.0,
-    rnn_radius: float = 0.5,
+    rnn_radius: float = 0.85,
     rnn_p: float = 2.0,
     rnn_eps: float = 0.0,
-    weighted_k: int = 10,
+    weighted_k: int = 6,
     exclude_self: bool = True,
     reuse_existing: bool = False,
 ) -> dict:
@@ -284,7 +284,7 @@ def main() -> None:
     parser.add_argument(
         "--weights_csv",
         type=str,
-        default="analysis_output/distances/weights_emd_descriptors.csv",
+        default="analysis_output/distances/weights_emd_hist_sampling_descriptors.csv",
         help="Path to descriptor weights CSV for weighted retrieval.",
     )
     parser.add_argument(
@@ -312,8 +312,8 @@ def main() -> None:
         "-k",
         "--knn_k",
         type=int,
-        default=10,
-        help="k for kNN evaluation (default: 10).",
+        default=6,
+        help="k for kNN evaluation (default: 6).",
     )
     parser.add_argument(
         "--knn_p",
@@ -331,8 +331,8 @@ def main() -> None:
         "-r",
         "--rnn_radius",
         type=float,
-        default=0.5,
-        help="Radius r for rNN evaluation (default: 0.5).",
+        default=0.85,
+        help="Radius r for rNN evaluation (default: 0.85).",
     )
     parser.add_argument(
         "--rnn_p",
@@ -349,8 +349,8 @@ def main() -> None:
     parser.add_argument(
         "--weighted_k",
         type=int,
-        default=10,
-        help="k for weighted distance evaluation (default: 10).",
+        default=6,
+        help="k for weighted distance evaluation (default: 6).",
     )
     parser.add_argument(
         "--include_self",

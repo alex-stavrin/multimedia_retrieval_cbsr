@@ -221,9 +221,9 @@ def prepare_database(
     normalize_by_sum: bool = True,
     weights_csv: str | Path | None = None,
     tsne_perplexity: float = 30.0,
-    knn_k: int = 10,
-    rnn_radius: float = 0.5,
-    weighted_k: int = 10,
+    knn_k: int = 6,
+    rnn_radius: float = 0.85,
+    weighted_k: int = 6,
     weighted_config: str = "emd",
 ) -> None:
     if reset_checkpoint and reset_last_step:
@@ -656,20 +656,20 @@ def main() -> None:
     parser.add_argument(
         "--knn_k",
         type=int,
-        default=10,
-        help="Number of nearest neighbors for kNN evaluation (default: 10).",
+        default=6,
+        help="Number of nearest neighbors for kNN evaluation (default: 6).",
     )
     parser.add_argument(
         "--rnn_radius",
         type=float,
-        default=0.5,
-        help="Search radius for rNN evaluation (default: 0.5).",
+        default=0.85,
+        help="Search radius for rNN evaluation (default: 0.85).",
     )
     parser.add_argument(
         "--weighted_k",
         type=int,
-        default=10,
-        help="Number of nearest neighbors for weighted evaluation (default: 10).",
+        default=6,
+        help="Number of nearest neighbors for weighted evaluation (default: 6).",
     )
     parser.add_argument(
         "--weighted_config",

@@ -25,7 +25,7 @@ def run_and_evaluate_weighted(
     weights_csv: str | Path,
     output_dir: str | Path,
     config: str = "emd",
-    k: int = 10,
+    k: int = 6,
     exclude_self: bool = True,
     eval_roc: bool = True,
 ) -> dict:
@@ -145,7 +145,7 @@ def main() -> None:
     parser.add_argument(
         "--weights_csv",
         type=str,
-        default="analysis_output/distances/weights_emd_descriptors.csv",
+        default="analysis_output/distances/weights_emd_hist_sampling_descriptors.csv",
         help="Path to descriptor weights CSV.",
     )
     parser.add_argument(
@@ -166,8 +166,8 @@ def main() -> None:
     parser.add_argument(
         "-k",
         type=int,
-        default=10,
-        help="Number of nearest neighbors to retrieve (default: 10).",
+        default=6,
+        help="Number of nearest neighbors to retrieve (default: 6).",
     )
     parser.add_argument(
         "--include_self",

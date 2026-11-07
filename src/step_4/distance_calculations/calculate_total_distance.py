@@ -343,6 +343,10 @@ class ShapeDistanceCalculator:
             normalized_key = key.replace("\\", "/")
             self._filename_to_keys.setdefault(normalized_key, set()).add(key)
             self._filename_to_keys.setdefault(Path(key).name, set()).add(key)
+        self._shape_id_to_pos: dict[str, int] = {
+            key: idx for idx, key in enumerate(self.shape_identifiers)
+        }
+        self._candidate_cache: dict[tuple[int, tuple[str, ...]], dict[str, Any]] = {}
 
     @staticmethod
     def _get_histogram_columns(
@@ -383,10 +387,17 @@ class ShapeDistanceCalculator:
         query_identifier: str | None = None,
     ) -> dict[str, float]:
         """Use vectorized built-in distances, with a generic fallback."""
-        indexed = source_df.set_index(self.identifier_column)
-        candidates = indexed.loc[self.shape_identifiers, columns].to_numpy(
-            dtype=float
-        )
+        cache_key = (id(source_df), tuple(columns))
+        cached = self._candidate_cache.get(cache_key)
+        if cached is None:
+            indexed = source_df.set_index(self.identifier_column)
+            candidates = indexed.loc[self.shape_identifiers, columns].to_numpy(
+                dtype=float
+            )
+            cached = {"candidates": candidates}
+            self._candidate_cache[cache_key] = cached
+        else:
+            candidates = cached["candidates"]
         query_vector = np.asarray(query_features, dtype=float)
 
         if config.function is euclidean_distance:
@@ -398,14 +409,17 @@ class ShapeDistanceCalculator:
             return dict(zip(self.shape_identifiers, values.astype(float)))
 
         if config.function is earth_movers_distance and is_histogram:
-            candidate_sums = candidates.sum(axis=1, keepdims=True)
-            candidate_sums[candidate_sums == 0] = 1.0
+            candidate_cdfs = cached.get("candidate_cdfs")
+            if candidate_cdfs is None:
+                candidate_sums = candidates.sum(axis=1, keepdims=True)
+                candidate_sums[candidate_sums == 0] = 1.0
+                candidate_cdfs = np.cumsum(candidates / candidate_sums, axis=1)[
+                    :, :-1
+                ]
+                cached["candidate_cdfs"] = candidate_cdfs
             query_sum = query_vector.sum()
             if query_sum == 0:
                 query_sum = 1.0
-            candidate_cdfs = np.cumsum(candidates / candidate_sums, axis=1)[
-                :, :-1
-            ]
             query_cdf = np.cumsum(query_vector / query_sum)[:-1]
             values = cdf_earth_movers_distance(
                 candidate_cdfs,
@@ -415,7 +429,10 @@ class ShapeDistanceCalculator:
             return dict(zip(self.shape_identifiers, values.astype(float)))
 
         if config.function is cosine_distance:
-            candidate_norms = np.linalg.norm(candidates, axis=1)
+            candidate_norms = cached.get("candidate_norms")
+            if candidate_norms is None:
+                candidate_norms = np.linalg.norm(candidates, axis=1)
+                cached["candidate_norms"] = candidate_norms
             query_norm = float(np.linalg.norm(query_vector))
             if query_norm == 0 or np.any(candidate_norms == 0):
                 raise ValueError(
@@ -690,13 +707,28 @@ class ShapeDistanceCalculator:
                 columns = self._descriptor_sources[
                     (function_name, descriptor)
                 ][1]
-                query_features = source_df.set_index(
-                    self.identifier_column
-                ).loc[query_key, columns]
-                if isinstance(query_features, pd.Series):
-                    query_features = query_features.to_numpy(dtype=float)
+                cache_key = (id(source_df), tuple(columns))
+                cached = self._candidate_cache.get(cache_key)
+                if cached is None:
+                    indexed = source_df.set_index(self.identifier_column)
+                    candidates = indexed.loc[
+                        self.shape_identifiers, columns
+                    ].to_numpy(dtype=float)
+                    cached = {"candidates": candidates}
+                    self._candidate_cache[cache_key] = cached
                 else:
-                    query_features = np.asarray([query_features], dtype=float)
+                    candidates = cached["candidates"]
+                query_pos = self._shape_id_to_pos.get(query_key)
+                if query_pos is not None:
+                    query_features = candidates[query_pos]
+                else:
+                    qf = source_df.set_index(
+                        self.identifier_column
+                    ).loc[query_key, columns]
+                    if isinstance(qf, pd.Series):
+                        query_features = qf.to_numpy(dtype=float)
+                    else:
+                        query_features = np.asarray([qf], dtype=float)
 
                 if config.function in {
                     euclidean_distance,

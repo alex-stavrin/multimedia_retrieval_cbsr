@@ -92,6 +92,26 @@ class SpatialSearchEngine:
         shape_ids = merged_data_frame["_norm_id"].astype(str).tolist()
         return shape_ids, feature_columns, matrix
 
+    @staticmethod
+    def balance_feature_matrix(
+        matrix: numpy.ndarray,
+        feature_columns: list[str],
+    ) -> numpy.ndarray:
+        groups: dict[str, list[int]] = {}
+        for index, column in enumerate(feature_columns):
+            prefix, _, bin_index = column.rpartition("_")
+            name = prefix if bin_index.isdigit() and prefix else "elementary"
+            groups.setdefault(name, []).append(index)
+
+        balanced = numpy.empty_like(matrix)
+        for indices in groups.values():
+            block = matrix[:, indices]
+            total_variance = block.var(axis=0).sum()
+            balanced[:, indices] = (
+                block / numpy.sqrt(total_variance) if total_variance > 0 else block
+            )
+        return balanced
+
     def _build_lookup_tables(self) -> None:
         for idx, shape_id in enumerate(self.shape_ids):
             self._id_to_index[shape_id] = idx
@@ -114,13 +134,22 @@ class SpatialSearchEngine:
         self,
         elementary_csv: str | Path,
         histogram_csv: str | Path,
+        balance: bool = True,
     ) -> None:
         self.elementary_csv = Path(elementary_csv)
         self.histogram_csv = Path(histogram_csv)
         self.identifier_column = IDENTIFIER_COLUMN
         self.leaf_size = 16
-        self.shape_ids, self.feature_columns, self.feature_matrix = (
+        self.balance = balance
+        self.shape_ids, self.feature_columns, self.raw_feature_matrix = (
             self._load_and_merge_features()
+        )
+        self.feature_matrix = (
+            self.balance_feature_matrix(
+                self.raw_feature_matrix, self.feature_columns
+            )
+            if balance
+            else self.raw_feature_matrix
         )
 
         self.kd_tree = KDTree(self.feature_matrix, self.leaf_size)

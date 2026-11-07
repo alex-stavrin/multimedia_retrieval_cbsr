@@ -11,7 +11,7 @@ def run_and_evaluate_knn(
     elementary_csv: str | Path,
     histogram_csv: str | Path,
     output_dir: str | Path,
-    k: int = 10,
+    k: int = 6,
     p: float = 2.0,
     eps: float = 0.0,
     exclude_self: bool = True,
@@ -149,8 +149,8 @@ def main() -> None:
     parser.add_argument(
         "-k",
         type=int,
-        default=10,
-        help="Number of nearest neighbors to retrieve (default: 10).",
+        default=6,
+        help="Number of nearest neighbors to retrieve (default: 6).",
     )
     parser.add_argument(
         "-p",
