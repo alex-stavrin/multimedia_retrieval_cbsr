@@ -5,6 +5,7 @@ from typing import Callable
 
 import numpy as np
 import trimesh
+from trimesh import grouping
 import vedo
 
 from tqdm import tqdm
@@ -79,6 +80,33 @@ def preprocess(shape: vedo.Mesh) -> vedo.Mesh:
     return shape.clone().triangulate().clean()
 
 
+def deduplicate(shape: vedo.Mesh) -> vedo.Mesh:
+    """Remove duplicate and degenerate triangles that `vedo.Mesh.clean()` leaves behind."""
+    faces = np.asarray(shape.cells, dtype=np.int64)
+    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
+        return shape
+
+    non_degenerate = (
+        (faces[:, 0] != faces[:, 1])
+        & (faces[:, 1] != faces[:, 2])
+        & (faces[:, 0] != faces[:, 2])
+    )
+    valid_faces = faces[non_degenerate]
+    if len(valid_faces) == 0:
+        return shape
+
+    unique_idx, _ = grouping.unique_rows(np.sort(valid_faces, axis=1))
+    if len(unique_idx) == len(faces):
+        return shape
+
+    unique_faces = valid_faces[np.sort(unique_idx)]
+    cleaned = vedo.Mesh(
+        [np.asarray(shape.vertices, dtype=np.float64), unique_faces]
+    )
+    cleaned.clean()
+    return cleaned
+
+
 def close_holes(shape: vedo.Mesh) -> vedo.Mesh:
     """Fills holes. Never raises; the result may still be open."""
     if shape.is_closed():
@@ -103,11 +131,12 @@ def correct_winding(shape: vedo.Mesh) -> vedo.Mesh:
 
 STEPS: dict[str, Callable[[vedo.Mesh], vedo.Mesh]] = {
     "preprocess": preprocess,
+    "deduplicate": deduplicate,
     "close_holes": close_holes,
     "correct_winding": correct_winding,
 }
 
-DEFAULT_STEPS = ["preprocess", "close_holes", "correct_winding"]
+DEFAULT_STEPS = ["preprocess", "deduplicate", "close_holes", "correct_winding"]
 
 
 def run_steps(

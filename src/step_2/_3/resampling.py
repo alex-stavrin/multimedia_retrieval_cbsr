@@ -176,40 +176,11 @@ def _adaptive_subdivide(
     return result
 
 
-def _deduplicate_faces(mesh: vedo.Mesh) -> vedo.Mesh:
-    """Remove duplicate and degenerate triangles that `vedo.Mesh.clean()` leaves behind."""
-    faces = numpy.asarray(mesh.cells, dtype=numpy.int64)
-    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
-        return mesh
-
-    non_degenerate = (
-        (faces[:, 0] != faces[:, 1])
-        & (faces[:, 1] != faces[:, 2])
-        & (faces[:, 0] != faces[:, 2])
-    )
-    valid_faces = faces[non_degenerate]
-    if len(valid_faces) == 0:
-        return mesh
-
-    unique_idx, _ = grouping.unique_rows(numpy.sort(valid_faces, axis=1))
-    if len(unique_idx) == len(faces):
-        return mesh
-
-    unique_faces = valid_faces[numpy.sort(unique_idx)]
-    cleaned = vedo.Mesh(
-        [numpy.asarray(mesh.vertices, dtype=numpy.float64), unique_faces]
-    )
-    cleaned.clean()
-    return cleaned
-
-
 def resample_mesh(
     mesh: vedo.Mesh,
     max_iterations: int = MAX_RESAMPLING_ATTEMPTS,
     subdivision_methods: list[str] | None = None,
 ) -> vedo.Mesh:
-    mesh = _deduplicate_faces(mesh)
-
     needs_vertices_count_fix = not (
         MIN_VERTEX_COUNT <= mesh.npoints <= MAX_VERTEX_COUNT
     )
@@ -277,7 +248,7 @@ def resample_mesh_file(
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        mesh = _deduplicate_faces(vedo.Mesh(str(mesh_path)))
+        mesh = vedo.Mesh(str(mesh_path))
         before_vertices = mesh.npoints
 
         subdivision_methods: list[str] = []
