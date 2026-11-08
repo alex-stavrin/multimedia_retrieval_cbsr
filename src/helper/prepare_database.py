@@ -24,6 +24,12 @@ import src.step_3._1.full_normalization as full_normalisation
 import src.step_3._2.elementary_descriptors.descriptor_analyzer as descriptor_analyzer
 import src.step_3._2.histogram_descriptors.analyze_and_save as histogram_descriptor_analyzer
 import src.step_4.distance_calculations.normalize_descriptors as normalize_descriptors
+import src.step_5.DR.tsne_engine as dr_engine
+from src.step_5.DR.scatterplot import Scatterplot
+import src.step_6.run_and_evaluate_knn as evaluate_knn
+import src.step_6.run_and_evaluate_rnn as evaluate_rnn
+import src.step_6.run_and_evaluate_weighted as evaluate_weighted
+import src.step_6.run_and_evaluate_all as evaluate_all
 from src.helper.database_functions import verify_database_complete
 
 CHECKPOINT_VERSION = 1
@@ -41,6 +47,11 @@ STEP_ORDER = [
     "calculate_descriptors",
     "normalize_descriptors",
     "calculate_histogram_descriptor",
+    "dimensionality_reduction_tsne",
+    "run_and_evaluate_knn",
+    "run_and_evaluate_rnn",
+    "run_and_evaluate_weighted",
+    "run_and_evaluate_all",
 ]
 
 
@@ -166,15 +177,54 @@ def _run_step(
     print(f"[DONE] {name}: checkpoint saved.")
 
 
+def _run_tsne(
+    elementary_csv: Path,
+    histogram_csv: Path,
+    output_csv: Path,
+    output_image: Path | None = None,
+    perplexity: float = 30.0,
+    seed: int = 0,
+) -> None:
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    engine = dr_engine.DimensionalityReductionEngine(
+        elementary_csv=elementary_csv,
+        histogram_csv=histogram_csv,
+    )
+    points = engine.reduce(
+        perplexity=perplexity,
+        random_state=seed,
+        balance=True,
+    )
+    engine.save(points, output_csv)
+    features = engine.balanced_features()
+    print(
+        f"[t-SNE] Saved {len(points)} 2D embedding points to: {output_csv}\n"
+        f"[t-SNE] 10 nearest neighbours class agreement: "
+        f"{engine.class_agreement(features):.3f} (feature space), "
+        f"{engine.class_agreement(points):.3f} (2D plot)"
+    )
+    if output_image is not None:
+        plot = Scatterplot(str(output_csv))
+        plot.save_image(output_image)
+
+
 def prepare_database(
     database_path: str,
     output_path: str = "3d_models_prepared",
     *,
     analyze: bool = False,
+    evaluate: bool = True,
+    run_dr: bool = True,
     reset_checkpoint: bool = False,
     reset_last_step: bool = False,
     seed: int = 42,
-    normalize_by_sum: bool = False,
+    normalize_by_sum: bool = True,
+    weights_csv: str | Path | None = None,
+    tsne_perplexity: float = 30.0,
+    knn_k: int = 6,
+    rnn_radius: float = 0.85,
+    weighted_k: int = 6,
+    weighted_config: str = "emd",
 ) -> None:
     if reset_checkpoint and reset_last_step:
         raise ValueError(
@@ -394,6 +444,130 @@ def prepare_database(
         raw_path,
     )
 
+    # ---
+    # Dimensionality Reduction (t-SNE 2D embedding for scatterplot)
+
+    if run_dr:
+        embeddings_dir = output_root / "embeddings"
+        tsne_csv = embeddings_dir / "tsne.csv"
+        tsne_png = embeddings_dir / "tsne_scatterplot.png"
+        _run_step(
+            "dimensionality_reduction_tsne",
+            lambda: _run_tsne(
+                elementary_csv=descriptors_normalized_csv,
+                histogram_csv=hist_descriptors_csv,
+                output_csv=tsne_csv,
+                output_image=tsne_png,
+                perplexity=tsne_perplexity,
+                seed=seed,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+    # ---
+    # Retrieval evaluations (kNN, rNN, weighted, and combined comparison)
+
+    if evaluate:
+        evaluation_path = output_root / "evaluation"
+        evaluation_path.mkdir(parents=True, exist_ok=True)
+        knn_output_dir = evaluation_path / "knn"
+        rnn_output_dir = evaluation_path / "rnn"
+        weighted_output_dir = evaluation_path / "weighted"
+
+        _run_step(
+            "run_and_evaluate_knn",
+            lambda: evaluate_knn.run_and_evaluate_knn(
+                elementary_csv=str(descriptors_normalized_csv),
+                histogram_csv=str(hist_descriptors_csv),
+                output_dir=str(knn_output_dir),
+                k=knn_k,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+        _run_step(
+            "run_and_evaluate_rnn",
+            lambda: evaluate_rnn.run_and_evaluate_rnn(
+                elementary_csv=str(descriptors_normalized_csv),
+                histogram_csv=str(hist_descriptors_csv),
+                output_dir=str(rnn_output_dir),
+                radius=rnn_radius,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+        resolved_weights_csv: Path | None = None
+        if weights_csv is not None:
+            resolved_weights_csv = Path(weights_csv).expanduser().resolve()
+            if (
+                not resolved_weights_csv.is_file()
+                and resolved_weights_csv.with_suffix(".csv").is_file()
+            ):
+                resolved_weights_csv = resolved_weights_csv.with_suffix(".csv")
+        else:
+            candidates: list[Path] = []
+            if normalize_by_sum:
+                candidates.append(
+                    Path(
+                        "analysis_output/distances/weights_emd_hist_sampling_descriptors.csv"
+                    )
+                )
+            candidates.extend(
+                [
+                    Path("analysis_output/distances/weights_emd_descriptors.csv"),
+                    Path("analysis_output/distances/weights_equal.csv"),
+                ]
+            )
+            for candidate in candidates:
+                if candidate.is_file():
+                    resolved_weights_csv = candidate.resolve()
+                    break
+
+        if resolved_weights_csv is not None and resolved_weights_csv.is_file():
+            _run_step(
+                "run_and_evaluate_weighted",
+                lambda: evaluate_weighted.run_and_evaluate_weighted(
+                    elementary_csv=str(descriptors_normalized_csv),
+                    histogram_csv=str(hist_descriptors_csv),
+                    weights_csv=str(resolved_weights_csv),
+                    output_dir=str(weighted_output_dir),
+                    config=weighted_config,
+                    k=weighted_k,
+                ),
+                state,
+                checkpoint_path,
+                raw_path,
+            )
+        else:
+            print(
+                "[WARN] Skipping 'run_and_evaluate_weighted': "
+                "no weights CSV found. Specify with --weights_csv."
+            )
+
+        _run_step(
+            "run_and_evaluate_all",
+            lambda: evaluate_all.run_and_evaluate_all(
+                elementary_csv=str(descriptors_normalized_csv),
+                histogram_csv=str(hist_descriptors_csv),
+                weights_csv=str(resolved_weights_csv) if resolved_weights_csv else None,
+                output_dir=str(evaluation_path),
+                weighted_configs=[weighted_config],
+                knn_k=knn_k,
+                rnn_radius=rnn_radius,
+                weighted_k=weighted_k,
+                reuse_existing=True,
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
     print(f"Pipeline complete. Checkpoint: {checkpoint_path}")
 
 
@@ -442,9 +616,67 @@ def main() -> None:
     parser.add_argument(
         "--normalize_by_sum",
         "--normalize-by-sum",
-        action="store_true",
-        default=False,
-        help="Normalize histogram descriptors by sum (sum = 1) instead of area (integral = 1).",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Normalize histogram descriptors by sum (sum = 1) instead of area (integral = 1) (default: True).",
+    )
+    parser.add_argument(
+        "--normalize_by_area",
+        "--normalize-by-area",
+        dest="normalize_by_sum",
+        action="store_false",
+        help="Normalize histogram descriptors by area (integral = 1) instead of sum.",
+    )
+    parser.add_argument(
+        "--dr",
+        "--run_dr",
+        dest="run_dr",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Run dimensionality reduction (t-SNE) and save 2D embeddings (default: True).",
+    )
+    parser.add_argument(
+        "--tsne_perplexity",
+        type=float,
+        default=30.0,
+        help="Perplexity parameter for t-SNE (default: 30.0).",
+    )
+    parser.add_argument(
+        "--evaluate",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Run retrieval evaluations (kNN, rNN, weighted, and combined comparison) (default: True).",
+    )
+    parser.add_argument(
+        "--weights_csv",
+        type=str,
+        default=None,
+        help="Path to descriptor weights CSV for weighted retrieval evaluation.",
+    )
+    parser.add_argument(
+        "--knn_k",
+        type=int,
+        default=6,
+        help="Number of nearest neighbors for kNN evaluation (default: 6).",
+    )
+    parser.add_argument(
+        "--rnn_radius",
+        type=float,
+        default=0.85,
+        help="Search radius for rNN evaluation (default: 0.85).",
+    )
+    parser.add_argument(
+        "--weighted_k",
+        type=int,
+        default=6,
+        help="Number of nearest neighbors for weighted evaluation (default: 6).",
+    )
+    parser.add_argument(
+        "--weighted_config",
+        type=str,
+        choices=["emd", "l2", "cosine"],
+        default="emd",
+        help="Distance metric configuration for weighted evaluation (default: emd).",
     )
     args = parser.parse_args()
 
@@ -458,10 +690,18 @@ def main() -> None:
         args.input,
         args.output,
         analyze=args.analyze,
+        evaluate=args.evaluate,
+        run_dr=args.run_dr,
         reset_checkpoint=args.reset_checkpoint,
         reset_last_step=args.reset_last_step,
         seed=args.seed,
         normalize_by_sum=args.normalize_by_sum,
+        weights_csv=args.weights_csv,
+        tsne_perplexity=args.tsne_perplexity,
+        knn_k=args.knn_k,
+        rnn_radius=args.rnn_radius,
+        weighted_k=args.weighted_k,
+        weighted_config=args.weighted_config,
     )
 
 

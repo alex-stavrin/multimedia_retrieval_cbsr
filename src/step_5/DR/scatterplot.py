@@ -2,6 +2,7 @@
 name and class of the shape, and clicking a point highlights its whole class."""
 
 import argparse
+from pathlib import Path
 
 import matplotlib.pyplot as pyplot
 import numpy
@@ -113,13 +114,36 @@ class Scatterplot:
         self.title.set_text(self._title())
         self.figure.canvas.draw_idle()
 
+    def save_image(self, output_path: str | Path, dpi: int = 300) -> None:
+        """Saves a static image of the scatterplot."""
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        self.figure.savefig(out, dpi=dpi, facecolor=BACKGROUND, bbox_inches="tight")
+        print(f"Saved scatterplot image to: {out.resolve()}")
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", type=str, default=DEFAULT_OUTPUT)
+    parser.add_argument(
+        "-s",
+        "--save",
+        type=str,
+        default=None,
+        help="Optional path to save a PNG image of the plot.",
+    )
+    parser.add_argument(
+        "--no_show",
+        action="store_true",
+        help="Do not display GUI window (useful when only saving image).",
+    )
     arguments = parser.parse_args()
 
-    Scatterplot(arguments.input).show()
+    plot = Scatterplot(arguments.input)
+    if arguments.save:
+        plot.save_image(arguments.save)
+    if not arguments.no_show:
+        plot.show()
 
 
 if __name__ == "__main__":

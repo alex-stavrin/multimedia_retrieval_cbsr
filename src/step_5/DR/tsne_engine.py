@@ -24,10 +24,12 @@ class DimensionalityReductionEngine:
     ) -> None:
         # the search engine already merges the two csv files, so the points in
         # the plot are made from the same vectors as the ones in the KD-tree
-        search_engine = SpatialSearchEngine(elementary_csv, histogram_csv)
+        search_engine = SpatialSearchEngine(
+            elementary_csv, histogram_csv, balance=False
+        )
         self.shape_ids: list[str] = search_engine.shape_ids
         self.feature_columns: list[str] = search_engine.feature_columns
-        self.feature_matrix: numpy.ndarray = search_engine.feature_matrix
+        self.feature_matrix: numpy.ndarray = search_engine.raw_feature_matrix
         self.shape_classes: numpy.ndarray = numpy.array(
             [shape_id.split("/")[0] for shape_id in self.shape_ids]
         )
@@ -38,20 +40,9 @@ class DimensionalityReductionEngine:
 
         With 320 histogram columns and only 6 scalars, the Euclidean distance
         would otherwise be decided by whichever group has the largest values."""
-        groups: dict[str, list[int]] = {}
-        for index, column in enumerate(self.feature_columns):
-            prefix, _, bin_index = column.rpartition("_")
-            name = prefix if bin_index.isdigit() and prefix else "elementary"
-            groups.setdefault(name, []).append(index)
-
-        balanced = numpy.empty_like(self.feature_matrix)
-        for indices in groups.values():
-            block = self.feature_matrix[:, indices]
-            total_variance = block.var(axis=0).sum()
-            balanced[:, indices] = (
-                block / numpy.sqrt(total_variance) if total_variance > 0 else block
-            )
-        return balanced
+        return SpatialSearchEngine.balance_feature_matrix(
+            self.feature_matrix, self.feature_columns
+        )
 
     def step4_distances(self, calculator) -> numpy.ndarray:
         """The distances between all pairs of shapes, as the search of Step 4 gives
@@ -171,9 +162,9 @@ def main() -> None:
     parser.add_argument(
         "--distance",
         choices=["euclidean", "step4"],
-        default="euclidean",
-        help="euclidean: between the feature vectors, step4: the weighted "
-        "distance of the Step 4 search (needs --weights_csv)",
+        default="step4",
+        help="step4: the weighted distance of the Step 4 search (needs "
+        "--weights_csv), euclidean: between the feature vectors",
     )
     parser.add_argument(
         "--weights_csv",
