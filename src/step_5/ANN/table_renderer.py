@@ -74,7 +74,9 @@ def render_meshes_grid(
         query_ax.set_yticks([])
 
         if row_index == 0:
-            query_ax.set_title("Query shape", fontsize=11, fontweight="bold", pad=8)
+            query_ax.set_title(
+                "Query shape", fontsize=11, fontweight="bold", pad=8
+            )
 
         for spine in query_ax.spines.values():
             spine.set_color("black")
@@ -87,7 +89,10 @@ def render_meshes_grid(
 
             if row_index == 0:
                 match_ax.set_title(
-                    f"{column_index:02d}", fontsize=11, fontweight="bold", pad=8
+                    f"{column_index:02d}",
+                    fontsize=11,
+                    fontweight="bold",
+                    pad=8,
                 )
 
             if match_index < len(matches):
@@ -97,7 +102,9 @@ def render_meshes_grid(
                 match_ax.imshow(match_img)
                 match_ax.set_xticks([])
                 match_ax.set_yticks([])
-                match_ax.set_xlabel(f"dis={dist:.6f}", fontsize=8.5, labelpad=4)
+                match_ax.set_xlabel(
+                    f"dis={dist:.6f}", fontsize=8.5, labelpad=4
+                )
 
                 for spine in match_ax.spines.values():
                     spine.set_color("black")

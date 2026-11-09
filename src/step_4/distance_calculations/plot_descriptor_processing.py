@@ -55,7 +55,7 @@ HISTOGRAM_EDGE_COLOR = "black"
 # Range plot
 RANGE_LINEWIDTH = 6
 RANGE_LINESTYLE_RAW = "solid"
-RANGE_LINESTYLE_PROCESSED = "dashed"
+RANGE_LINESTYLE_PROCESSED = "solid"
 RANGE_ENDPOINT_MARKER = "|"
 RANGE_PADDING_FRACTION = 0.08
 ZERO_RANGE_PADDING_FRACTION = 0.05
@@ -121,8 +121,10 @@ def compare_ranges(
                 "descriptor": column,
                 "raw_min": raw_values.min(),
                 "raw_max": raw_values.max(),
+                "raw_mean": raw_values.mean(),
                 "processed_min": processed_values.min(),
                 "processed_max": processed_values.max(),
+                "processed_mean": processed_values.mean(),
             }
         )
 
@@ -161,6 +163,12 @@ def plot_ranges(
         raw_max = float(row["raw_max"])
         processed_min = float(row["processed_min"])
         processed_max = float(row["processed_max"])
+
+        print(
+            f"Descriptor: {descriptors[position]}\n"
+            f"Raw: min: {raw_min}, max: {raw_max}, mean: {row["raw_mean"]}"
+            f"Processed: min: {processed_min}, max: {processed_max}, mean: {row["processed_mean"]}"
+        )
 
         raw_ax.hlines(
             0,
@@ -264,7 +272,8 @@ def plot_descriptor_histograms(
     bins: int = DEFAULT_HISTOGRAM_BINS,
     verbose: bool = False,
 ):
-    """Plot raw and processed distributions for one descriptor side by side."""
+    """Plot raw and processed distributions within their 5th–95th
+    percentile ranges."""
     raw_df = pd.read_csv(raw_csv)
     processed_df = pd.read_csv(processed_csv)
 
@@ -274,7 +283,10 @@ def plot_descriptor_histograms(
                 f"Descriptor '{descriptor}' not found in {label} CSV."
             )
 
-    raw_values = pd.to_numeric(raw_df[descriptor], errors="coerce").dropna()
+    raw_values = pd.to_numeric(
+        raw_df[descriptor], errors="coerce"
+    ).dropna()
+
     processed_values = pd.to_numeric(
         processed_df[descriptor], errors="coerce"
     ).dropna()
@@ -285,9 +297,43 @@ def plot_descriptor_histograms(
             "in one or both CSV files."
         )
 
+    # Calculate the 5th and 95th percentiles independently.
+    raw_lower, raw_upper = raw_values.quantile([0.05, 0.95])
+    processed_lower, processed_upper = processed_values.quantile(
+        [0.05, 0.95]
+    )
+
+    # Retain only observations within the percentile ranges.
+    raw_plot_values = raw_values[
+        raw_values.between(raw_lower, raw_upper)
+    ]
+
+    processed_plot_values = processed_values[
+        processed_values.between(processed_lower, processed_upper)
+    ]
+
     if verbose:
-        print("Raw:\n", raw_values.describe())
-        print("Processed:\n", processed_values.describe())
+        print(f"\nDescriptor: {descriptor}")
+        print("Raw:")
+        print(raw_values.describe())
+        print(
+            f"Displayed range: [{raw_lower:.4f}, {raw_upper:.4f}]"
+        )
+        print(
+            f"Displayed observations: {len(raw_plot_values)} "
+            f"/ {len(raw_values)}"
+        )
+
+        print("\nProcessed:")
+        print(processed_values.describe())
+        print(
+            f"Displayed range: "
+            f"[{processed_lower:.4f}, {processed_upper:.4f}]"
+        )
+        print(
+            f"Displayed observations: {len(processed_plot_values)} "
+            f"/ {len(processed_values)}"
+        )
 
     fig, (raw_ax, processed_ax) = plt.subplots(
         ncols=2,
@@ -298,7 +344,7 @@ def plot_descriptor_histograms(
     )
 
     raw_ax.hist(
-        raw_values,
+        raw_plot_values,
         bins=bins,
         color=RAW_COLOR,
         edgecolor=HISTOGRAM_EDGE_COLOR,
@@ -309,7 +355,7 @@ def plot_descriptor_histograms(
     raw_ax.grid(axis="y")
 
     processed_ax.hist(
-        processed_values,
+        processed_plot_values,
         bins=bins,
         color=PROCESSED_COLOR,
         edgecolor=HISTOGRAM_EDGE_COLOR,
@@ -319,7 +365,19 @@ def plot_descriptor_histograms(
     processed_ax.set_ylabel("Frequency")
     processed_ax.grid(axis="y")
 
-    fig.suptitle(f"Distribution of {descriptor}: Raw vs. Processed")
+    processed_ax.axvline(
+        0,
+        color="red",
+        linestyle="--",
+        linewidth=1.2,
+        label="Zero (mean)",
+    )
+    processed_ax.legend()
+
+    fig.suptitle(
+        f"Distribution of {descriptor}: Raw vs. Processed "
+        "(5th–95th percentile)"
+    )
     fig.tight_layout()
 
     if output_path:
@@ -330,11 +388,12 @@ def plot_descriptor_histograms(
             bbox_inches=FIGURE_BBOX,
             format="pdf",
         )
-        print(f"Saved histogram to {output}")
+        print(f"Saved plot to {output}")
     else:
         plt.show()
 
     return fig
+
 
 
 def main() -> None:

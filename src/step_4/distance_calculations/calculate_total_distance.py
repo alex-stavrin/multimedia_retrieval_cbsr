@@ -940,6 +940,19 @@ def main():
                 str(mesh_root / shape)
                 for shape in list(total_distances.keys())[:10]
             ]
+        else:
+            # Distance keys are usually database-relative identifiers such as
+            # ``Car/m1496.obj`` rather than paths relative to the working
+            # directory. When the query is a mesh file, its class directory's
+            # parent is the likely database root; use it to resolve those keys.
+            query_path = Path(args.query)
+            if query_path.is_file():
+                mesh_root = query_path.parent.parent
+                shapes = [
+                    shape if Path(shape).is_file()
+                    else str(mesh_root / shape)
+                    for shape in shapes
+                ]
         visualize_mesh_distances(
             query=args.query,
             shapes_to_compare=shapes,
