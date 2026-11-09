@@ -78,12 +78,17 @@ def _adaptive_subdivide(
     subdivision_methods: list[str] | None = None,
 ) -> vedo.Mesh:
     """Iteratively bisect the longest edges until reaching `target_vertices`."""
+
+    # get vertices
     vertices = numpy.array(mesh.vertices, dtype=numpy.float64, copy=True)
+    # get face indices
     faces = numpy.asarray(mesh.cells, dtype=numpy.int64).copy()
 
-    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
+    # ensure every face is a triangle and is fine
+    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:
         return mesh
 
+    # how many vertices to aim for
     goal_vertices = max(target_vertices, min(9_800, len(vertices) + 2_500))
     added_any = False
 
@@ -92,12 +97,17 @@ def _adaptive_subdivide(
         if needed <= 0:
             break
 
+        # from faces to edges (sorted)
         edges = numpy.sort(faces_to_edges(faces), axis=1)
+        # unique edges indices (no duplicate edges, because faces share edges)
+        # inverse is the indices to mapping every face back to its edge list
         unique, inverse = grouping.unique_rows(edges)
+        # all unique edges
         edges_unique = edges[unique]
         if len(edges_unique) == 0:
             break
 
+        # find the maximum edge length
         lengths = numpy.linalg.norm(
             vertices[edges_unique[:, 0]] - vertices[edges_unique[:, 1]], axis=1
         )
@@ -105,16 +115,21 @@ def _adaptive_subdivide(
         if max_len <= 1e-12:
             break
 
+        # consider edges who have at least 50% of the maximum length
         candidates = numpy.flatnonzero(lengths >= 0.5 * max_len)
+
+        # if more edges qualify than vertices needed, pick the top needed longest edges. Otherwise all canditates are selected
         if len(candidates) > needed:
             top_idx = numpy.argpartition(lengths[candidates], -needed)[-needed:]
             selected = candidates[top_idx]
         else:
             selected = candidates
 
+        # actually select the edges
         long_edge = numpy.zeros(len(unique), dtype=bool)
         long_edge[selected] = True
 
+        # compute all 3d midpoints for all selected edges and add new vertices to the vertex mesh structure
         midpoint = numpy.full(len(unique), -1, dtype=numpy.int64)
         midpoint[long_edge] = numpy.arange(int(long_edge.sum())) + len(vertices)
         vertices = numpy.vstack(
@@ -122,13 +137,22 @@ def _adaptive_subdivide(
         )
         added_any = True
 
+        # Now we need to re-triangualize our mesh because we added new vertices
+        # We have some cases:
+        # case 0 : no splits
+        # case 1 : 1 splits. Makes 2 triangles
+        # case 2 : 2 splits. Makes 3 triangles
+        # case 3 : 3 splits. Makes 4 triangles
+
         face_mid = midpoint[inverse].reshape((-1, 3))
         split = face_mid >= 0
         count = split.sum(axis=1)
 
+        # case 0
         keep = count == 0
         faces_keep = faces[keep]
 
+        # case 1
         one = count == 1
         j = numpy.argmax(split[one], axis=1)
         r = numpy.arange(len(j))
@@ -137,6 +161,7 @@ def _adaptive_subdivide(
         p = mid1[r, j]
         faces_one = numpy.column_stack((a, p, c, p, b, c)).reshape((-1, 3))
 
+        # case 2
         two = count == 2
         j = (numpy.argmin(split[two], axis=1) + 1) % 3
         r = numpy.arange(len(j))
@@ -156,6 +181,7 @@ def _adaptive_subdivide(
         )
         faces_two = numpy.vstack((corner, quad_a, quad_b))
 
+        # case 3
         three = count == 3
         f3, mid3 = faces[three], face_mid[three]
         v0, v1, v2 = f3.T
@@ -164,9 +190,9 @@ def _adaptive_subdivide(
             (v0, m0, m2, m0, v1, m1, m2, m1, v2, m0, m1, m2)
         ).reshape((-1, 3))
 
-        faces = numpy.vstack(
-            (faces_keep, faces_one, faces_two, faces_three)
-        ).astype(numpy.int64)
+        faces = numpy.vstack((faces_keep, faces_one, faces_two, faces_three)).astype(
+            numpy.int64
+        )
 
     if added_any and subdivision_methods is not None:
         subdivision_methods.append("AdaptiveEdge")
@@ -176,40 +202,11 @@ def _adaptive_subdivide(
     return result
 
 
-def _deduplicate_faces(mesh: vedo.Mesh) -> vedo.Mesh:
-    """Remove duplicate and degenerate triangles that `vedo.Mesh.clean()` leaves behind."""
-    faces = numpy.asarray(mesh.cells, dtype=numpy.int64)
-    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
-        return mesh
-
-    non_degenerate = (
-        (faces[:, 0] != faces[:, 1])
-        & (faces[:, 1] != faces[:, 2])
-        & (faces[:, 0] != faces[:, 2])
-    )
-    valid_faces = faces[non_degenerate]
-    if len(valid_faces) == 0:
-        return mesh
-
-    unique_idx, _ = grouping.unique_rows(numpy.sort(valid_faces, axis=1))
-    if len(unique_idx) == len(faces):
-        return mesh
-
-    unique_faces = valid_faces[numpy.sort(unique_idx)]
-    cleaned = vedo.Mesh(
-        [numpy.asarray(mesh.vertices, dtype=numpy.float64), unique_faces]
-    )
-    cleaned.clean()
-    return cleaned
-
-
 def resample_mesh(
     mesh: vedo.Mesh,
     max_iterations: int = MAX_RESAMPLING_ATTEMPTS,
     subdivision_methods: list[str] | None = None,
 ) -> vedo.Mesh:
-    mesh = _deduplicate_faces(mesh)
-
     needs_vertices_count_fix = not (
         MIN_VERTEX_COUNT <= mesh.npoints <= MAX_VERTEX_COUNT
     )
@@ -223,9 +220,7 @@ def resample_mesh(
         mesh.clean()
         needs_area_fix = _is_area_distribution_uneven(mesh)
 
-    if mesh.npoints < MIN_VERTEX_COUNT or (
-        needs_area_fix and mesh.npoints < 9_500
-    ):
+    if mesh.npoints < MIN_VERTEX_COUNT or (needs_area_fix and mesh.npoints < 9_500):
         mesh = _adaptive_subdivide(
             mesh,
             target_vertices=TARGET_VERTEX_COUNT,
@@ -252,9 +247,7 @@ def resample_mesh(
         if mesh.npoints <= MAX_VERTEX_COUNT:
             break
         before_vertices = mesh.npoints
-        mesh.decimate(
-            n=TARGET_VERTEX_COUNT, regularization=DECIMATE_REGULARIZATION
-        )
+        mesh.decimate(n=TARGET_VERTEX_COUNT, regularization=DECIMATE_REGULARIZATION)
         mesh.clean()
         if mesh.npoints == before_vertices:
             break
@@ -277,7 +270,7 @@ def resample_mesh_file(
     destination.parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        mesh = _deduplicate_faces(vedo.Mesh(str(mesh_path)))
+        mesh = vedo.Mesh(str(mesh_path))
         before_vertices = mesh.npoints
 
         subdivision_methods: list[str] = []
