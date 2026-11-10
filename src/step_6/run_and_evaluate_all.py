@@ -20,6 +20,7 @@ METRIC_COLUMNS = [
     "macro_last_rank",
     "macro_first_tier",
     "macro_second_tier",
+    "macro_is_first_correct_accuracy",
     "macro_auroc",
     "micro_precision",
     "micro_recall",
@@ -30,8 +31,8 @@ METRIC_COLUMNS = [
     "micro_last_rank",
     "micro_first_tier",
     "micro_second_tier",
+    "micro_is_first_correct_accuracy",
     "micro_auroc",
-    "is_first_correct_accuracy",
 ]
 
 

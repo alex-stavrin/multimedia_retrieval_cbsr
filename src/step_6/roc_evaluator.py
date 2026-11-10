@@ -332,7 +332,7 @@ class ROCEvaluator:
             ("macro_first_tier", "1st Tier"),
             ("macro_second_tier", "2nd Tier"),
             ("macro_auroc", "AUROC"),
-            ("is_first_correct_accuracy", "Top-1 Acc"),
+            ("macro_is_first_correct_accuracy", "Top-1 Acc"),
         ]
 
         available_metrics = [

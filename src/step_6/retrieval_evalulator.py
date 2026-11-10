@@ -171,6 +171,9 @@ class RetrievalEvaluator:
             "macro_last_rank": float(per_class["last_rank"].mean()),
             "macro_first_tier": float(per_class["first_tier"].mean()),
             "macro_second_tier": float(per_class["second_tier"].mean()),
+            "macro_is_first_correct_accuracy": float(
+                per_class["is_first_correct"].mean()
+            ),
             "micro_precision": float(data_frame_queries["precision"].mean()),
             "micro_recall": float(data_frame_queries["recall"].mean()),
             "micro_specificity": float(data_frame_queries["specificity"].mean()),
@@ -180,7 +183,7 @@ class RetrievalEvaluator:
             "micro_last_rank": float(data_frame_queries["last_rank"].mean()),
             "micro_first_tier": float(data_frame_queries["first_tier"].mean()),
             "micro_second_tier": float(data_frame_queries["second_tier"].mean()),
-            "is_first_correct_accuracy": float(
+            "micro_is_first_correct_accuracy": float(
                 data_frame_queries["is_first_correct"].mean()
             ),
         }
