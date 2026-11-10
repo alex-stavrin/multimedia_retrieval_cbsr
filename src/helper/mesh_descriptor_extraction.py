@@ -26,12 +26,9 @@ def calculate_all_descriptors(
     seed: int | None = DEFAULT_SEED,
 ) -> tuple[dict[str, float], dict[str, np.ndarray]]:
     """Calculate requested descriptors without modifying or preprocessing mesh."""
-    raw_scalars = (
-        calculate_mesh_descriptors(mesh) if scalar_descriptors else {}
-    )
+    raw_scalars = calculate_mesh_descriptors(mesh) if scalar_descriptors else {}
     scalar_values = {
-        descriptor: float(raw_scalars[descriptor])
-        for descriptor in scalar_descriptors
+        descriptor: float(raw_scalars[descriptor]) for descriptor in scalar_descriptors
     }
     histogram_functions = {
         "A3": lambda bins: calculate_angle_histogram(
@@ -74,10 +71,8 @@ def calculate_all_descriptors(
         extractor = histogram_functions.get(descriptor)
         if extractor is None:
             raise ValueError(
-                f"No mesh extractor is registered for histogram "
-                f"'{descriptor}'."
+                f"No mesh extractor is registered for histogram " f"'{descriptor}'."
             )
         histogram_values[descriptor] = extractor(bins)
 
     return scalar_values, histogram_values
-

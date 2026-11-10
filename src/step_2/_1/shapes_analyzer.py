@@ -78,9 +78,7 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     # Class of the object is the name of the folder containing it
     parent_dir = os.path.basename(os.path.dirname(os.path.abspath(shape_path)))
     if not parent_dir:
-        raise ValueError(
-            f"File path does not contain class superfolder: {shape_path}"
-        )
+        raise ValueError(f"File path does not contain class superfolder: {shape_path}")
     shape_class = parent_dir
 
     # Create mesh object from file
@@ -89,18 +87,14 @@ def analyze_shape_from_file(shape_path: str) -> ShapeAnalysis:
     # Get bounding box of mesh
     bounds_array = mesh.bounds()
     if bounds_array is None:
-        raise ValueError(
-            f"Could not retrieve bounding box from shape: {shape_path}"
-        )
+        raise ValueError(f"Could not retrieve bounding box from shape: {shape_path}")
 
     bounding_box = Box(*bounds_array)
 
     # Retrieve cells for face/cell type
     cells = mesh.cells
     if cells is None or len(cells) == 0:
-        raise ValueError(
-            f"Could not retrieve any cells from shape: {shape_path}"
-        )
+        raise ValueError(f"Could not retrieve any cells from shape: {shape_path}")
 
     # Classify cells
     cell_sizes = {len(cell) for cell in cells}
@@ -189,9 +183,7 @@ def analyze_database(root_dir: str, output_path: str):
     return analyze_inputs([root_dir], output_path)
 
 
-def visualize_analyses(
-    analyses: list[ShapeAnalysis], shape_paths: list[str]
-) -> int:
+def visualize_analyses(analyses: list[ShapeAnalysis], shape_paths: list[str]) -> int:
     meshes: list[vedo.Mesh] = []
 
     for analysis, shape_path in zip(analyses, shape_paths):
@@ -227,8 +219,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Analyze 3D shapes from OBJ files and/or "
-        "database directories."
+        description="Analyze 3D shapes from OBJ files and/or " "database directories."
     )
 
     parser.add_argument(

@@ -51,9 +51,7 @@ def style_class_pill(
     class_override: str | None = None,
 ) -> None:
     shape_class = (
-        class_override
-        if class_override is not None
-        else get_shape_class(shape_path)
+        class_override if class_override is not None else get_shape_class(shape_path)
     )
     if class_override is None and shape_class not in SHAPE_CLASS_COLORS:
         shape_class = "Outside Database"
@@ -101,9 +99,7 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        app_icon_path = (
-            Path(__file__).resolve().parents[3] / "assets" / "icon.png"
-        )
+        app_icon_path = Path(__file__).resolve().parents[3] / "assets" / "icon.png"
         app_icon = QIcon(str(app_icon_path))
         self.setWindowIcon(app_icon)
         app = QApplication.instance()
@@ -116,9 +112,7 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
-        default_db = Path(
-            "3d_models_final/3d_models_steps/3_models_fully_normalized"
-        )
+        default_db = Path("3d_models_final/3d_models_steps/3_models_fully_normalized")
         if not default_db.is_dir():
             default_db = Path("3d_models")
 
@@ -243,9 +237,7 @@ class MainWindow(QMainWindow):
         self.results_list.setViewMode(QListWidget.ViewMode.IconMode)
         self.results_list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self.results_list.setMovement(QListWidget.Movement.Static)
-        self.results_list.setSelectionMode(
-            QListWidget.SelectionMode.NoSelection
-        )
+        self.results_list.setSelectionMode(QListWidget.SelectionMode.NoSelection)
         self.results_list.setSpacing(10)
         main_layout.addWidget(left_panel, stretch=1)
         main_layout.addWidget(self.results_list, stretch=2)
@@ -270,19 +262,13 @@ class MainWindow(QMainWindow):
             self.query_button.setEnabled(True)
 
     def open_database_picker(self) -> None:
-        folder = QFileDialog.getExistingDirectory(
-            self, "Select 3D Database Directory"
-        )
+        folder = QFileDialog.getExistingDirectory(self, "Select 3D Database Directory")
         if folder:
             self.database_directory = folder
             self.database_label.setText(f"Database: {folder}")
 
-    def _set_loading_state(
-        self, loading: bool, message: str = "Querying..."
-    ) -> None:
-        self.query_button.setEnabled(
-            not loading and self.selected_file is not None
-        )
+    def _set_loading_state(self, loading: bool, message: str = "Querying...") -> None:
+        self.query_button.setEnabled(not loading and self.selected_file is not None)
         self.pick_button.setEnabled(not loading)
         self.database_button.setEnabled(not loading)
         self.k_spinbox.setEnabled(not loading)
@@ -330,10 +316,7 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            if (
-                self.shape_distance_calculator.last_preprocessed_mesh
-                is not None
-            ):
+            if self.shape_distance_calculator.last_preprocessed_mesh is not None:
                 self.left_viewer.load_mesh(
                     self.shape_distance_calculator.last_preprocessed_mesh
                 )
@@ -342,13 +325,9 @@ class MainWindow(QMainWindow):
             sorted_items = sorted(results.items(), key=lambda item: item[1])
             if self.exclude_self_checkbox.isChecked() and self.selected_file:
                 query_key: str | None = None
-                if self.shape_distance_calculator.is_in_database(
-                    self.selected_file
-                ):
-                    query_key = (
-                        self.shape_distance_calculator._resolve_query_key(
-                            self.selected_file
-                        )
+                if self.shape_distance_calculator.is_in_database(self.selected_file):
+                    query_key = self.shape_distance_calculator._resolve_query_key(
+                        self.selected_file
                     )
                 selected_name = Path(self.selected_file).name
                 sorted_items = [
@@ -365,9 +344,7 @@ class MainWindow(QMainWindow):
             viewer_width = 300
             viewer_height = 300
             for idx, (shape_path, distance) in enumerate(matches, start=1):
-                self.loading_label.setText(
-                    f"Loading result {idx}/{len(matches)}..."
-                )
+                self.loading_label.setText(f"Loading result {idx}/{len(matches)}...")
                 self.loading_progress.setValue(idx)
                 QApplication.processEvents()
 
@@ -389,17 +366,13 @@ class MainWindow(QMainWindow):
                     class_pill, alignment=Qt.AlignmentFlag.AlignCenter
                 )
 
-                label = QLabel(
-                    f"{os.path.basename(shape_path)}\ndist: {distance:.3f}"
-                )
+                label = QLabel(f"{os.path.basename(shape_path)}\ndist: {distance:.3f}")
                 label.setAlignment(Qt.AlignmentFlag.AlignCenter)
                 card_layout.addWidget(label)
                 viewer = EmbeddedViewer(card)
                 viewer.setFixedSize(viewer_width, viewer_height)
                 viewer.load_mesh(full_shape_path)
-                card_layout.addWidget(
-                    viewer, alignment=Qt.AlignmentFlag.AlignCenter
-                )
+                card_layout.addWidget(viewer, alignment=Qt.AlignmentFlag.AlignCenter)
                 card_layout.activate()
                 item = QListWidgetItem(self.results_list)
                 item.setSizeHint(card.sizeHint())

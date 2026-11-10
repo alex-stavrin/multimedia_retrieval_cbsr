@@ -171,7 +171,11 @@ def analyze_mesh(
     except ValueError:
         relative_path = shape_path_obj.name
 
-    shape_class = shape_path_obj.parent.name if shape_path_obj.parent != base_dir_obj else "default"
+    shape_class = (
+        shape_path_obj.parent.name
+        if shape_path_obj.parent != base_dir_obj
+        else "default"
+    )
 
     try:
         mesh = vedo.Mesh(str(shape_path_obj))
@@ -315,8 +319,14 @@ def print_summary_table(results: list[NonManifoldReport]) -> None:
     print("-" * 110)
 
     for i, r in enumerate(results, start=1):
-        rel_path = r.relative_path if len(r.relative_path) <= 30 else "..." + r.relative_path[-27:]
-        shape_class = r.shape_class if len(r.shape_class) <= 18 else r.shape_class[:15] + "..."
+        rel_path = (
+            r.relative_path
+            if len(r.relative_path) <= 30
+            else "..." + r.relative_path[-27:]
+        )
+        shape_class = (
+            r.shape_class if len(r.shape_class) <= 18 else r.shape_class[:15] + "..."
+        )
         row = (
             f"{i:<3} | {shape_class:<18} | {rel_path:<30} | "
             f"{r.n_vertices:<8} | {r.n_faces:<8} | {r.non_manifold_edges:<8} | "
@@ -377,7 +387,11 @@ def copy_objects(results: list[NonManifoldReport], dest_dir: str | Path) -> None
 
     for r in results:
         src_path = Path(r.file_path)
-        dest_filename = f"{r.shape_class}_{src_path.name}" if r.shape_class != "default" else src_path.name
+        dest_filename = (
+            f"{r.shape_class}_{src_path.name}"
+            if r.shape_class != "default"
+            else src_path.name
+        )
         dest_path = destination / dest_filename
         shutil.copy2(src_path, dest_path)
 

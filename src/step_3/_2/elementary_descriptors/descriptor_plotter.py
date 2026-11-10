@@ -36,22 +36,15 @@ def load_features(csv_path: str) -> tuple[pd.DataFrame, list[str]]:
 
     # Extract the class name from the first folder in file_path.
     df[CLASS_COLUMN] = (
-        df["file_path"]
-        .str.replace("\\", "/", regex=False)
-        .str.split("/")
-        .str[0]
+        df["file_path"].str.replace("\\", "/", regex=False).str.split("/").str[0]
     )
 
     # Convert the closed column to boolean.
-    df["was_closed"] = (
-        df["was_closed"].astype(str).str.strip().str.lower().eq("true")
-    )
+    df["was_closed"] = df["was_closed"].astype(str).str.strip().str.lower().eq("true")
 
     # Identify feature columns and convert them to numeric values.
     feature_names = [
-        c
-        for c in df.columns
-        if c not in NON_FEATURE_COLUMNS and c != CLASS_COLUMN
+        c for c in df.columns if c not in NON_FEATURE_COLUMNS and c != CLASS_COLUMN
     ]
 
     for feature in feature_names:
@@ -149,14 +142,9 @@ def plot_by_class(
 
         feature_ax = axes[i]
 
-        data = [
-            df.loc[df[CLASS_COLUMN] == cls, feature].dropna()
-            for cls in classes
-        ]
+        data = [df.loc[df[CLASS_COLUMN] == cls, feature].dropna() for cls in classes]
 
-        feature_ax.boxplot(
-            data, tick_labels=[str(cls) for cls in classes], sym=""
-        )
+        feature_ax.boxplot(data, tick_labels=[str(cls) for cls in classes], sym="")
 
         feature_ax.set_title(feature)
         feature_ax.set_xlabel("Class")
@@ -206,9 +194,7 @@ def find_shape_row(df: pd.DataFrame, shape_path: str) -> pd.Series:
 
     if matches.empty:
         file_name = target.split("/")[-1]
-        matches = df.loc[
-            [_file_name_matches(path, file_name) for path in csv_paths]
-        ]
+        matches = df.loc[[_file_name_matches(path, file_name) for path in csv_paths]]
 
     if matches.empty:
         raise ValueError(f"{shape_path} was not found in the CSV")
@@ -261,9 +247,7 @@ def _save_comparison_table(
 ) -> None:
     """Save shape descriptors as a LaTeX table."""
     table_rows = {
-        name: [_format_value(row[name]) for row in rows]
-        for name in feature_names
-
+        name: [_format_value(row[name]) for row in rows] for name in feature_names
     }
 
     table_df = pd.DataFrame(table_rows, index=titles).T
@@ -348,9 +332,7 @@ def compare_shapes(
     table_ax = fig.add_subplot(grid[1, :])
     table_ax.axis("off")
 
-    cell_text = [
-        [_format_value(row[name]) for row in rows] for name in feature_names
-    ]
+    cell_text = [[_format_value(row[name]) for row in rows] for name in feature_names]
 
     table = table_ax.table(
         cellText=cell_text,
@@ -380,8 +362,7 @@ def main() -> None:
     parser.add_argument(
         "--by_class",
         action="store_true",
-        help="Boxplot per class (first folder in file_path) instead of "
-        "histograms",
+        help="Boxplot per class (first folder in file_path) instead of " "histograms",
     )
     parser.add_argument(
         "--closed_only",

@@ -59,16 +59,12 @@ def load_statistics(csv_path: Path) -> pd.DataFrame:
         )
 
     data["closed_raw"] = parse_bool_column(data["closed_raw"], "closed_raw")
-    data["closed_after"] = parse_bool_column(
-        data["closed_after"], "closed_after"
-    )
+    data["closed_after"] = parse_bool_column(data["closed_after"], "closed_after")
 
     # Explicitly identify processing errors from the report.
     if "reason" in data.columns:
         reason = data["reason"].fillna("").astype(str).str.strip()
-        processing_error = reason.str.startswith(
-            ("error:", "worker error:"), na=False
-        )
+        processing_error = reason.str.startswith(("error:", "worker error:"), na=False)
     else:
         processing_error = pd.Series(False, index=data.index)
 
@@ -169,9 +165,7 @@ def print_statistics(
     print(f"Total shapes: {total:,}")
 
     for label, count, percentage in zip(labels, counts, percentages):
-        print(
-            f"{label.replace(chr(10), ' ')}: " f"{count:,} ({percentage:.1f}%)"
-        )
+        print(f"{label.replace(chr(10), ' ')}: " f"{count:,} ({percentage:.1f}%)")
 
     print(f"Plot saved to: {output_path}")
 
@@ -179,9 +173,7 @@ def print_statistics(
 def parse_arguments() -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
-        description=(
-            "Plot how many meshes were closed before and after repair."
-        )
+        description=("Plot how many meshes were closed before and after repair.")
     )
 
     parser.add_argument(

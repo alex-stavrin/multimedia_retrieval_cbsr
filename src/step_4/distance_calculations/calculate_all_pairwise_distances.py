@@ -130,9 +130,7 @@ def calculate_all_pairwise_distances(
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    checkpoint_path = output_path.with_name(
-        f"{output_path.stem}_checkpoint.pkl"
-    )
+    checkpoint_path = output_path.with_name(f"{output_path.stem}_checkpoint.pkl")
 
     meshes = get_all_mesh_identifiers(
         csv_paths,
@@ -170,9 +168,7 @@ def calculate_all_pairwise_distances(
             total_meshes,
         )
 
-    remaining_queries = [
-        mesh for mesh in query_meshes if mesh not in completed_queries
-    ]
+    remaining_queries = [mesh for mesh in query_meshes if mesh not in completed_queries]
 
     completed_pairs = sum(
         total_meshes - i - 1
@@ -200,8 +196,10 @@ def calculate_all_pairwise_distances(
 
     queries_since_checkpoint = 0
 
-    print(f"Calculating pair-wise distances using\n: {distance_config}\n\n"
-          f"With descriptor csv files\n: {csv_paths}\n")
+    print(
+        f"Calculating pair-wise distances using\n: {distance_config}\n\n"
+        f"With descriptor csv files\n: {csv_paths}\n"
+    )
 
     progress = tqdm(
         remaining_queries,
