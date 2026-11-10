@@ -4,16 +4,6 @@
 
 Prepares the 3D model database through reparation, resampling, normalization, descriptor extraction, and retrieval evaluation with checkpoint resume support.
 
-### Full Pipeline (Suggested)
-
-```python -m src.helper.prepare_database -i 3d_models -o 3d_models_final -a```
-
-### Command Format
-
-```bash
-python -m src.helper.prepare_database -i {input_database} -o {output_directory} [options]
-```
-
 ### Arguments
 
 - `-i`, `--input`: (Required) Path to the raw input database folder.

@@ -51,8 +51,12 @@ class EmbeddedViewer(QWidget):
         )
         self._configure_camera()
 
-    def load_mesh(self, file_path: str) -> None:
-        mesh = vedo.Mesh(file_path)
+    def load_mesh(self, file_path: str | vedo.Mesh) -> None:
+        mesh = (
+            file_path.clone()
+            if isinstance(file_path, vedo.Mesh)
+            else vedo.Mesh(file_path)
+        )
         mesh.phong()
         mesh.c("#A0A0A0")
         mesh.lighting("plastic")

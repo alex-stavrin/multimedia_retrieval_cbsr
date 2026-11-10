@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
 from src.step_5.ANN.table_renderer import find_mesh_path, render_meshes_grid
 
@@ -26,11 +27,6 @@ def main() -> None:
 
     rows_data = []
     for query_string in arguments.queries:
-        resolved_id = spatial_search_engine.shape_ids[
-            spatial_search_engine.resolve_query_index(query_string)
-        ]
-        query_file = find_mesh_path(arguments.model_dir, resolved_id)
-
         results = spatial_search_engine.query_range(
             query=query_string,
             radius=arguments.radius,
@@ -38,6 +34,18 @@ def main() -> None:
             p=arguments.p,
             exclude_self=True,
         )
+
+        try:
+            resolved_id = spatial_search_engine.shape_ids[
+                spatial_search_engine.resolve_query_index(query_string)
+            ]
+            query_file = find_mesh_path(arguments.model_dir, resolved_id)
+        except ValueError:
+            query_file = (
+                spatial_search_engine.last_preprocessed_mesh
+                if spatial_search_engine.last_preprocessed_mesh is not None
+                else Path(query_string)
+            )
 
         matches = [
             (find_mesh_path(arguments.model_dir, shape_id), dist)
@@ -51,3 +59,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
