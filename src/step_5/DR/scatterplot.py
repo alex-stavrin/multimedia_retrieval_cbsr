@@ -12,7 +12,7 @@ from matplotlib.colors import to_rgba
 from src.step_4.user_interface.class_colors import get_class_color
 from src.step_5.DR.tsne_engine import DEFAULT_OUTPUT, load_embedding
 
-BACKGROUND = "#111111"
+BACKGROUND = "#000000"
 # how close (in pixels) the mouse has to be to a point to select it
 PICK_DISTANCE = 8
 DIMMED_ALPHA = 0.08

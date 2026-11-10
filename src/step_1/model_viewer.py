@@ -72,14 +72,14 @@ class ModelViewer(QMainWindow):
             mesh.lighting("plastic")
 
             # make edges of mesh stand out
-            mesh.linewidth(3)
+            mesh.linewidth(1)
             mesh.linecolor("#000000")
 
             mesh.shift(*shift_amount)
             shift_amount = numpy.add(shift_amount, models_delta)
 
             # make vertices of mesh stand out
-            points: Points = Points(mesh.vertices, r=10, c="#000000")
+            points: Points = Points(mesh.vertices, r=4, c="#000000")
             points.properties.RenderPointsAsSpheresOff()
             self.points.append(points)
 
@@ -171,13 +171,13 @@ class ModelViewer(QMainWindow):
         edges_layout = QVBoxLayout(edges_group)
 
         # slider to change line-width of edges
-        EDGE_STARTING_VALUE = 3
+        EDGE_STARTING_VALUE = 1
         self.edge_width_label = QLabel(f"Width = {EDGE_STARTING_VALUE}")
         edges_layout.addWidget(self.edge_width_label)
 
         self.edge_width_slider = QSlider(Qt.Orientation.Horizontal)
         self.edge_width_slider.setRange(0, 15)
-        self.edge_width_slider.setValue(3)
+        self.edge_width_slider.setValue(EDGE_STARTING_VALUE)
         edges_layout.addWidget(self.edge_width_slider)
 
         controls.addWidget(edges_group)
@@ -186,7 +186,7 @@ class ModelViewer(QMainWindow):
         vertices_group = QGroupBox("Vertices")
         vertices_layout = QVBoxLayout(vertices_group)
 
-        VERTEX_STARTING_VALUE = 10
+        VERTEX_STARTING_VALUE = 4
         self.vertex_radius_label = QLabel(f"Point size = {VERTEX_STARTING_VALUE}")
         vertices_layout.addWidget(self.vertex_radius_label)
 

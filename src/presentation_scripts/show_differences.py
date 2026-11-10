@@ -2,6 +2,7 @@
 
 Usage:
     python -m src.presentation_scripts.show_differences processed/Category/model.obj
+    python -m src.presentation_scripts.show_differences processed/Category/model.obj --no-wireframe
     python -m src.presentation_scripts.show_differences processed/Category/model.obj original/Category/model.obj
 """
 
@@ -11,15 +12,16 @@ from pathlib import Path
 import vedo
 
 
-def load_mesh(mesh_path: str | Path) -> vedo.Mesh:
-    """Load and center a wireframe mesh for interactive viewing."""
+def load_mesh(mesh_path: str | Path, wireframe: bool = True) -> vedo.Mesh:
+    """Load and center a mesh for interactive viewing."""
     path = Path(mesh_path)
     if not path.is_file():
         raise FileNotFoundError(f"Mesh file does not exist: {path}")
 
     mesh = vedo.Mesh(str(path))
     mesh.shift(-mesh.center_of_mass())  # type: ignore
-    mesh.wireframe()
+    if wireframe:
+        mesh.wireframe()
     mesh.color("#858585")
 
     return mesh
@@ -30,6 +32,7 @@ def show_meshes_side_by_side(
     second_mesh: str | Path | None = None,
     output_path: str | Path | None = None,
     database_root: str | Path = "3d_models",
+    wireframe: bool = True,
 ) -> None:
     """Display two mesh renderings, optionally saving the comparison image."""
     first_mesh = Path(first_mesh)
@@ -43,7 +46,7 @@ def show_meshes_side_by_side(
         second_path, database_root
     ) and not _is_under_database_root(first_mesh, database_root):
         paths = (second_path, first_mesh)
-    meshes = [load_mesh(path) for path in paths]
+    meshes = [load_mesh(path, wireframe=wireframe) for path in paths]
     titles = [
         f"{_database_root_name(path, database_root)}\n{path.name}"
         for path in paths
@@ -128,12 +131,20 @@ def main() -> None:
         type=Path,
         help="Save the comparison image instead of opening a window",
     )
+    parser.add_argument(
+        "-w",
+        "--wireframe",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Show meshes as wireframes (default; use --no-wireframe for surfaces)",
+    )
     args = parser.parse_args()
     show_meshes_side_by_side(
         args.first_mesh,
         args.second_mesh,
         output_path=args.output,
         database_root=args.database_root,
+        wireframe=args.wireframe,
     )
 
 
