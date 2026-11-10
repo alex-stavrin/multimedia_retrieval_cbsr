@@ -4,6 +4,7 @@ from pathlib import Path
 import vedo
 import numpy as np
 
+
 def _distance_color(normalized_error: float) -> tuple[float, float, float]:
     """Map low-to-high distances onto a fixed-hue blue gradient."""
     error = float(np.clip(normalized_error, 0.0, 1.0))
@@ -76,9 +77,7 @@ def visualize_mesh_distances(
         if np.isfinite(distance) and distance > 1e-12
     ]
     color_scale = (
-        float(np.percentile(positive_distances, 95))
-        if positive_distances
-        else 1.0
+        float(np.percentile(positive_distances, 95)) if positive_distances else 1.0
     )
     if color_scale <= 0:
         color_scale = 1.0

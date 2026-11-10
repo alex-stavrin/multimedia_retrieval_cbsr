@@ -67,8 +67,20 @@ def main():
             "(assignment guidance: start small, then scale up once the pipeline works)."
         )
     )
-    parser.add_argument("-i", "--input", type=str, required=True, help="Path to the full shape database root")
-    parser.add_argument("-o", "--output", type=str, required=True, help="Path to write the reduced database to")
+    parser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        required=True,
+        help="Path to the full shape database root",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        required=True,
+        help="Path to write the reduced database to",
+    )
     parser.add_argument(
         "-n",
         "--shapes-per-class",
@@ -76,13 +88,19 @@ def main():
         default=DEFAULT_SHAPES_PER_CLASS,
         help=f"Maximum shapes to take per class (default: {DEFAULT_SHAPES_PER_CLASS})",
     )
-    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducible selection")
+    parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for reproducible selection"
+    )
     args = parser.parse_args()
 
-    selection = build_reduced_database(args.input, args.output, args.shapes_per_class, args.seed)
+    selection = build_reduced_database(
+        args.input, args.output, args.shapes_per_class, args.seed
+    )
 
     total = sum(len(paths) for paths in selection.values())
-    counts = sorted((len(paths), shape_class) for shape_class, paths in selection.items())
+    counts = sorted(
+        (len(paths), shape_class) for shape_class, paths in selection.items()
+    )
 
     print(f"Selected {total} shapes across {len(selection)} classes")
     print(f"Smallest class: {counts[0][1]} ({counts[0][0]} shapes)")

@@ -48,24 +48,17 @@ def show_meshes_side_by_side(
         paths = (second_path, first_mesh)
     meshes = [load_mesh(path, wireframe=wireframe) for path in paths]
     titles = [
-        f"{_database_root_name(path, database_root)}\n{path.name}"
-        for path in paths
+        f"{_database_root_name(path, database_root)}\n{path.name}" for path in paths
     ]
     plotter = vedo.Plotter(shape=(1, 2), sharecam=True, bg="white")
     plotter.show(meshes[0], at=0, resetcam=True, interactive=False)
-    plotter.add(
-        vedo.Text2D(titles[0], pos="top-center", c="black", s=1.5), at=0
-    )
+    plotter.add(vedo.Text2D(titles[0], pos="top-center", c="black", s=1.5), at=0)
     plotter.show(meshes[1], at=1, resetcam=False, interactive=False)
-    plotter.add(
-        vedo.Text2D(titles[1], pos="top-center", c="black", s=1.5), at=1
-    )
+    plotter.add(vedo.Text2D(titles[1], pos="top-center", c="black", s=1.5), at=1)
     plotter.interactive()
 
 
-def _is_under_database_root(
-    mesh_path: Path, database_root: str | Path
-) -> bool:
+def _is_under_database_root(mesh_path: Path, database_root: str | Path) -> bool:
     """Whether a mesh path belongs to the named database root."""
     return _database_root_name(mesh_path, database_root) == "3d_models"
 
@@ -77,9 +70,7 @@ def _database_root_name(mesh_path: Path, database_root: str | Path) -> str:
     return inferred_root or Path(database_root).name
 
 
-def find_matching_mesh(
-    first_mesh: str | Path, database_root: str | Path
-) -> Path:
+def find_matching_mesh(first_mesh: str | Path, database_root: str | Path) -> Path:
     """Find the same category and filename beneath another database root."""
     first_path = Path(first_mesh)
     root = Path(database_root)

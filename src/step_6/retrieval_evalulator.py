@@ -170,9 +170,7 @@ class RetrievalEvaluator:
         )
 
         total_retrieval_time_s = (
-            float(sum(query_times.values()))
-            if query_times is not None
-            else 0.0
+            float(sum(query_times.values())) if query_times is not None else 0.0
         )
 
         total_stats = {

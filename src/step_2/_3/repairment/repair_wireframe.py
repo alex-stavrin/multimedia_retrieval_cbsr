@@ -102,9 +102,7 @@ def deduplicate(shape: vedo.Mesh) -> vedo.Mesh:
         return shape
 
     unique_faces = valid_faces[np.sort(unique_idx)]
-    cleaned = vedo.Mesh(
-        [np.asarray(shape.vertices, dtype=np.float64), unique_faces]
-    )
+    cleaned = vedo.Mesh([np.asarray(shape.vertices, dtype=np.float64), unique_faces])
     cleaned.clean()
     return cleaned
 

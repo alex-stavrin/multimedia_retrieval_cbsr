@@ -53,9 +53,7 @@ class Scatterplot:
         self.figure = pyplot.figure(
             figsize=(12, 8), facecolor=BACKGROUND, num="t-SNE of the shape database"
         )
-        self.axes = self.figure.add_axes(
-            (0.03, 0.05, 0.71, 0.88), facecolor=BACKGROUND
-        )
+        self.axes = self.figure.add_axes((0.03, 0.05, 0.71, 0.88), facecolor=BACKGROUND)
         self.axes.set_xticks([])
         self.axes.set_yticks([])
         for spine in self.axes.spines.values():
@@ -79,7 +77,9 @@ class Scatterplot:
             annotation_clip=False,
         )
         self.annotation.set_visible(False)
-        self.title = self.axes.set_title(self._title(), color=TEXT_COLOR, fontsize=11, pad=8)
+        self.title = self.axes.set_title(
+            self._title(), color=TEXT_COLOR, fontsize=11, pad=8
+        )
 
         self._init_legend()
 
@@ -180,9 +180,7 @@ class Scatterplot:
         self._update_legend_scroll()
 
     def _update_legend_scroll(self) -> None:
-        self.scroll_offset = float(
-            numpy.clip(self.scroll_offset, 0.0, self.max_scroll)
-        )
+        self.scroll_offset = float(numpy.clip(self.scroll_offset, 0.0, self.max_scroll))
         top = self.scroll_offset
         bottom = self.scroll_offset + self.visible_items
         self.legend_axes.set_ylim(bottom, top)

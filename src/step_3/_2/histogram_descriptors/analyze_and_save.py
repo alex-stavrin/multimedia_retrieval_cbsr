@@ -99,9 +99,7 @@ def analyze_and_save(
     histogram_descriptors = ["A3", "D1", "D2", "D3", "D4"]
 
     header = ["file_path"] + [
-        f"{h_desc}_{i}"
-        for h_desc in histogram_descriptors
-        for i in range(bins)
+        f"{h_desc}_{i}" for h_desc in histogram_descriptors for i in range(bins)
     ]
 
     # get all 3D files (.obj)
@@ -112,15 +110,14 @@ def analyze_and_save(
         writer = csv.writer(f)
         writer.writerow(header)
 
-        tasks = [
-            (file, input, samples, bins, seed, normalize_by_sum)
-            for file in files
-        ]
+        tasks = [(file, input, samples, bins, seed, normalize_by_sum) for file in files]
         n_workers = max_workers or os.cpu_count() or 1
         print(f"Using {n_workers} worker processes")
 
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            chunksize = max(1, min(16, len(tasks) // (n_workers * 2))) if len(tasks) > 0 else 1
+            chunksize = (
+                max(1, min(16, len(tasks) // (n_workers * 2))) if len(tasks) > 0 else 1
+            )
             for row in tqdm(
                 executor.map(proccess_file, tasks, chunksize=chunksize),
                 total=len(tasks),

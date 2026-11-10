@@ -87,12 +87,8 @@ class _DataFrameShapeLookup:
 
 
 # Per-DataFrame caches keyed by id(df)
-_LOOKUP_CACHE: dict[
-    tuple[int, str], tuple[pd.DataFrame, _DataFrameShapeLookup]
-] = {}
-_HISTOGRAM_GROUPS_CACHE: dict[
-    int, tuple[pd.DataFrame, dict[str, list[str]]]
-] = {}
+_LOOKUP_CACHE: dict[tuple[int, str], tuple[pd.DataFrame, _DataFrameShapeLookup]] = {}
+_HISTOGRAM_GROUPS_CACHE: dict[int, tuple[pd.DataFrame, dict[str, list[str]]]] = {}
 _FEATURE_MATRIX_CACHE: dict[
     tuple[int, str, bool, str],
     tuple[pd.DataFrame, list[str], np.ndarray, np.ndarray],
@@ -204,8 +200,7 @@ def _get_histogram_groups(df: pd.DataFrame) -> dict[str, list[str]]:
 
     if not result:
         raise ValueError(
-            "No histogram columns found. "
-            "Expected names such as A3_0, A3_1, etc."
+            "No histogram columns found. " "Expected names such as A3_0, A3_1, etc."
         )
 
     _HISTOGRAM_GROUPS_CACHE[id(df)] = (df, result)
@@ -273,15 +268,13 @@ def _get_cached_feature_matrix(
     if cached is not None and cached[0] is df:
         return cached[1], cached[2], cached[3]
 
-    columns = _get_feature_columns(
-        df, descriptor, histogram, identifier_column
-    )
+    columns = _get_feature_columns(df, descriptor, histogram, identifier_column)
     sub_df = df[columns]
     matrix = np.empty((len(df), len(columns)), dtype=np.float64)
     for col_idx, col_name in enumerate(columns):
-        matrix[:, col_idx] = pd.to_numeric(
-            sub_df[col_name], errors="coerce"
-        ).to_numpy(dtype=np.float64)
+        matrix[:, col_idx] = pd.to_numeric(sub_df[col_name], errors="coerce").to_numpy(
+            dtype=np.float64
+        )
 
     finite_mask = np.isfinite(matrix).all(axis=1)
     _FEATURE_MATRIX_CACHE[cache_key] = (df, columns, matrix, finite_mask)
@@ -309,9 +302,7 @@ def euclidean_distance(
 
     query_idx = lookup.resolve_index(query)
     if not finite_mask[query_idx]:
-        raise ValueError(
-            f"Missing or non-finite feature values for mesh '{query}'."
-        )
+        raise ValueError(f"Missing or non-finite feature values for mesh '{query}'.")
 
     comp_indices, comp_keys = lookup.resolve_many(shapes_to_compare)
     if not finite_mask[comp_indices].all():
@@ -353,9 +344,7 @@ def cosine_distance(
 
     query_idx = lookup.resolve_index(query)
     if not finite_mask[query_idx]:
-        raise ValueError(
-            f"Missing or non-finite feature values for mesh '{query}'."
-        )
+        raise ValueError(f"Missing or non-finite feature values for mesh '{query}'.")
 
     comp_indices, comp_keys = lookup.resolve_many(shapes_to_compare)
     if not finite_mask[comp_indices].all():
@@ -368,9 +357,7 @@ def cosine_distance(
     query_vector = matrix[query_idx]
     query_norm = float(np.linalg.norm(query_vector))
     if query_norm == 0:
-        raise ValueError(
-            f"Cosine distance is undefined for zero vector: '{query}'."
-        )
+        raise ValueError(f"Cosine distance is undefined for zero vector: '{query}'.")
 
     comp_matrix = matrix[comp_indices]
     comp_norms = np.linalg.norm(comp_matrix, axis=1)
@@ -423,9 +410,7 @@ def earth_movers_distance(
 
     query_idx = lookup.resolve_index(query)
     if not finite_mask[query_idx]:
-        raise ValueError(
-            f"Missing or non-finite feature values for mesh '{query}'."
-        )
+        raise ValueError(f"Missing or non-finite feature values for mesh '{query}'.")
 
     query_values = matrix[query_idx]
     if (query_values < 0).any():

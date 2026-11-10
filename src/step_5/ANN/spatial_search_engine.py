@@ -55,9 +55,7 @@ class SpatialSearchEngine:
             fname = Path(query).name
             if fname in self._id_to_index:
                 return self._id_to_index[fname]
-            raise ValueError(
-                f"Query shape '{query}' not found in feature database."
-            )
+            raise ValueError(f"Query shape '{query}' not found in feature database.")
 
         norm = normalize_shape_path(raw)
         if norm in self._id_to_index:
@@ -103,9 +101,7 @@ class SpatialSearchEngine:
         )
 
         elementary_columns = [
-            col
-            for col in ELEMENTAL_DESCRIPTORS
-            if col in merged_data_frame.columns
+            col for col in ELEMENTAL_DESCRIPTORS if col in merged_data_frame.columns
         ]
         histogram_columns: list[str] = []
         for histogram_prefix in HISTOGRAM_DESCRIPTORS:
@@ -129,14 +125,10 @@ class SpatialSearchEngine:
             ]
             if bins:
                 row_sums = (
-                    merged_data_frame[bins]
-                    .to_numpy(dtype=numpy.float64)
-                    .sum(axis=1)
+                    merged_data_frame[bins].to_numpy(dtype=numpy.float64).sum(axis=1)
                 )
                 mean_sum = float(numpy.nanmean(row_sums))
-                self._normalize_by_sum = abs(mean_sum - 1.0) < abs(
-                    mean_sum - len(bins)
-                )
+                self._normalize_by_sum = abs(mean_sum - 1.0) < abs(mean_sum - len(bins))
                 break
 
         self._query_transforms: dict[str, tuple[float, float]] = {}
@@ -170,8 +162,7 @@ class SpatialSearchEngine:
                         offset = float(numpy.mean(y))
                     else:
                         scale = float(
-                            numpy.mean((x - x.mean()) * (y - y.mean()))
-                            / variance
+                            numpy.mean((x - x.mean()) * (y - y.mean())) / variance
                         )
                         offset = float(y.mean() - scale * x.mean())
                     self._query_transforms[descriptor] = (scale, offset)
@@ -179,9 +170,7 @@ class SpatialSearchEngine:
         feature_columns = elementary_columns + histogram_columns
 
         # make the matrix NxM. Where N is the number of shapes and M is the number of descriptor columns (elementary + histogram)
-        matrix = merged_data_frame[feature_columns].to_numpy(
-            dtype=numpy.float64
-        )
+        matrix = merged_data_frame[feature_columns].to_numpy(dtype=numpy.float64)
         shape_ids = merged_data_frame["_norm_id"].astype(str).tolist()
         return shape_ids, feature_columns, matrix
 
@@ -201,9 +190,7 @@ class SpatialSearchEngine:
             block = matrix[:, indices]
             total_variance = float(block.var(axis=0).sum())
             scales[name] = (
-                float(numpy.sqrt(total_variance))
-                if total_variance > 0
-                else 1.0
+                float(numpy.sqrt(total_variance)) if total_variance > 0 else 1.0
             )
         return groups, scales
 
@@ -264,9 +251,7 @@ class SpatialSearchEngine:
             self.raw_feature_matrix, self.feature_columns
         )
         self.feature_matrix = (
-            self.balance_feature_matrix(
-                self.raw_feature_matrix, self.feature_columns
-            )
+            self.balance_feature_matrix(self.raw_feature_matrix, self.feature_columns)
             if balance
             else self.raw_feature_matrix
         )
@@ -294,8 +279,7 @@ class SpatialSearchEngine:
                 )
             mesh = vedo.Mesh(str(mesh_path))
             is_fully_normalized_file = any(
-                part.endswith("_models_fully_normalized")
-                for part in mesh_path.parts
+                part.endswith("_models_fully_normalized") for part in mesh_path.parts
             )
         elif isinstance(mesh_or_path, vedo.Mesh):
             mesh = mesh_or_path
@@ -310,9 +294,7 @@ class SpatialSearchEngine:
         histogram_bins: dict[str, int] = {}
         for prefix in HISTOGRAM_DESCRIPTORS:
             bins = [
-                col
-                for col in self.histogram_columns
-                if col.startswith(f"{prefix}_")
+                col for col in self.histogram_columns if col.startswith(f"{prefix}_")
             ]
             if bins:
                 histogram_bins[prefix] = len(bins)
@@ -336,9 +318,7 @@ class SpatialSearchEngine:
 
         for descriptor, (scale, offset) in self._query_transforms.items():
             if descriptor in scalar_values:
-                scalar_values[descriptor] = (
-                    scale * scalar_values[descriptor] + offset
-                )
+                scalar_values[descriptor] = scale * scalar_values[descriptor] + offset
 
         raw_vector = numpy.zeros(len(self.feature_columns), dtype=numpy.float64)
         for idx, col in enumerate(self.feature_columns):
@@ -353,9 +333,7 @@ class SpatialSearchEngine:
             for name, indices in self._group_indices.items():
                 scale = self._group_scales[name]
                 balanced_vector[indices] = (
-                    raw_vector[indices] / scale
-                    if scale > 0
-                    else raw_vector[indices]
+                    raw_vector[indices] / scale if scale > 0 else raw_vector[indices]
                 )
             return balanced_vector
 
@@ -422,9 +400,7 @@ class SpatialSearchEngine:
 
         total_number_of_shapes = len(self.shape_ids)
         should_exclude_self = exclude_self and query_id is not None
-        k_return = min(
-            k + 1 if should_exclude_self else k, total_number_of_shapes
-        )
+        k_return = min(k + 1 if should_exclude_self else k, total_number_of_shapes)
 
         distances, indices = self.kd_tree.query(query_vector, k=k_return, eps=eps, p=p)
 
@@ -445,7 +421,6 @@ class SpatialSearchEngine:
                 break
 
         return results
-
 
 
 def main() -> None:

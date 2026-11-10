@@ -30,14 +30,10 @@ def compare_hole_fill_stats(
     show_progress: bool = True,
 ):
     if not isinstance(original_database_path, str):
-        raise TypeError(
-            f"Database path must be string: {original_database_path}"
-        )
+        raise TypeError(f"Database path must be string: {original_database_path}")
 
     if not isinstance(filled_database_path, str):
-        raise TypeError(
-            f"Database path must be string: {filled_database_path}"
-        )
+        raise TypeError(f"Database path must be string: {filled_database_path}")
 
     original_files = map_by_relative_path(original_database_path)
     filled_files = map_by_relative_path(filled_database_path)
@@ -68,9 +64,7 @@ def compare_hole_fill_stats(
         # Sorted so the CSV output is deterministic
         file_keys = sorted(original_files)
         iterator = (
-            tqdm(file_keys, desc="Analyzing reparation")
-            if show_progress
-            else file_keys
+            tqdm(file_keys, desc="Analyzing reparation") if show_progress else file_keys
         )
 
         for relative_path in iterator:
@@ -99,9 +93,7 @@ def generate_repair_report(
         raise TypeError("input_dir_path must be a str")
     if not isinstance(output_dir_path, str):
         raise TypeError("output_dir_path must be a str")
-    if report_output_path is not None and not isinstance(
-        report_output_path, str
-    ):
+    if report_output_path is not None and not isinstance(report_output_path, str):
         raise TypeError("report_output_path must be a str or None")
     if not isinstance(steps, dict):
         raise TypeError("steps must be a dict")
@@ -118,13 +110,10 @@ def generate_repair_report(
         writer = csv.DictWriter(f, fieldnames=REPORT_FIELDS)
         writer.writeheader()
 
-        for shape_file in tqdm(
-            all_shape_files, desc="Generating repair report"
-        ):
+        for shape_file in tqdm(all_shape_files, desc="Generating repair report"):
             if not isinstance(shape_file, str):
                 raise TypeError(
-                    "shape_file must be a str, got "
-                    f"{type(shape_file).__name__}"
+                    "shape_file must be a str, got " f"{type(shape_file).__name__}"
                 )
 
             relative_path = os.path.relpath(shape_file, root_abs)
@@ -178,9 +167,7 @@ def generate_repair_report(
     )
 
     if report_output_path is None:
-        report_output_path = os.path.join(
-            output_dir_path, "report_conclusion.txt"
-        )
+        report_output_path = os.path.join(output_dir_path, "report_conclusion.txt")
 
     with open(report_output_path, "w", encoding="utf-8") as f:
         f.write(summary)
@@ -201,9 +188,7 @@ def generate_closing_result_csv(
     raw_files = retrieve_all_shape_files(raw_root)
     repaired_files = retrieve_all_shape_files(repaired_root)
 
-    raw_by_relative_path = {
-        os.path.relpath(path, raw_root): path for path in raw_files
-    }
+    raw_by_relative_path = {os.path.relpath(path, raw_root): path for path in raw_files}
     repaired_by_relative_path = {
         os.path.relpath(path, repaired_root): path for path in repaired_files
     }
@@ -272,9 +257,7 @@ def generate_closing_result_csv(
                     row["nonmanifold_edges_after"] = stats["nonmanifold_edges"]
 
                 except Exception as e:
-                    errors.append(
-                        f"Repaired mesh error: {type(e).__name__}: {e}"
-                    )
+                    errors.append(f"Repaired mesh error: {type(e).__name__}: {e}")
 
             # Only determine whether repair succeeded when both
             # closure statuses are known.
@@ -326,8 +309,7 @@ def plot_differences(
     # Plot.
     fig, axes = plt.subplots(1, 2, figsize=FIGSIZE)
     fig.suptitle(
-        f"Effects of standardisation: "
-        f"{property_before} vs. {property_after}"
+        f"Effects of standardisation: " f"{property_before} vs. {property_after}"
     )
 
     # 1. Before vs. after scatter plot.
@@ -408,9 +390,7 @@ def plot_differences(
     results = pd.DataFrame(
         {
             "file_path": (
-                df["file_path"].values
-                if "file_path" in df.columns
-                else df.index
+                df["file_path"].values if "file_path" in df.columns else df.index
             ),
             "before": before.values,
             "after": after.values,
@@ -421,10 +401,7 @@ def plot_differences(
 
     print(
         results.reindex(
-            results["relative_change_pct"]
-            .abs()
-            .sort_values(ascending=False)
-            .index
+            results["relative_change_pct"].abs().sort_values(ascending=False).index
         )
         .head(10)
         .to_string(index=False)
@@ -440,16 +417,14 @@ def main():
         "--before",
         required=True,
         type=str,
-        help="The before datbase, "
-        "or before property of analysis when using --plot",
+        help="The before datbase, " "or before property of analysis when using --plot",
     )
     parser.add_argument(
         "-a",
         "--after",
         required=True,
         type=str,
-        help="The before database, "
-        "or before property of analysis when using --plot",
+        help="The before database, " "or before property of analysis when using --plot",
     )
     parser.add_argument(
         "--csv_path",
@@ -459,8 +434,7 @@ def main():
     parser.add_argument(
         "--plot",
         action="store_true",
-        help="Plot an existing CSV (given by --output) "
-        "instead of calculating.",
+        help="Plot an existing CSV (given by --output) " "instead of calculating.",
     )
     parser.add_argument(
         "--figure",
@@ -493,13 +467,11 @@ def main():
     if args.plot:
         if os.path.exists(before):
             raise ValueError(
-                "Before flag should be a dataframe property/csv column, "
-                "not a file"
+                "Before flag should be a dataframe property/csv column, " "not a file"
             )
         if os.path.exists(after):
             raise ValueError(
-                "After flag should be a dataframe property/csv column, "
-                "not a file"
+                "After flag should be a dataframe property/csv column, " "not a file"
             )
 
         plot_differences(
@@ -510,13 +482,9 @@ def main():
         )
     else:
         if not os.path.isdir(before):
-            raise ValueError(
-                "Before flag should be a directory for comparing datbases"
-            )
+            raise ValueError("Before flag should be a directory for comparing datbases")
         if not os.path.isdir(after):
-            raise ValueError(
-                "After flag should be a directory for comparing datbases"
-            )
+            raise ValueError("After flag should be a directory for comparing datbases")
 
         if args.create_closed_report:
             generate_closing_result_csv(

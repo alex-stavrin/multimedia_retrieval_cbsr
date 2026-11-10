@@ -115,7 +115,9 @@ def main():
     target_files = [file for file in files if file.parent.name in class_to_axis]
 
     # Loop through files and map them into their corresponding subplot
-    for file in tqdm(target_files, desc=f"Processing {arguements.descriptor} descriptors"):
+    for file in tqdm(
+        target_files, desc=f"Processing {arguements.descriptor} descriptors"
+    ):
         model_class = file.parent.name
         mesh = vedo.Mesh(str(file))
 

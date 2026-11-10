@@ -42,9 +42,7 @@ def standardize_descriptors(
             continue
 
         if cur_column not in statistics:
-            raise ValueError(
-                f"No standardization statistics found for '{cur_column}'."
-            )
+            raise ValueError(f"No standardization statistics found for '{cur_column}'.")
 
         mean, std = statistics[cur_column]
 
@@ -122,15 +120,10 @@ def main() -> None:
     output_path = args.output
     if output_path is None:
         input_path = Path(args.input)
-        output_path = str(
-            input_path.with_name(f"{input_path.stem}_processed.csv")
-        )
+        output_path = str(input_path.with_name(f"{input_path.stem}_processed.csv"))
 
     if not args.ignore:
-        process_descriptors(
-            csv_path=args.input,
-            output_path=output_path
-        )
+        process_descriptors(csv_path=args.input, output_path=output_path)
     else:
         process_descriptors(
             csv_path=args.input,

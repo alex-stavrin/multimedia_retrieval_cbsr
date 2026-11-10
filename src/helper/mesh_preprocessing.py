@@ -16,4 +16,3 @@ def preprocess_mesh(mesh: vedo.Mesh) -> vedo.Mesh:
     processed_mesh = resample_mesh(repaired_mesh)
     full_normalize(processed_mesh)
     return processed_mesh
-

@@ -105,9 +105,7 @@ def _reset_last_step(state: dict, checkpoint_path: Path) -> None:
         target_index = STEP_ORDER.index(current_step)
     else:
         completed_indices = [
-            STEP_ORDER.index(name)
-            for name in STEP_ORDER
-            if completed.get(name) is True
+            STEP_ORDER.index(name) for name in STEP_ORDER if completed.get(name) is True
         ]
         if not completed_indices:
             print("[RESET] No completed step found; nothing to reset.")
@@ -158,9 +156,7 @@ def _run_step(
     # Remove partial output before retrying a database-producing step.
     if output_database_path is not None:
         if output_database_path.exists():
-            print(
-                f"[CLEAN] Removing incomplete output: {output_database_path}"
-            )
+            print(f"[CLEAN] Removing incomplete output: {output_database_path}")
             shutil.rmtree(output_database_path)
         output_database_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -227,21 +223,15 @@ def prepare_database(
     weighted_config: str = "emd",
 ) -> None:
     if reset_checkpoint and reset_last_step:
-        raise ValueError(
-            "Choose either reset_checkpoint or reset_last_step, not both."
-        )
+        raise ValueError("Choose either reset_checkpoint or reset_last_step, not both.")
 
     raw_path = Path(database_path).expanduser().resolve()
     if not raw_path.is_dir():
-        raise NotADirectoryError(
-            f"Raw database directory not found: {raw_path}"
-        )
+        raise NotADirectoryError(f"Raw database directory not found: {raw_path}")
 
     output_root = Path(output_path).expanduser().resolve()
     if output_root == raw_path or raw_path in output_root.parents:
-        raise ValueError(
-            "output_path must be outside the raw database directory."
-        )
+        raise ValueError("output_path must be outside the raw database directory.")
 
     analysis_path = output_root / "analysis"
     databases_path = output_root / "3d_models_steps"
@@ -346,9 +336,7 @@ def prepare_database(
     if analyze:
         resampled_analysis_dir = analysis_path / "2_models_resampled"
         resampled_analysis_dir.mkdir(parents=True, exist_ok=True)
-        resampled_analysis_csv = (
-            resampled_analysis_dir / "resampled_shape_analysis.csv"
-        )
+        resampled_analysis_csv = resampled_analysis_dir / "resampled_shape_analysis.csv"
         _run_step(
             "analyze_resampled_database",
             lambda: shape_analyzer.analyze_database(
@@ -428,9 +416,7 @@ def prepare_database(
     # ---
     # Calculate histogram descriptors
 
-    hist_descriptors_csv = (
-        descriptors_analysis_dir / "histogram_descriptors.csv"
-    )
+    hist_descriptors_csv = descriptors_analysis_dir / "histogram_descriptors.csv"
     _run_step(
         "calculate_histogram_descriptor",
         lambda: histogram_descriptor_analyzer.analyze_and_save(

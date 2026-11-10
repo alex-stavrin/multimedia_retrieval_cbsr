@@ -440,8 +440,7 @@ def main():
     parser.add_argument(
         "--export",
         action="store_true",
-        help="If active, export found outliers to CSV, output argument "
-        "needed too",
+        help="If active, export found outliers to CSV, output argument " "needed too",
     )
     parser.add_argument(
         "-o", "--output", help="Output for either saved png or exported CSV"
