@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 from pathlib import Path
 from tqdm import tqdm
 
@@ -29,6 +30,7 @@ def run_and_evaluate_weighted(
     exclude_self: bool = True,
     eval_roc: bool = True,
 ) -> dict:
+    total_start = time.perf_counter()
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
@@ -38,10 +40,12 @@ def run_and_evaluate_weighted(
         )
 
     distance_config = CONFIG_MAP[config]
+    init_start = time.perf_counter()
     calculator = ShapeDistanceCalculator(
         csv_databases=[str(elementary_csv), str(histogram_csv), str(weights_csv)],
         distance_config=distance_config,
     )
+    init_time_s = time.perf_counter() - init_start
 
     ground_truth = {
         sid: sid.replace("\\", "/").split("/")[0]
@@ -51,10 +55,12 @@ def run_and_evaluate_weighted(
 
     results: dict[str, list[str]] = {}
     full_rankings: dict[str, list[str]] = {}
+    query_times: dict[str, float] = {}
     print(
         f"Calculating weighted distances ({config}) for {len(calculator.shape_identifiers)} shapes..."
     )
     for shape_id in tqdm(calculator.shape_identifiers, desc="Evaluating Queries"):
+        q_start = time.perf_counter()
         total_distances = calculator.calculate_total_distance(
             query=shape_id,
             run_pipeline=False,
@@ -66,12 +72,15 @@ def run_and_evaluate_weighted(
             if not (exclude_self and sid == shape_id)
         ]
         results[shape_id] = ranked[:k]
+        query_times[shape_id] = time.perf_counter() - q_start
         full_rankings[shape_id] = ranked
 
     eval_results = evaluator.evaluate(
         results=results,
         method_name=f"Weighted ({config}, k={k})",
         full_rankings=full_rankings,
+        query_times=query_times,
+        init_time_s=init_time_s,
     )
 
     if eval_roc:
@@ -99,6 +108,10 @@ def run_and_evaluate_weighted(
             out_path / f"weighted_{config}_k{k}_roc.png",
             title=f"ROC Curve - Weighted ({config.upper()})",
         )
+
+    eval_results["total_stats"]["total_time_s"] = float(
+        time.perf_counter() - total_start
+    )
 
     per_class_file = out_path / f"weighted_{config}_k{k}_per_class.csv"
     queries_file = out_path / f"weighted_{config}_k{k}_queries.csv"

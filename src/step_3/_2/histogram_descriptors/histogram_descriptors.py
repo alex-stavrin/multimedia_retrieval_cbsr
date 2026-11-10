@@ -142,7 +142,7 @@ def calculate_angle_histogram(
 def calculate_distance_from_barycenter(
     mesh: vedo.Mesh,
     n_bins_histogram: int,
-    seed: int | numpy.random.Generator | None = None,
+    seed: int | numpy.random.Generator | None = DEFAULT_SEED,
     normalize_by_sum: bool = False,
 ) -> tuple[numpy.ndarray, numpy.ndarray]:
     vertices: numpy.ndarray = numpy.asarray(mesh.vertices)

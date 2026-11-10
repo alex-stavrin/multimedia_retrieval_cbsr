@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 from pathlib import Path
 
 from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
@@ -17,13 +18,16 @@ def run_and_evaluate_rnn(
     exclude_self: bool = True,
     eval_roc: bool = True,
 ) -> dict:
+    total_start = time.perf_counter()
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
+    init_start = time.perf_counter()
     spatial_search_engine = SpatialSearchEngine(
         elementary_csv=elementary_csv,
         histogram_csv=histogram_csv,
     )
+    init_time_s = time.perf_counter() - init_start
 
     # Build ground truth mapping: shape_id -> class_name
     ground_truth = {
@@ -37,8 +41,10 @@ def run_and_evaluate_rnn(
     results: dict[str, list[str]] = {}
     full_rankings: dict[str, list[str]] = {}
     distance_results: dict[str, dict[str, float]] = {}
+    query_times: dict[str, float] = {}
 
     for shape_id in spatial_search_engine.shape_ids:
+        q_start = time.perf_counter()
         rnn_matches = spatial_search_engine.query_range(
             query=shape_id,
             radius=radius,
@@ -47,6 +53,7 @@ def run_and_evaluate_rnn(
             exclude_self=exclude_self,
         )
         results[shape_id] = list(rnn_matches.keys())
+        query_times[shape_id] = time.perf_counter() - q_start
 
         if eval_roc:
             full_matches = spatial_search_engine.query_knn(
@@ -64,6 +71,8 @@ def run_and_evaluate_rnn(
         results=results,
         method_name=method_label,
         full_rankings=full_rankings if full_rankings else None,
+        query_times=query_times,
+        init_time_s=init_time_s,
     )
 
     if eval_roc:
@@ -89,6 +98,10 @@ def run_and_evaluate_rnn(
             out_path / f"rnn_r{radius}_roc.png",
             title=f"ROC Curve - rNN (p={p}, eps={eps})",
         )
+
+    evaluation_results["total_stats"]["total_time_s"] = float(
+        time.perf_counter() - total_start
+    )
 
     # Save all results to disk
     per_class_file = out_path / f"rnn_r{radius}_per_class.csv"

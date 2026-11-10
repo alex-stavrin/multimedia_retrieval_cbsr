@@ -4,7 +4,6 @@ from pathlib import Path
 import vedo
 import numpy as np
 
-
 def _distance_color(normalized_error: float) -> tuple[float, float, float]:
     """Map low-to-high distances onto a fixed-hue blue gradient."""
     error = float(np.clip(normalized_error, 0.0, 1.0))

@@ -1,5 +1,6 @@
 import argparse
 import json
+import time
 from pathlib import Path
 
 from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
@@ -17,12 +18,15 @@ def run_and_evaluate_knn(
     exclude_self: bool = True,
     eval_roc: bool = True,
 ) -> dict:
+    total_start = time.perf_counter()
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
+    init_start = time.perf_counter()
     spatial_search_engine = SpatialSearchEngine(
         elementary_csv=elementary_csv, histogram_csv=histogram_csv
     )
+    init_time_s = time.perf_counter() - init_start
 
     # Build ground truth: shape_id -> class_name
     ground_truth = {
@@ -34,9 +38,21 @@ def run_and_evaluate_knn(
     total_db_shapes = len(spatial_search_engine.shape_ids)
     results: dict[str, list[str]] = {}
     full_rankings: dict[str, list[str]] = {}
+    query_times: dict[str, float] = {}
 
     for shape_id in spatial_search_engine.shape_ids:
-        if eval_roc and eps == 0.0:
+        q_start = time.perf_counter()
+        knn_matches = spatial_search_engine.query_knn(
+            query=shape_id,
+            k=k,
+            eps=eps,
+            p=p,
+            exclude_self=exclude_self,
+        )
+        results[shape_id] = list(knn_matches.keys())
+        query_times[shape_id] = time.perf_counter() - q_start
+
+        if eval_roc:
             full_matches = spatial_search_engine.query_knn(
                 query=shape_id,
                 k=total_db_shapes,
@@ -44,33 +60,15 @@ def run_and_evaluate_knn(
                 p=p,
                 exclude_self=exclude_self,
             )
-            ranked_all = list(full_matches.keys())
-            full_rankings[shape_id] = ranked_all
-            results[shape_id] = ranked_all[:k]
-        else:
-            knn_matches = spatial_search_engine.query_knn(
-                query=shape_id,
-                k=k,
-                eps=eps,
-                p=p,
-                exclude_self=exclude_self,
-            )
-            results[shape_id] = list(knn_matches.keys())
-            if eval_roc:
-                full_matches = spatial_search_engine.query_knn(
-                    query=shape_id,
-                    k=total_db_shapes,
-                    eps=eps,
-                    p=p,
-                    exclude_self=exclude_self,
-                )
-                full_rankings[shape_id] = list(full_matches.keys())
+            full_rankings[shape_id] = list(full_matches.keys())
 
     method_label = f"KNN (k={k}, p={p}, eps={eps})"
     eval_results = evaluator.evaluate(
         results=results,
         method_name=method_label,
         full_rankings=full_rankings if full_rankings else None,
+        query_times=query_times,
+        init_time_s=init_time_s,
     )
 
     if eval_roc:
@@ -96,6 +94,10 @@ def run_and_evaluate_knn(
             out_path / f"knn_k{k}_roc.png",
             title=f"ROC Curve - kNN (p={p}, eps={eps})",
         )
+
+    eval_results["total_stats"]["total_time_s"] = float(
+        time.perf_counter() - total_start
+    )
 
     # Save all results to disk
     per_class_file = out_path / f"knn_k{k}_per_class.csv"

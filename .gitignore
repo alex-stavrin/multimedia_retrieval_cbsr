@@ -24,6 +24,8 @@ src/step_4/distance_calculations/testing/*.csv
 **/*pairwise*.csv
 **/*.pkl
 
+#Environment files/folders
+.env
 .venv/
 __pycache__/
 *.py[cod]
