@@ -9,7 +9,6 @@ from src.step_6.run_and_evaluate_knn import run_and_evaluate_knn
 from src.step_6.run_and_evaluate_rnn import run_and_evaluate_rnn
 from src.step_6.run_and_evaluate_weighted import run_and_evaluate_weighted
 
-
 TIME_COLUMNS = [
     "init_time_s",
     "retrieval_time_s",
@@ -67,9 +66,7 @@ def compute_ranking_table(comparison_df: pd.DataFrame) -> pd.DataFrame:
     rank_df = pd.DataFrame()
     rank_df["method"] = comparison_df["method"]
 
-    present_time_cols = [
-        col for col in TIME_COLUMNS if col in comparison_df.columns
-    ]
+    present_time_cols = [col for col in TIME_COLUMNS if col in comparison_df.columns]
     for col in present_time_cols:
         # Lower time is better -> ascending=True, method="min"
         rank_df[f"{col}_rank"] = (
@@ -187,7 +184,9 @@ def run_and_evaluate_all(
             resolved_weights = Path(weights_csv)
         else:
             for candidate in [
-                Path("analysis_output/distances/weights_emd_hist_sampling_descriptors.csv"),
+                Path(
+                    "analysis_output/distances/weights_emd_hist_sampling_descriptors.csv"
+                ),
                 Path("analysis_output/distances/weights_emd_descriptors.csv"),
                 Path("analysis_output/distances/weights_equal.csv"),
             ]:
@@ -196,19 +195,17 @@ def run_and_evaluate_all(
                     break
 
         if resolved_weights is None or not resolved_weights.is_file():
-            print(
-                "[WARN] Skipping 'weighted' evaluation: no valid weights CSV found."
-            )
+            print("[WARN] Skipping 'weighted' evaluation: no valid weights CSV found.")
         else:
             weighted_dir = out_root / "weighted"
             for cfg in weighted_configs:
-                stats_file = weighted_dir / f"weighted_{cfg}_k{weighted_k}_total_stats.json"
+                stats_file = (
+                    weighted_dir / f"weighted_{cfg}_k{weighted_k}_total_stats.json"
+                )
                 roc_file = weighted_dir / f"weighted_{cfg}_k{weighted_k}_roc.json"
 
                 loaded = (
-                    _try_load_existing(stats_file, roc_file)
-                    if reuse_existing
-                    else None
+                    _try_load_existing(stats_file, roc_file) if reuse_existing else None
                 )
                 if loaded is not None:
                     print(

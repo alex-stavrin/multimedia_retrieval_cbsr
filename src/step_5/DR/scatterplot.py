@@ -79,7 +79,7 @@ class Scatterplot:
             annotation_clip=False,
         )
         self.annotation.set_visible(False)
-        self.title = self.axes.set_title(self._title(), color=TEXT_COLOR)
+        self.title = self.axes.set_title(self._title(), color=TEXT_COLOR, fontsize=11, pad=8)
 
         self._init_legend()
 
@@ -211,7 +211,7 @@ class Scatterplot:
 
     def _title(self) -> str:
         if self.selected_class is None:
-            return f"{len(self.points)} shapes, click a point or legend class to highlight"
+            return ""
         count = int((self.shape_classes == self.selected_class).sum())
         return f"{self.selected_class} ({count} shapes), click empty space to clear"
 
@@ -344,7 +344,10 @@ class Scatterplot:
         """Saves a static image of the scatterplot."""
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
+        prev_visible = self.title.get_visible()
+        self.title.set_visible(False)
         self.figure.savefig(out, dpi=dpi, facecolor=BACKGROUND, bbox_inches="tight")
+        self.title.set_visible(prev_visible)
         print(f"Saved scatterplot image to: {out.resolve()}")
 
 
@@ -354,9 +357,10 @@ def main() -> None:
     parser.add_argument(
         "-s",
         "--save",
-        type=str,
+        nargs="?",
+        const="",
         default=None,
-        help="Optional path to save a PNG image of the plot.",
+        help="Optional path to save a PNG image of the plot. Defaults to tsne_scatterplot.png next to input if passed without path.",
     )
     parser.add_argument(
         "--no_show",
@@ -366,8 +370,13 @@ def main() -> None:
     arguments = parser.parse_args()
 
     plot = Scatterplot(arguments.input)
-    if arguments.save:
-        plot.save_image(arguments.save)
+    if arguments.save is not None:
+        save_path = (
+            arguments.save
+            if arguments.save != ""
+            else Path(arguments.input).parent / "tsne_scatterplot.png"
+        )
+        plot.save_image(save_path)
     if not arguments.no_show:
         pyplot.show()
 

@@ -55,7 +55,7 @@ class ROCEvaluator:
             specificities = np.append(specificities, 0.0)
 
         trap_fn = getattr(np, "trapezoid", getattr(np, "trapz", None))
-        auroc = float(trap_fn(specificities, sensitivities))
+        auroc = float(trap_fn(specificities, sensitivities))  # type: ignore
 
         return sensitivities, specificities, auroc
 
@@ -130,9 +130,7 @@ class ROCEvaluator:
 
             # Ensure sorted by distance ascending, excluding self
             pairs = [
-                (rid, float(dist))
-                for rid, dist in matches.items()
-                if rid != query_id
+                (rid, float(dist)) for rid, dist in matches.items() if rid != query_id
             ]
             pairs.sort(key=lambda item: item[1])
 
@@ -201,19 +199,27 @@ class ROCEvaluator:
         interp_spec = np.interp(common_sensitivity, sens_arr, spec_arr)
 
         trap_fn = getattr(np, "trapezoid", getattr(np, "trapz", None))
-        micro_auroc = float(trap_fn(spec_arr, sens_arr))
+        micro_auroc = float(trap_fn(spec_arr, sens_arr))  # type: ignore
 
         # Per-class AUROC under radius sweep
         class_mean_auroc = {}
         for cls in class_sens_curves:
             c_sens = np.concatenate(
-                ([0.0], [float(np.mean(vals)) for vals in class_sens_curves[cls]], [1.0])
+                (
+                    [0.0],
+                    [float(np.mean(vals)) for vals in class_sens_curves[cls]],
+                    [1.0],
+                )
             )
             c_spec = np.concatenate(
-                ([1.0], [float(np.mean(vals)) for vals in class_spec_curves[cls]], [0.0])
+                (
+                    [1.0],
+                    [float(np.mean(vals)) for vals in class_spec_curves[cls]],
+                    [0.0],
+                )
             )
             c_ord = np.argsort(c_sens, kind="mergesort")
-            class_mean_auroc[cls] = float(trap_fn(c_spec[c_ord], c_sens[c_ord]))
+            class_mean_auroc[cls] = float(trap_fn(c_spec[c_ord], c_sens[c_ord]))  # type: ignore
 
         macro_auroc = float(np.mean(list(class_mean_auroc.values())))
 
@@ -223,10 +229,8 @@ class ROCEvaluator:
             q_s = np.concatenate(([0.0], query_sens_trajectories[q_id], [1.0]))
             q_sp = np.concatenate(([1.0], query_spec_trajectories[q_id], [0.0]))
             q_ord = np.argsort(q_s, kind="mergesort")
-            q_auc = float(trap_fn(q_sp[q_ord], q_s[q_ord]))
-            query_records.append(
-                {"query_id": q_id, "class": q_cls, "auroc": q_auc}
-            )
+            q_auc = float(trap_fn(q_sp[q_ord], q_s[q_ord]))  # type: ignore
+            query_records.append({"query_id": q_id, "class": q_cls, "auroc": q_auc})
 
         data_frame_queries = pd.DataFrame(query_records)
 
@@ -297,8 +301,8 @@ class ROCEvaluator:
                     label=f"  • {op_label} (Sens={op_sens:.2f}, Spec={op_spec:.2f})",
                 )
 
-        plt.xlim([-0.02, 1.02])
-        plt.ylim([-0.02, 1.02])
+        plt.xlim([-0.02, 1.02])  # type: ignore
+        plt.ylim([-0.02, 1.02])  # type: ignore
         plt.xlabel("Sensitivity (Recall / TPR)", fontsize=12)
         plt.ylabel("Specificity (TNR)", fontsize=12)
         plt.title(title, fontsize=14, fontweight="bold")
@@ -375,8 +379,14 @@ class ROCEvaluator:
                     rotation=90 if num_methods > 3 else 0,
                 )
 
-        plt.xticks(x, [label for _, label in available_metrics], rotation=20, ha="right", fontsize=10)
-        plt.ylim([0.0, 1.12])
+        plt.xticks(
+            x,
+            [label for _, label in available_metrics],
+            rotation=20,
+            ha="right",
+            fontsize=10,
+        )
+        plt.ylim([0.0, 1.12])  # type: ignore
         plt.ylabel("Score [0, 1]", fontsize=12)
         plt.title(title, fontsize=14, fontweight="bold")
         plt.legend(loc="upper right", fontsize=9, framealpha=0.9)
@@ -454,11 +464,13 @@ class ROCEvaluator:
         axes[0].set_xticks(x)
         axes[0].set_xticklabels(methods, rotation=20, ha="right", fontsize=9)
         axes[0].set_ylabel("Time (seconds)", fontsize=11)
-        axes[0].set_title("Total Time to Finish & Retrieval Time (s)", fontsize=12, fontweight="bold")
+        axes[0].set_title(
+            "Total Time to Finish & Retrieval Time (s)", fontsize=12, fontweight="bold"
+        )
         axes[0].legend(loc="upper left", fontsize=9, framealpha=0.9)
         axes[0].grid(axis="y", linestyle=":", alpha=0.6)
         if max(total_times + retrieval_times, default=0.0) > 0:
-            axes[0].set_ylim([0, max(total_times + retrieval_times) * 1.18])
+            axes[0].set_ylim([0, max(total_times + retrieval_times) * 1.18])  # type: ignore
 
         # Panel 2: Mean Query Time per Shape (milliseconds)
         bars_q = axes[1].bar(
@@ -484,10 +496,12 @@ class ROCEvaluator:
         axes[1].set_xticks(x)
         axes[1].set_xticklabels(methods, rotation=20, ha="right", fontsize=9)
         axes[1].set_ylabel("Mean Query Time (ms / query)", fontsize=11)
-        axes[1].set_title("Mean Retrieval Time per Query (ms)", fontsize=12, fontweight="bold")
+        axes[1].set_title(
+            "Mean Retrieval Time per Query (ms)", fontsize=12, fontweight="bold"
+        )
         axes[1].grid(axis="y", linestyle=":", alpha=0.6)
         if max(mean_query_ms, default=0.0) > 0:
-            axes[1].set_ylim([0, max(mean_query_ms) * 1.22])
+            axes[1].set_ylim([0, max(mean_query_ms) * 1.22])  # type: ignore
 
         fig.suptitle(title, fontsize=14, fontweight="bold")
         plt.tight_layout()
@@ -506,7 +520,9 @@ class ROCEvaluator:
         out_path = Path(output_dir)
         out_path.mkdir(parents=True, exist_ok=True)
 
-        if "queries" in eval_result and isinstance(eval_result["queries"], pd.DataFrame):
+        if "queries" in eval_result and isinstance(
+            eval_result["queries"], pd.DataFrame
+        ):
             eval_result["queries"].to_csv(
                 out_path / f"{prefix}_auroc_queries.csv", index=False
             )
@@ -518,7 +534,10 @@ class ROCEvaluator:
             "per_class_auroc": eval_result["per_class_auroc"],
             "curve": eval_result["curve"],
         }
-        if "operating_point" in eval_result and eval_result["operating_point"] is not None:
+        if (
+            "operating_point" in eval_result
+            and eval_result["operating_point"] is not None
+        ):
             summary["operating_point"] = list(eval_result["operating_point"])
 
         with open(out_path / f"{prefix}_roc.json", "w", encoding="utf-8") as f:
