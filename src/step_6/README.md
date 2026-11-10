@@ -2,7 +2,7 @@
 
 ## run_and_evaluate_all.py
 
-Runs and evaluates all retrieval methods (`knn`, `rnn`, `weighted`), compares all metrics side by side in a single table (`all_methods_comparison_table.csv`), computes per-metric and average ranks (`all_methods_ranking_table.csv`), and plots all methods together on a combined ROC curve (`all_methods_roc_comparison.png`) and metrics bar chart (`all_methods_metrics_comparison.png`).
+Runs and evaluates all retrieval methods (`knn`, `rnn`, `weighted`), compares all metrics and execution/retrieval times (`init_time_s`, `retrieval_time_s`, `mean_query_time_ms`, `total_time_s`) side by side in a single table (`all_methods_comparison_table.csv`), computes per-metric and average ranks (`all_methods_ranking_table.csv`), and plots all methods together on a combined ROC curve (`all_methods_roc_comparison.png`), metrics bar chart (`all_methods_metrics_comparison.png`), and execution/retrieval time comparison chart (`all_methods_time_comparison.png`).
 
 ```python -m src.step_6.run_and_evaluate_all --elementary_csv {elementary_csv_file} --histogram_csv {histogram_csv_file} --weights_csv {weights_csv_file} --output_dir {output_directory_for_results} --knn_k {k} --rnn_radius {radius} --weighted_k {k}```
 

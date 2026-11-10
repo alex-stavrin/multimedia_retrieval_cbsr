@@ -18,6 +18,8 @@ class RetrievalEvaluator:
         results: dict[str, list[str]],
         method_name: str = "Retrieval",
         full_rankings: dict[str, list[str]] | None = None,
+        query_times: dict[str, float] | None = None,
+        init_time_s: float | None = None,
     ) -> dict:
         # this will collect the stats and data for individual query
         query_records = []
@@ -44,8 +46,6 @@ class RetrievalEvaluator:
             true_positive = 0
             is_first_correct = False
             precision_i = []
-            consecutive_correct = 0
-            hit_error = False
 
             # loop through the results
             for rank, retrieved_id in enumerate(retrieval_ids):
@@ -56,10 +56,6 @@ class RetrievalEvaluator:
                     true_positive += 1
                     if rank == 0:
                         is_first_correct = True
-                    if not hit_error:
-                        consecutive_correct += 1
-                else:
-                    hit_error = True
 
                 precision_i.append(true_positive / (rank + 1))
 
@@ -94,7 +90,6 @@ class RetrievalEvaluator:
             )
 
             mean_precision = float(np.mean(precision_i)) if precision_i else 0.0
-            last_rank = min(1.0, consecutive_correct / same_class_as_query_count)
 
             c = same_class_as_query_count
             tier_source = (
@@ -102,6 +97,13 @@ class RetrievalEvaluator:
                 if full_rankings is not None
                 else retrieval_ids
             )
+            consecutive_correct = 0
+            for rid in tier_source:
+                if self.ground_truth.get(rid) == query_class:
+                    consecutive_correct += 1
+                else:
+                    break
+            last_rank = min(1.0, consecutive_correct / c)
             tp_first_tier = sum(
                 1
                 for rid in tier_source[:c]
@@ -114,6 +116,12 @@ class RetrievalEvaluator:
                 if self.ground_truth.get(rid) == query_class
             )
             second_tier = tp_second_tier / c
+
+            query_time_s = (
+                float(query_times.get(query_id, 0.0))
+                if query_times is not None
+                else 0.0
+            )
 
             query_records.append(
                 {
@@ -134,6 +142,7 @@ class RetrievalEvaluator:
                     "first_tier": first_tier,
                     "second_tier": second_tier,
                     "is_first_correct": 1.0 if is_first_correct else 0.0,
+                    "query_time_ms": query_time_s * 1000.0,
                 }
             )
 
@@ -154,14 +163,24 @@ class RetrievalEvaluator:
                 f1=("f1", "mean"),
                 ap=("average_precision", "mean"),
                 is_first_correct=("is_first_correct", "mean"),
+                mean_query_time_ms=("query_time_ms", "mean"),
             )
             .reset_index()
             .sort_values("f1", ascending=False)
         )
 
+        total_retrieval_time_s = (
+            float(sum(query_times.values()))
+            if query_times is not None
+            else 0.0
+        )
+
         total_stats = {
             "method": method_name,
             "total_queries": len(data_frame_queries),
+            "init_time_s": float(init_time_s) if init_time_s is not None else 0.0,
+            "retrieval_time_s": total_retrieval_time_s,
+            "mean_query_time_ms": float(data_frame_queries["query_time_ms"].mean()),
             "macro_precision": float(per_class["precision"].mean()),
             "macro_recall": float(per_class["recall"].mean()),
             "macro_specificity": float(per_class["specificity"].mean()),

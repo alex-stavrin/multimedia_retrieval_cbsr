@@ -390,6 +390,115 @@ class ROCEvaluator:
         print(f"Saved metrics comparison plot to: {out_file.resolve()}")
 
     @staticmethod
+    def plot_time_comparison(
+        all_stats: list[dict],
+        output_path: str | Path,
+        title: str = "Execution & Retrieval Time Comparison Across Methods",
+    ) -> None:
+        """
+        Plots side-by-side bar charts comparing total execution time, retrieval query time,
+        and mean per-query time across retrieval methods.
+        """
+        methods = [
+            stat.get("method", f"Method {idx + 1}")
+            for idx, stat in enumerate(all_stats)
+        ]
+        init_times = [float(stat.get("init_time_s", 0.0)) for stat in all_stats]
+        retrieval_times = [
+            float(stat.get("retrieval_time_s", 0.0)) for stat in all_stats
+        ]
+        total_times = [float(stat.get("total_time_s", 0.0)) for stat in all_stats]
+        mean_query_ms = [
+            float(stat.get("mean_query_time_ms", 0.0)) for stat in all_stats
+        ]
+
+        x = np.arange(len(methods))
+        colors = ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd", "#8c564b"]
+        bar_colors = [colors[i % len(colors)] for i in range(len(methods))]
+
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6), dpi=300)
+
+        # Panel 1: Total Time to Finish vs Retrieval Time (seconds)
+        width = 0.36
+        bars_ret = axes[0].bar(
+            x - width / 2,
+            retrieval_times,
+            width=width,
+            label="Retrieval Queries Time (s)",
+            color="#1f77b4",
+            edgecolor="black",
+            linewidth=0.6,
+            alpha=0.9,
+        )
+        bars_tot = axes[0].bar(
+            x + width / 2,
+            total_times,
+            width=width,
+            label="Total Time to Finish (s)",
+            color="#ff7f0e",
+            edgecolor="black",
+            linewidth=0.6,
+            alpha=0.9,
+        )
+        for bar in list(bars_ret) + list(bars_tot):
+            h = bar.get_height()
+            axes[0].annotate(
+                f"{h:.2f}s",
+                xy=(bar.get_x() + bar.get_width() / 2, h),
+                xytext=(0, 3),
+                textcoords="offset points",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
+        axes[0].set_xticks(x)
+        axes[0].set_xticklabels(methods, rotation=20, ha="right", fontsize=9)
+        axes[0].set_ylabel("Time (seconds)", fontsize=11)
+        axes[0].set_title("Total Time to Finish & Retrieval Time (s)", fontsize=12, fontweight="bold")
+        axes[0].legend(loc="upper left", fontsize=9, framealpha=0.9)
+        axes[0].grid(axis="y", linestyle=":", alpha=0.6)
+        if max(total_times + retrieval_times, default=0.0) > 0:
+            axes[0].set_ylim([0, max(total_times + retrieval_times) * 1.18])
+
+        # Panel 2: Mean Query Time per Shape (milliseconds)
+        bars_q = axes[1].bar(
+            x,
+            mean_query_ms,
+            width=0.5,
+            color=bar_colors,
+            edgecolor="black",
+            linewidth=0.6,
+            alpha=0.9,
+        )
+        for bar, init_t in zip(bars_q, init_times):
+            h = bar.get_height()
+            axes[1].annotate(
+                f"{h:.3f} ms\n(init: {init_t:.2f}s)",
+                xy=(bar.get_x() + bar.get_width() / 2, h),
+                xytext=(0, 3),
+                textcoords="offset points",
+                ha="center",
+                va="bottom",
+                fontsize=8,
+            )
+        axes[1].set_xticks(x)
+        axes[1].set_xticklabels(methods, rotation=20, ha="right", fontsize=9)
+        axes[1].set_ylabel("Mean Query Time (ms / query)", fontsize=11)
+        axes[1].set_title("Mean Retrieval Time per Query (ms)", fontsize=12, fontweight="bold")
+        axes[1].grid(axis="y", linestyle=":", alpha=0.6)
+        if max(mean_query_ms, default=0.0) > 0:
+            axes[1].set_ylim([0, max(mean_query_ms) * 1.22])
+
+        fig.suptitle(title, fontsize=14, fontweight="bold")
+        plt.tight_layout()
+
+        out_file = Path(output_path)
+        out_file.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(out_file)
+        plt.close()
+        print(f"Saved time comparison plot to: {out_file.resolve()}")
+
+    @staticmethod
     def save_roc_results(
         eval_result: dict, output_dir: str | Path, prefix: str
     ) -> None:

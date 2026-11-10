@@ -10,7 +10,10 @@ from src.step_4.distance_calculations.visualisations import (
 
 from src.helper.mesh_descriptor_extraction import calculate_all_descriptors
 from src.helper.mesh_preprocessing import preprocess_mesh
-from src.helper.path_helpers import normalize_path_separators
+from src.helper.path_helpers import (
+    normalize_path_separators,
+    normalize_shape_path,
+)
 import argparse
 from pathlib import Path
 from dataclasses import dataclass
@@ -79,6 +82,19 @@ class ShapeDistanceCalculator:
     """Calculate mesh distances using
     fast vectorized descriptor comparisons."""
 
+    _PROCESSED_SUFFIXES = ("_processed", "_normalized")
+
+    @classmethod
+    def _is_processed_stem(cls, stem: str) -> bool:
+        return any(stem.endswith(suffix) for suffix in cls._PROCESSED_SUFFIXES)
+
+    @classmethod
+    def _raw_stem(cls, stem: str) -> str:
+        for suffix in cls._PROCESSED_SUFFIXES:
+            if stem.endswith(suffix):
+                return stem.removesuffix(suffix)
+        return stem
+
     def __init__(
         self,
         csv_databases: list[str | Path],
@@ -112,6 +128,7 @@ class ShapeDistanceCalculator:
         self.all_distances: dict[str, dict[str, dict[str, float]]] = {}
         self.total_distances: dict[str, float] = {}
         self.last_query: str | None = None
+        self.last_preprocessed_mesh: vedo.Mesh | None = None
 
         for path, df in self.databases.items():
             cols = set(df.columns)
@@ -175,7 +192,7 @@ class ShapeDistanceCalculator:
                     processed_candidates = [
                         item
                         for item in source_candidates
-                        if item[0].stem.endswith("_processed")
+                        if self._is_processed_stem(item[0].stem)
                     ]
                     if len(processed_candidates) == 1:
                         source_candidates = processed_candidates
@@ -270,7 +287,7 @@ class ShapeDistanceCalculator:
             if is_histogram or len(columns) != 1:
                 continue
             source_path = self._descriptor_source_paths[key]
-            if not source_path.stem.endswith("_processed"):
+            if not self._is_processed_stem(source_path.stem):
                 continue
             descriptor = columns[0]
             raw_sources = [
@@ -279,13 +296,19 @@ class ShapeDistanceCalculator:
                 if path != source_path
                 and descriptor in df.columns
                 and self.identifier_column in df.columns
-                and not path.stem.endswith("_processed")
+                and not self._is_processed_stem(path.stem)
             ]
             sibling_path = source_path.with_name(
-                f"{source_path.stem.removesuffix('_processed')}.csv"
+                f"{self._raw_stem(source_path.stem)}.csv"
             )
             if sibling_path.is_file():
                 raw_df = pd.read_csv(sibling_path)
+                if self.identifier_column in raw_df.columns:
+                    raw_df[self.identifier_column] = (
+                        raw_df[self.identifier_column]
+                        .astype(str)
+                        .map(normalize_path_separators)
+                    )
             elif len(raw_sources) == 1:
                 raw_df = raw_sources[0][1]
             else:
@@ -472,12 +495,37 @@ class ShapeDistanceCalculator:
             for shape, distance in distances.items()
         }
 
+    def is_in_database(self, query: str | Path) -> bool:
+        """Return True if the query resolves to an entry in the database."""
+        try:
+            self._resolve_query_key(str(query))
+            return True
+        except ValueError:
+            return False
+
     def _resolve_query_key(self, query: str) -> str:
         """Resolve an identifier or unambiguous filename in the databases."""
         normalized_query = str(query).replace("\\", "/").strip("/")
         exact_matches = self._filename_to_keys.get(normalized_query, set())
         if len(exact_matches) == 1:
             return next(iter(exact_matches))
+
+        if Path(query).is_file():
+            resolved_norm = normalize_shape_path(Path(query).resolve())
+            if resolved_norm in self._shape_id_to_pos:
+                return resolved_norm
+            fname = Path(query).name
+            if fname in self._shape_id_to_pos:
+                return fname
+            raise ValueError(
+                f"Query mesh file '{query}' was not found in the supplied "
+                "descriptor databases."
+            )
+
+        norm_shape = normalize_shape_path(normalized_query)
+        norm_matches = self._filename_to_keys.get(norm_shape, set())
+        if len(norm_matches) == 1:
+            return next(iter(norm_matches))
 
         filename = Path(normalized_query).name
         filename_matches = self._filename_to_keys.get(filename, set())
@@ -493,6 +541,15 @@ class ShapeDistanceCalculator:
             f"Query '{query}' was not found in the supplied descriptor "
             "databases."
         )
+
+    def _detect_normalize_by_sum(self) -> bool:
+        """Infer whether histogram database columns are normalized by sum (=1) or area."""
+        for _, (source_df, columns, is_histogram) in self._descriptor_sources.items():
+            if is_histogram and columns:
+                row_sums = source_df[columns].to_numpy(dtype=float).sum(axis=1)
+                mean_sum = float(np.nanmean(row_sums))
+                return abs(mean_sum - 1.0) < abs(mean_sum - len(columns))
+        return True
 
     def process_mesh_and_extract_descriptors(
         self,
@@ -510,6 +567,7 @@ class ShapeDistanceCalculator:
             mesh = mesh_or_path
         if not is_fully_normalized_file:
             mesh = preprocess_mesh(mesh)
+        self.last_preprocessed_mesh = mesh
 
         scalar_descriptors = {
             columns[0]
@@ -535,8 +593,8 @@ class ShapeDistanceCalculator:
             if (
                 not is_histogram
                 and len(columns) == 1
-                and self._descriptor_source_paths[key].stem.endswith(
-                    "_processed"
+                and self._is_processed_stem(
+                    self._descriptor_source_paths[key].stem
                 )
             )
         }
@@ -555,6 +613,7 @@ class ShapeDistanceCalculator:
             mesh,
             scalar_descriptors,
             histogram_bins,
+            normalize_by_sum=self._detect_normalize_by_sum(),
         )
         for descriptor, (scale, offset) in self._query_transforms.items():
             if descriptor in scalar_values:
@@ -583,6 +642,7 @@ class ShapeDistanceCalculator:
                 query_key = None
             if query_key is not None:
                 self.last_query = str(mesh_or_path)
+                self.last_preprocessed_mesh = None
                 self.all_distances = self.calculate_all_distances(query_key)
                 self.total_distances = self._sum_weighted_distances(
                     self.all_distances
@@ -622,7 +682,8 @@ class ShapeDistanceCalculator:
                 )
 
         self.all_distances = all_distances
-        return self._sum_weighted_distances(all_distances)
+        self.total_distances = self._sum_weighted_distances(all_distances)
+        return self.total_distances
 
     def _sum_weighted_distances(
         self,
@@ -984,13 +1045,34 @@ def main():
             # directory. When the query is a mesh file, its class directory's
             # parent is the likely database root; use it to resolve those keys.
             query_path = Path(args.query)
+            candidate_roots: list[Path] = []
             if query_path.is_file():
-                mesh_root = query_path.parent.parent
-                shapes = [
-                    shape if Path(shape).is_file()
-                    else str(mesh_root / shape)
-                    for shape in shapes
+                candidate_roots.append(query_path.parent.parent)
+            candidate_roots.extend(
+                [
+                    Path(
+                        "3d_models_final/3d_models_steps/3_models_fully_normalized"
+                    ),
+                    Path("3d_models"),
                 ]
+            )
+            resolved_shapes: list[str] = []
+            for shape in shapes:
+                if Path(shape).is_file():
+                    resolved_shapes.append(shape)
+                    continue
+                for root in candidate_roots:
+                    candidate = root / shape
+                    if candidate.is_file():
+                        resolved_shapes.append(str(candidate))
+                        break
+                else:
+                    resolved_shapes.append(
+                        str(candidate_roots[0] / shape)
+                        if candidate_roots
+                        else shape
+                    )
+            shapes = resolved_shapes
         visualize_mesh_distances(
             query=args.query,
             shapes_to_compare=shapes,

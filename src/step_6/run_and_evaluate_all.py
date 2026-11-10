@@ -10,6 +10,13 @@ from src.step_6.run_and_evaluate_rnn import run_and_evaluate_rnn
 from src.step_6.run_and_evaluate_weighted import run_and_evaluate_weighted
 
 
+TIME_COLUMNS = [
+    "init_time_s",
+    "retrieval_time_s",
+    "mean_query_time_ms",
+    "total_time_s",
+]
+
 METRIC_COLUMNS = [
     "macro_precision",
     "macro_recall",
@@ -40,6 +47,8 @@ def _try_load_existing(stats_file: Path, roc_file: Path) -> tuple[dict, dict] | 
     if stats_file.is_file() and roc_file.is_file():
         with open(stats_file, "r", encoding="utf-8") as f:
             stats = json.load(f)
+        if "total_time_s" not in stats or "retrieval_time_s" not in stats:
+            return None
         roc = ROCEvaluator.load_roc_results(roc_file)
         if "macro_auroc" not in stats:
             stats["macro_auroc"] = roc["macro_auroc"]
@@ -51,11 +60,21 @@ def _try_load_existing(stats_file: Path, roc_file: Path) -> tuple[dict, dict] | 
 
 def compute_ranking_table(comparison_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Computes integer ranks (1 = best/highest score) per metric and average rank
-    per row, following Slide 31 of Module 7.
+    Computes integer ranks (1 = best) per metric and average rank per row,
+    following Slide 31 of Module 7. Quality metrics rank higher=better;
+    timing metrics rank lower=better (faster = rank 1).
     """
     rank_df = pd.DataFrame()
     rank_df["method"] = comparison_df["method"]
+
+    present_time_cols = [
+        col for col in TIME_COLUMNS if col in comparison_df.columns
+    ]
+    for col in present_time_cols:
+        # Lower time is better -> ascending=True, method="min"
+        rank_df[f"{col}_rank"] = (
+            comparison_df[col].rank(ascending=True, method="min").astype(int)
+        )
 
     present_metrics = [col for col in METRIC_COLUMNS if col in comparison_df.columns]
     for col in present_metrics:
@@ -64,8 +83,15 @@ def compute_ranking_table(comparison_df: pd.DataFrame) -> pd.DataFrame:
             comparison_df[col].rank(ascending=False, method="min").astype(int)
         )
 
-    rank_cols = [f"{col}_rank" for col in present_metrics]
-    rank_df["average_rank"] = rank_df[rank_cols].mean(axis=1)
+    metric_rank_cols = [f"{col}_rank" for col in present_metrics]
+    time_rank_cols = [f"{col}_rank" for col in present_time_cols]
+    all_rank_cols = time_rank_cols + metric_rank_cols
+
+    if metric_rank_cols:
+        rank_df["average_quality_rank"] = rank_df[metric_rank_cols].mean(axis=1)
+    if time_rank_cols:
+        rank_df["average_time_rank"] = rank_df[time_rank_cols].mean(axis=1)
+    rank_df["average_rank"] = rank_df[all_rank_cols].mean(axis=1)
     rank_df = rank_df.sort_values("average_rank", ascending=True).reset_index(drop=True)
     return rank_df
 
@@ -211,9 +237,11 @@ def run_and_evaluate_all(
 
     # 4. Build Combined Comparison Table (Slide 30) & Ranking Table (Slide 31)
     comparison_df = pd.DataFrame(all_total_stats)
-    ordered_cols = ["method", "total_queries"] + [
-        c for c in METRIC_COLUMNS if c in comparison_df.columns
-    ]
+    ordered_cols = (
+        ["method", "total_queries"]
+        + [c for c in TIME_COLUMNS if c in comparison_df.columns]
+        + [c for c in METRIC_COLUMNS if c in comparison_df.columns]
+    )
     comparison_df = comparison_df[ordered_cols]
 
     ranking_df = compute_ranking_table(comparison_df)
@@ -227,7 +255,7 @@ def run_and_evaluate_all(
     with open(comparison_json, "w", encoding="utf-8") as f:
         json.dump(all_total_stats, f, indent=2)
 
-    # 5. Plot Combined ROC Curve (Slide 26) & Combined Metrics Bar Chart
+    # 5. Plot Combined ROC Curve (Slide 26), Metrics Bar Chart & Time Comparison
     roc_plot_path = comparison_dir / "all_methods_roc_comparison.png"
     ROCEvaluator.plot_roc_curves(
         all_roc_results,
@@ -242,13 +270,28 @@ def run_and_evaluate_all(
         title="Metrics Comparison - All Retrieval Methods",
     )
 
+    time_plot_path = comparison_dir / "all_methods_time_comparison.png"
+    ROCEvaluator.plot_time_comparison(
+        all_total_stats,
+        output_path=time_plot_path,
+        title="Execution & Retrieval Time Comparison - All Retrieval Methods",
+    )
+
     # 6. Print Comparison & Ranking Tables to Console
     pd.set_option("display.max_columns", None)
     pd.set_option("display.width", 1000)
     print("\n" + "=" * 95)
-    print("COMBINED METRICS COMPARISON TABLE (Slide 30)")
+    print("COMBINED METRICS & TIME COMPARISON TABLE (Slide 30)")
     print("=" * 95)
     print(comparison_df.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
+
+    time_cols_present = [c for c in TIME_COLUMNS if c in comparison_df.columns]
+    if time_cols_present:
+        print("\n" + "=" * 95)
+        print("EXECUTION & RETRIEVAL TIME COMPARISON")
+        print("=" * 95)
+        time_summary_df = comparison_df[["method", "total_queries"] + time_cols_present]
+        print(time_summary_df.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
 
     print("\n" + "=" * 95)
     print("SYSTEM RANKING TABLE (1 = Best, Slide 31)")
@@ -263,6 +306,7 @@ def run_and_evaluate_all(
         "roc_results": all_roc_results,
         "roc_plot": roc_plot_path,
         "metrics_plot": metrics_plot_path,
+        "time_plot": time_plot_path,
     }
 
 
