@@ -40,6 +40,11 @@ else:
     os.environ.setdefault("QT_QPA_PLATFORM", "xcb")
 
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 def style_class_pill(
     pill: QLabel,
     shape_path: str,
@@ -96,7 +101,9 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        app_icon_path = Path(__file__).resolve().parents[3] / "assets" / "icon.png"
+        app_icon_path = (
+            Path(__file__).resolve().parents[3] / "assets" / "icon.png"
+        )
         app_icon = QIcon(str(app_icon_path))
         self.setWindowIcon(app_icon)
         app = QApplication.instance()
@@ -122,20 +129,30 @@ class MainWindow(QMainWindow):
         self.result_viewers: list[EmbeddedViewer] = []
         self.query_worker: QueryWorker | None = None
 
-        # self.shape_distance_calculator = ShapeDistanceCalculator(
-        #     csv_databases=[
-        #         "analysis_output/descriptors/simple_descriptors_normalized.csv",
-        #         "analysis_output/descriptors/histogram_descriptors.csv",
-        #         "analysis_output/distances/L2_weights_descriptors.csv",
-        #     ],
-        #     distance_config=DISTANCE_CONFIG_L2
-        # )
+        # Get csv's from .env
+        simple_descriptors_csv = os.getenv("SIMPLE_DESCRIPTORS_CSV")
+        histogram_descriptors_csv = os.getenv("HISTOGRAM_DESCRIPTORS_CSV")
+        weights_emd_csv = os.getenv("WEIGHTS_EMD_CSV")
+
+        if (
+            simple_descriptors_csv is None
+            or histogram_descriptors_csv is None
+            or weights_emd_csv is None
+        ):
+            raise ValueError(
+                "Missing CSV file paths in .env. "
+                "Check SIMPLE_DESCRIPTORS_CSV, "
+                "HISTOGRAM_DESCRIPTORS_CSV, and WEIGHTS_EMD_CSV."
+            )
+
+        csv_databases = [
+            simple_descriptors_csv,
+            histogram_descriptors_csv,
+            weights_emd_csv,
+        ]
+
         self.shape_distance_calculator = ShapeDistanceCalculator(
-            csv_databases=[
-                "3d_models_final/analysis/4_descriptors/simple_descriptors_normalized.csv",
-                "3d_models_final/analysis/4_descriptors/histogram_descriptors.csv",
-                "analysis_output/distances/weights_emd_hist_sampling_descriptors.csv",
-            ],
+            csv_databases=csv_databases,
             distance_config=DISTANCE_CONFIG_EMD,
         )
 
@@ -226,7 +243,9 @@ class MainWindow(QMainWindow):
         self.results_list.setViewMode(QListWidget.ViewMode.IconMode)
         self.results_list.setResizeMode(QListWidget.ResizeMode.Adjust)
         self.results_list.setMovement(QListWidget.Movement.Static)
-        self.results_list.setSelectionMode(QListWidget.SelectionMode.NoSelection)
+        self.results_list.setSelectionMode(
+            QListWidget.SelectionMode.NoSelection
+        )
         self.results_list.setSpacing(10)
         main_layout.addWidget(left_panel, stretch=1)
         main_layout.addWidget(self.results_list, stretch=2)
@@ -251,13 +270,19 @@ class MainWindow(QMainWindow):
             self.query_button.setEnabled(True)
 
     def open_database_picker(self) -> None:
-        folder = QFileDialog.getExistingDirectory(self, "Select 3D Database Directory")
+        folder = QFileDialog.getExistingDirectory(
+            self, "Select 3D Database Directory"
+        )
         if folder:
             self.database_directory = folder
             self.database_label.setText(f"Database: {folder}")
 
-    def _set_loading_state(self, loading: bool, message: str = "Querying...") -> None:
-        self.query_button.setEnabled(not loading and self.selected_file is not None)
+    def _set_loading_state(
+        self, loading: bool, message: str = "Querying..."
+    ) -> None:
+        self.query_button.setEnabled(
+            not loading and self.selected_file is not None
+        )
         self.pick_button.setEnabled(not loading)
         self.database_button.setEnabled(not loading)
         self.k_spinbox.setEnabled(not loading)
@@ -305,7 +330,10 @@ class MainWindow(QMainWindow):
             return
 
         try:
-            if self.shape_distance_calculator.last_preprocessed_mesh is not None:
+            if (
+                self.shape_distance_calculator.last_preprocessed_mesh
+                is not None
+            ):
                 self.left_viewer.load_mesh(
                     self.shape_distance_calculator.last_preprocessed_mesh
                 )

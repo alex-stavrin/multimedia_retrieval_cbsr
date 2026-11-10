@@ -67,6 +67,8 @@ class EmbeddedViewer(QWidget):
             self.world_origin,
         )
         self.plotter.reset_camera()
+        # Zoom in closer to the object
+        self.plotter.camera.Dolly(3)
         self._configure_camera()
 
     def _configure_camera(self) -> None:
