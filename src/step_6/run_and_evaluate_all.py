@@ -4,6 +4,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from src.step_6.evaluation_plots import (
+    plot_metrics_comparison,
+    plot_roc_curves,
+    plot_time_comparison,
+)
 from src.step_6.roc_evaluator import ROCEvaluator
 from src.step_6.run_and_evaluate_knn import run_and_evaluate_knn
 from src.step_6.run_and_evaluate_rnn import run_and_evaluate_rnn
@@ -14,6 +19,10 @@ TIME_COLUMNS = [
     "retrieval_time_s",
     "mean_query_time_ms",
     "total_time_s",
+]
+
+RANK_TIME_COLUMNS = [
+    "mean_query_time_ms",
 ]
 
 METRIC_COLUMNS = [
@@ -66,7 +75,13 @@ def compute_ranking_table(comparison_df: pd.DataFrame) -> pd.DataFrame:
     rank_df = pd.DataFrame()
     rank_df["method"] = comparison_df["method"]
 
-    present_time_cols = [col for col in TIME_COLUMNS if col in comparison_df.columns]
+    present_time_cols = [
+        col for col in RANK_TIME_COLUMNS if col in comparison_df.columns
+    ]
+    if not present_time_cols:
+        present_time_cols = [
+            col for col in TIME_COLUMNS if col in comparison_df.columns
+        ]
     for col in present_time_cols:
         # Lower time is better -> ascending=True, method="min"
         rank_df[f"{col}_rank"] = (
@@ -254,24 +269,24 @@ def run_and_evaluate_all(
 
     # 5. Plot Combined ROC Curve (Slide 26), Metrics Bar Chart & Time Comparison
     roc_plot_path = comparison_dir / "all_methods_roc_comparison.png"
-    ROCEvaluator.plot_roc_curves(
+    plot_roc_curves(
         all_roc_results,
         output_path=roc_plot_path,
         title="ROC Curves Comparison - All Retrieval Methods",
     )
 
     metrics_plot_path = comparison_dir / "all_methods_metrics_comparison.png"
-    ROCEvaluator.plot_metrics_comparison(
+    plot_metrics_comparison(
         all_total_stats,
         output_path=metrics_plot_path,
         title="Metrics Comparison - All Retrieval Methods",
     )
 
     time_plot_path = comparison_dir / "all_methods_time_comparison.png"
-    ROCEvaluator.plot_time_comparison(
+    plot_time_comparison(
         all_total_stats,
         output_path=time_plot_path,
-        title="Execution & Retrieval Time Comparison - All Retrieval Methods",
+        title="Mean Retrieval Time per Query - All Retrieval Methods",
     )
 
     # 6. Print Comparison & Ranking Tables to Console

@@ -2,17 +2,17 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from src.step_6.evaluation_plots import (
+    plot_metrics_comparison,
+    plot_roc_curves,
+    plot_time_comparison,
+)
+
 
 class ROCEvaluator:
-    """
-    Computes ROC curves (Sensitivity vs Specificity) and AUROC as defined
-    in Multimedia Retrieval Module 7 (Slides 21-26).
-    """
-
     def __init__(self, ground_truth: dict[str, str]):
         self.ground_truth = ground_truth
         self.class_counts = defaultdict(int)
@@ -23,9 +23,6 @@ class ROCEvaluator:
     def compute_query_roc(
         self, query_id: str, ranked_ids: list[str]
     ) -> tuple[np.ndarray, np.ndarray, float]:
-        """
-        Computes (Sensitivity, Specificity, AUROC) for a single query's ranked results.
-        """
         query_class = self.ground_truth.get(query_id)
         c = max(1, self.class_counts[query_class] - 1)
         negative_count = max(1, self.total_db_size - c)
@@ -65,10 +62,6 @@ class ROCEvaluator:
         method_name: str = "Retrieval",
         grid_points: int = 101,
     ) -> dict:
-        """
-        Evaluates query-level AUROC and interpolates a mean ROC curve across all queries
-        by sweeping rank cutoffs k in [1, d].
-        """
         common_sensitivity = np.linspace(0.0, 1.0, grid_points)
         interpolated_specificities = []
         query_records = []
@@ -116,10 +109,6 @@ class ROCEvaluator:
         method_name: str = "rNN",
         grid_points: int = 101,
     ) -> dict:
-        """
-        Evaluates rNN ROC curve by sweeping a global distance threshold r across
-        the dataset (Slide 22: ||I - Q|| < threshold).
-        """
         all_dists = []
         prepared_queries = []
 
@@ -246,271 +235,10 @@ class ROCEvaluator:
             },
         }
 
-    @staticmethod
-    def plot_roc_curves(
-        evaluated_methods: list[dict],
-        output_path: str | Path,
-        title: str = "ROC Curves (Sensitivity vs Specificity)",
-    ) -> None:
-        """
-        Plots one or more ROC curves on the same figure (Slides 22-26).
-        """
-        plt.figure(figsize=(9, 7), dpi=300)
-
-        plt.plot(
-            [0.0, 1.0],
-            [1.0, 0.0],
-            linestyle="--",
-            color="gray",
-            linewidth=1.5,
-            label="Random Choice (AUROC = 0.500)",
-        )
-
-        linestyles = ["-", "--", "-.", ":"]
-        colors = ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd", "#8c564b"]
-
-        for idx, eval_res in enumerate(evaluated_methods):
-            name = eval_res["method"]
-            auc = eval_res["macro_auroc"]
-            sens = eval_res["curve"]["sensitivity"]
-            spec = eval_res["curve"]["specificity"]
-            color = colors[idx % len(colors)]
-            ls = linestyles[idx % len(linestyles)]
-
-            plt.plot(
-                sens,
-                spec,
-                linewidth=2.2,
-                linestyle=ls,
-                color=color,
-                label=f"{name} (AUROC = {auc:.4f})",
-            )
-
-            # Plot the operating point (e.g. chosen k or radius r) if provided
-            op = eval_res.get("operating_point")
-            if op is not None:
-                op_sens, op_spec, op_label = op
-                plt.scatter(
-                    [op_sens],
-                    [op_spec],
-                    color=color,
-                    s=65,
-                    zorder=5,
-                    edgecolors="black",
-                    linewidths=0.8,
-                    label=f"  • {op_label} (Sens={op_sens:.2f}, Spec={op_spec:.2f})",
-                )
-
-        plt.xlim([-0.02, 1.02])  # type: ignore
-        plt.ylim([-0.02, 1.02])  # type: ignore
-        plt.xlabel("Sensitivity (Recall / TPR)", fontsize=12)
-        plt.ylabel("Specificity (TNR)", fontsize=12)
-        plt.title(title, fontsize=14, fontweight="bold")
-        plt.legend(loc="lower left", fontsize=9, framealpha=0.9)
-        plt.grid(True, linestyle=":", alpha=0.6)
-        plt.tight_layout()
-
-        out_file = Path(output_path)
-        out_file.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(out_file)
-        plt.close()
-        print(f"Saved ROC plot to: {out_file.resolve()}")
-
-    @staticmethod
-    def plot_metrics_comparison(
-        all_stats: list[dict],
-        output_path: str | Path,
-        title: str = "Comparison of Retrieval Methods Across Metrics",
-    ) -> None:
-        """
-        Plots a grouped bar chart comparing all methods across key retrieval metrics.
-        """
-        metrics_to_plot = [
-            ("macro_precision", "Precision"),
-            ("macro_recall", "Recall (Sens)"),
-            ("macro_specificity", "Specificity"),
-            ("macro_accuracy", "Accuracy"),
-            ("macro_f1", "F1 Score"),
-            ("macro_map", "MAP"),
-            ("macro_last_rank", "Last Rank"),
-            ("macro_first_tier", "1st Tier"),
-            ("macro_second_tier", "2nd Tier"),
-            ("macro_auroc", "AUROC"),
-            ("macro_is_first_correct_accuracy", "Top-1 Acc"),
-        ]
-
-        available_metrics = [
-            (key, label)
-            for key, label in metrics_to_plot
-            if all(key in stat for stat in all_stats)
-        ]
-
-        x = np.arange(len(available_metrics))
-        num_methods = max(1, len(all_stats))
-        width = min(0.8 / num_methods, 0.22)
-
-        plt.figure(figsize=(14, 6.5), dpi=300)
-        colors = ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd", "#8c564b"]
-
-        for idx, stat in enumerate(all_stats):
-            method_name = stat.get("method", f"Method {idx + 1}")
-            values = [float(stat[key]) for key, _ in available_metrics]
-            offset = (idx - (num_methods - 1) / 2) * width
-            bars = plt.bar(
-                x + offset,
-                values,
-                width=width,
-                label=method_name,
-                color=colors[idx % len(colors)],
-                edgecolor="black",
-                linewidth=0.5,
-                alpha=0.9,
-            )
-            for bar in bars:
-                height = bar.get_height()
-                plt.annotate(
-                    f"{height:.2f}",
-                    xy=(bar.get_x() + bar.get_width() / 2, height),
-                    xytext=(0, 3),
-                    textcoords="offset points",
-                    ha="center",
-                    va="bottom",
-                    fontsize=7,
-                    rotation=90 if num_methods > 3 else 0,
-                )
-
-        plt.xticks(
-            x,
-            [label for _, label in available_metrics],
-            rotation=20,
-            ha="right",
-            fontsize=10,
-        )
-        plt.ylim([0.0, 1.12])  # type: ignore
-        plt.ylabel("Score [0, 1]", fontsize=12)
-        plt.title(title, fontsize=14, fontweight="bold")
-        plt.legend(loc="upper right", fontsize=9, framealpha=0.9)
-        plt.grid(axis="y", linestyle=":", alpha=0.6)
-        plt.tight_layout()
-
-        out_file = Path(output_path)
-        out_file.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(out_file)
-        plt.close()
-        print(f"Saved metrics comparison plot to: {out_file.resolve()}")
-
-    @staticmethod
-    def plot_time_comparison(
-        all_stats: list[dict],
-        output_path: str | Path,
-        title: str = "Execution & Retrieval Time Comparison Across Methods",
-    ) -> None:
-        """
-        Plots side-by-side bar charts comparing total execution time, retrieval query time,
-        and mean per-query time across retrieval methods.
-        """
-        methods = [
-            stat.get("method", f"Method {idx + 1}")
-            for idx, stat in enumerate(all_stats)
-        ]
-        init_times = [float(stat.get("init_time_s", 0.0)) for stat in all_stats]
-        retrieval_times = [
-            float(stat.get("retrieval_time_s", 0.0)) for stat in all_stats
-        ]
-        total_times = [float(stat.get("total_time_s", 0.0)) for stat in all_stats]
-        mean_query_ms = [
-            float(stat.get("mean_query_time_ms", 0.0)) for stat in all_stats
-        ]
-
-        x = np.arange(len(methods))
-        colors = ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd", "#8c564b"]
-        bar_colors = [colors[i % len(colors)] for i in range(len(methods))]
-
-        fig, axes = plt.subplots(1, 2, figsize=(14, 6), dpi=300)
-
-        # Panel 1: Total Time to Finish vs Retrieval Time (seconds)
-        width = 0.36
-        bars_ret = axes[0].bar(
-            x - width / 2,
-            retrieval_times,
-            width=width,
-            label="Retrieval Queries Time (s)",
-            color="#1f77b4",
-            edgecolor="black",
-            linewidth=0.6,
-            alpha=0.9,
-        )
-        bars_tot = axes[0].bar(
-            x + width / 2,
-            total_times,
-            width=width,
-            label="Total Time to Finish (s)",
-            color="#ff7f0e",
-            edgecolor="black",
-            linewidth=0.6,
-            alpha=0.9,
-        )
-        for bar in list(bars_ret) + list(bars_tot):
-            h = bar.get_height()
-            axes[0].annotate(
-                f"{h:.2f}s",
-                xy=(bar.get_x() + bar.get_width() / 2, h),
-                xytext=(0, 3),
-                textcoords="offset points",
-                ha="center",
-                va="bottom",
-                fontsize=8,
-            )
-        axes[0].set_xticks(x)
-        axes[0].set_xticklabels(methods, rotation=20, ha="right", fontsize=9)
-        axes[0].set_ylabel("Time (seconds)", fontsize=11)
-        axes[0].set_title(
-            "Total Time to Finish & Retrieval Time (s)", fontsize=12, fontweight="bold"
-        )
-        axes[0].legend(loc="upper left", fontsize=9, framealpha=0.9)
-        axes[0].grid(axis="y", linestyle=":", alpha=0.6)
-        if max(total_times + retrieval_times, default=0.0) > 0:
-            axes[0].set_ylim([0, max(total_times + retrieval_times) * 1.18])  # type: ignore
-
-        # Panel 2: Mean Query Time per Shape (milliseconds)
-        bars_q = axes[1].bar(
-            x,
-            mean_query_ms,
-            width=0.5,
-            color=bar_colors,
-            edgecolor="black",
-            linewidth=0.6,
-            alpha=0.9,
-        )
-        for bar, init_t in zip(bars_q, init_times):
-            h = bar.get_height()
-            axes[1].annotate(
-                f"{h:.3f} ms\n(init: {init_t:.2f}s)",
-                xy=(bar.get_x() + bar.get_width() / 2, h),
-                xytext=(0, 3),
-                textcoords="offset points",
-                ha="center",
-                va="bottom",
-                fontsize=8,
-            )
-        axes[1].set_xticks(x)
-        axes[1].set_xticklabels(methods, rotation=20, ha="right", fontsize=9)
-        axes[1].set_ylabel("Mean Query Time (ms / query)", fontsize=11)
-        axes[1].set_title(
-            "Mean Retrieval Time per Query (ms)", fontsize=12, fontweight="bold"
-        )
-        axes[1].grid(axis="y", linestyle=":", alpha=0.6)
-        if max(mean_query_ms, default=0.0) > 0:
-            axes[1].set_ylim([0, max(mean_query_ms) * 1.22])  # type: ignore
-
-        fig.suptitle(title, fontsize=14, fontweight="bold")
-        plt.tight_layout()
-
-        out_file = Path(output_path)
-        out_file.parent.mkdir(parents=True, exist_ok=True)
-        plt.savefig(out_file)
-        plt.close()
-        print(f"Saved time comparison plot to: {out_file.resolve()}")
+    # Plotting helper aliases (delegated to evaluation_plots)
+    plot_roc_curves = staticmethod(plot_roc_curves)
+    plot_metrics_comparison = staticmethod(plot_metrics_comparison)
+    plot_time_comparison = staticmethod(plot_time_comparison)
 
     @staticmethod
     def save_roc_results(
