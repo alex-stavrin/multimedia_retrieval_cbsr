@@ -85,7 +85,7 @@ def _adaptive_subdivide(
     faces = numpy.asarray(mesh.cells, dtype=numpy.int64).copy()
 
     # ensure every face is a triangle and is fine
-    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:
+    if faces.ndim != 2 or faces.shape[1] != 3 or len(faces) == 0:  # type: ignore
         return mesh
 
     # how many vertices to aim for
