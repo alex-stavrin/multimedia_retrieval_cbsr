@@ -17,6 +17,7 @@ from typing import Callable, Any
 
 import src.helper.silence_vtk  # noqa: F401
 import src.step_2._3.resampling as resampling
+import src.step_2._3.triangle_area_analyzer as triangle_area_analyzer
 import src.step_2._1.shapes_analyzer as shape_analyzer
 import src.step_2._3.repairment.repair_wireframe as reparation
 import src.step_2._3.repairment.repair_analyzer as rep_analyser
@@ -42,6 +43,7 @@ STEP_ORDER = [
     "reparation_shape_analysis",
     "resample_database",
     "analyze_resampled_database",
+    "analyze_resampled_triangle_areas",
     "fully_normalize_database",
     "fully_normalized_shape_analysis",
     "calculate_descriptors",
@@ -353,6 +355,29 @@ def prepare_database(
             "analyze_resampled_database",
             lambda: shape_analyzer.analyze_database(
                 str(resampled), str(resampled_analysis_csv)
+            ),
+            state,
+            checkpoint_path,
+            raw_path,
+        )
+
+        triangle_area_csv = (
+            resampled_analysis_dir / "triangle_area_distribution.csv"
+        )
+        triangle_area_plot = (
+            resampled_analysis_dir / "triangle_area_cv_histograms.png"
+        )
+        triangle_area_summary = (
+            resampled_analysis_dir / "triangle_area_summary.txt"
+        )
+        _run_step(
+            "analyze_resampled_triangle_areas",
+            lambda: triangle_area_analyzer.analyze_and_plot_triangle_areas(
+                before_dir=str(repaired),
+                after_dir=str(resampled),
+                output_csv=str(triangle_area_csv),
+                output_plot=str(triangle_area_plot),
+                output_summary=str(triangle_area_summary),
             ),
             state,
             checkpoint_path,

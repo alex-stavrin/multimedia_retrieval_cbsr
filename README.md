@@ -37,16 +37,9 @@ If you add a new library do
 ```py -m pip freeze > requirements.txt```  
 So others can install the library too
 
-## Libraries
-
-- vedo
-- PySide6
-
 ## Source Code
 
 Source code is inside the ```./src``` folder. The source is divided into steps from the assignment. Each folder has inside a readme that explains the script used for that step and how to run it.
-
-Every command is run from the project root (the folder that contains `src`) with the virtual environment activated. For quick tests, first create the reduced database (about 276 shapes, see [src/step_2/README.md](src/step_2/README.md)) and run the steps on it instead of the full `3d_models` folder.
 
 ## Pipeline
 3d_models -> (resampled) -> 3d_models_resampled -> (normalization) -> 3d_models_resampled_normalized
