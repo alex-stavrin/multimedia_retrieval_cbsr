@@ -64,7 +64,41 @@ def main():
         help="Normalize histograms by sum (sum of bins = 1) instead of area (integral = 1).",
     )
 
+    parser.add_argument(
+        "--compare",
+        nargs=3,
+        metavar=("SIMILAR_1", "SIMILAR_2", "DIFFERENT"),
+        default=None,
+        help="Compare 2 similar shapes and 1 different shape across all 5 histogram descriptors (A3, D1, D2, D3, D4).",
+    )
+
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=None,
+        help="Optional output path when using --compare (e.g. comparison.png or comparison.pdf).",
+    )
+
     arguements = parser.parse_args()
+
+    if arguements.compare is not None:
+        from src.step_3._2.histogram_descriptors.compare_shapes import (
+            plot_individual_descriptor_figures,
+        )
+
+        plot_individual_descriptor_figures(
+            shape_ids=list(arguements.compare),
+            descriptors=[arguements.descriptor],
+            n_samples=arguements.samples,
+            n_bins=arguements.bins,
+            seed=arguements.seed,
+            normalize_by_sum=arguements.normalize_by_sum,
+            output_path=arguements.output,
+            save_pdf=arguements.pdf,
+            show=True,
+        )
+        return
 
     # get all 3D files (.obj)
     files = [item for item in arguements.input.rglob("*.obj") if item.is_file()]

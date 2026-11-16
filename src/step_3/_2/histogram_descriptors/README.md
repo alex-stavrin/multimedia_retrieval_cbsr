@@ -29,3 +29,24 @@ Flag -pdf, if present will save the figure to a .pdf file
 This calculates the histogram descriptors and saves them in {output}
 
 ```python -m src.step_3._2.histogram_descriptors.analyze_and_save -i {input_3d_folder} -o {output} -s {number_of_samples} -b {number_of_bins} --seed {seed}```
+
+## compare_shapes (2 Similar Shapes vs. 1 Different Shape)
+Plots the 5 histogram descriptors (`A3`, `D1`, `D2`, `D3`, `D4`) and the 3 compared 3D models (`shapes_3d_comparison.pdf`) as individual figures/PDFs for LaTeX Overleaf (or combined with `--combined`).
+
+```bash
+# Save all 5 descriptor PDFs + the 3D models PDF (shapes_3d_comparison.pdf):
+python -m src.step_3._2.histogram_descriptors.compare_shapes -pdf --no-show
+
+# Generate ONLY the 3D models comparison PDF (shapes_3d_comparison.pdf):
+python -m src.step_3._2.histogram_descriptors.compare_shapes -d models -pdf --no-show
+
+# Plot/save a single specific descriptor (e.g. A3):
+python -m src.step_3._2.histogram_descriptors.compare_shapes -d A3 -pdf --no-show
+
+# Custom trio of shapes saved as separate PDFs (5 descriptors + 3D models):
+python -m src.step_3._2.histogram_descriptors.compare_shapes Guitar/D00374.obj Guitar/D00655.obj Mug/m507.obj -pdf --no-show
+
+# Save all individual PDFs into a specific folder:
+python -m src.step_3._2.histogram_descriptors.compare_shapes -pdf --output-dir ./overleaf_figs --no-show
+```
+
