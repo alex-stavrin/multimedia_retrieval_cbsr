@@ -124,6 +124,7 @@ def run_and_evaluate_all(
     weighted_k: int = 6,
     exclude_self: bool = True,
     reuse_existing: bool = False,
+    save_pdf: bool = False,
 ) -> dict:
     if methods is None:
         methods = ["knn", "rnn", "weighted"]
@@ -273,6 +274,7 @@ def run_and_evaluate_all(
         all_roc_results,
         output_path=roc_plot_path,
         title="ROC Curves Comparison - All Retrieval Methods",
+        save_pdf=save_pdf,
     )
 
     metrics_plot_path = comparison_dir / "all_methods_metrics_comparison.png"
@@ -280,6 +282,7 @@ def run_and_evaluate_all(
         all_total_stats,
         output_path=metrics_plot_path,
         title="Metrics Comparison - All Retrieval Methods",
+        save_pdf=save_pdf,
     )
 
     time_plot_path = comparison_dir / "all_methods_time_comparison.png"
@@ -287,6 +290,7 @@ def run_and_evaluate_all(
         all_total_stats,
         output_path=time_plot_path,
         title="Mean Retrieval Time per Query - All Retrieval Methods",
+        save_pdf=True,
     )
 
     # 6. Print Comparison & Ranking Tables to Console
@@ -319,6 +323,7 @@ def run_and_evaluate_all(
         "roc_plot": roc_plot_path,
         "metrics_plot": metrics_plot_path,
         "time_plot": time_plot_path,
+        "time_plot_pdf": time_plot_path.with_suffix(".pdf"),
     }
 
 
@@ -419,6 +424,12 @@ def main() -> None:
         action="store_true",
         help="Reuse existing evaluation JSONs if already present in output_dir.",
     )
+    parser.add_argument(
+        "-pdf",
+        "--pdf",
+        action="store_true",
+        help="Also export ROC and metrics comparison plots as PDFs (the time comparison plot is always exported as both PNG and PDF).",
+    )
 
     args = parser.parse_args()
     run_and_evaluate_all(
@@ -437,6 +448,7 @@ def main() -> None:
         weighted_k=args.weighted_k,
         exclude_self=not args.include_self,
         reuse_existing=args.reuse_existing,
+        save_pdf=args.pdf,
     )
 
 

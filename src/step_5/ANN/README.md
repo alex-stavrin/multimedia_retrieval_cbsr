@@ -18,3 +18,17 @@ This file makes the ANN data structure and does a rnn query on query shapes. You
 ### Example
 
 ```python -m src.step_5.ANN.rnn_search -q .\3d_models\Chess\D01049.obj -r 500 --max_matches 6 --elementary_csv .\3d_models_final\analysis\4_descriptors\simple_descriptors_normalized.csv --histogram_csv .\3d_models_final\analysis\4_descriptors\histogram_descriptors.csv --model_dir .\3d_models_final\3d_models_steps\3_models_fully_normalized\ -o result_rnn.png```
+
+
+## evaluate_leaf_size.py
+
+Benchmarks KNN retrieval speed and KD-Tree construction time across different KD-Tree `leaf_size` values and saves CSV tables and graphs (`knn_leaf_size_retrieval_time.png`, `knn_leaf_size_detailed_analysis.png`).
+
+```python -m src.step_5.ANN.evaluate_leaf_size --elementary_csv {elementary_csv} --histogram_csv {histogram_csv} -o {output_dir} -k {k}```
+
+
+## compare_methods_table.py
+
+Generates a 3-row comparison table (Step 4 Custom Weighted Distance, Step 5 kNN, and Step 5 rNN) for each query shape and exports the tables as PDFs (`result_comparison_chess_D01049.pdf`, `result_comparison_door_D01005.pdf`, `result_comparison_human_D00013.pdf`, `result_comparison_human_m356.pdf`).
+
+```python -m src.step_5.ANN.compare_methods_table```

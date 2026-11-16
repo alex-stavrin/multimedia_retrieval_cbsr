@@ -245,11 +245,12 @@ class SpatialSearchEngine:
         elementary_csv: str | Path,
         histogram_csv: str | Path,
         balance: bool = True,
+        leaf_size: int = 16,
     ) -> None:
         self.elementary_csv = Path(elementary_csv)
         self.histogram_csv = Path(histogram_csv)
         self.identifier_column = IDENTIFIER_COLUMN
-        self.leaf_size = 16
+        self.leaf_size = leaf_size
         self.balance = balance
         self.elementary_columns: list[str] = []
         self.histogram_columns: list[str] = []

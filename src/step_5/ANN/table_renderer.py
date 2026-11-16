@@ -3,17 +3,27 @@ import matplotlib.pyplot as plt
 import numpy
 from pathlib import Path
 import vedo
+from src.step_4.user_interface.class_colors import get_class_color
+
+
+_THUMBNAIL_CACHE: dict[
+    tuple[str, tuple[int, int], tuple[float, float, float]], numpy.ndarray
+] = {}
 
 
 def render_mesh_thumbnail(
     mesh_path: str | Path | vedo.Mesh,
     image_size: tuple[int, int] = (300, 300),
-    mesh_color: tuple[float, float, float] = (0.4, 0.3, 0.8),
+    mesh_color: tuple[float, float, float] = (0.6, 0.6, 0.6),
 ) -> numpy.ndarray:
+    cache_key: tuple[str, tuple[int, int], tuple[float, float, float]] | None = None
     if isinstance(mesh_path, vedo.Mesh):
         mesh = mesh_path.clone()
     else:
         path = Path(mesh_path)
+        cache_key = (str(path.resolve()), image_size, mesh_color)
+        if cache_key in _THUMBNAIL_CACHE:
+            return _THUMBNAIL_CACHE[cache_key]
         mesh = vedo.Mesh(str(path))
     mesh.shift(-mesh.center_of_mass())  # type: ignore
     mesh.color(mesh_color)
@@ -22,6 +32,9 @@ def render_mesh_thumbnail(
     plotter.show(mesh, zoom=1.1, resetcam=True)
     image = plotter.screenshot(asarray=True)
     plotter.close()
+
+    if cache_key is not None:
+        _THUMBNAIL_CACHE[cache_key] = image
 
     return image
 
@@ -43,6 +56,54 @@ def find_mesh_path(model_dir: str | Path, shape_id: str) -> Path:
     )
 
 
+def _extract_class_and_name(mesh_source: str | Path | vedo.Mesh) -> tuple[str, str]:
+    if isinstance(mesh_source, (str, Path)):
+        path = Path(mesh_source)
+        return path.parent.name, path.name
+    return "Outside DB", "query.obj"
+
+
+def _add_cell_caption(
+    ax: Any,
+    class_name: str,
+    model_name: str,
+    dist: float | None = None,
+) -> None:
+    pill_color = get_class_color(class_name)
+    ax.text(
+        0.5,
+        -0.11,
+        class_name,
+        transform=ax.transAxes,
+        ha="center",
+        va="center",
+        fontsize=8.0,
+        fontweight="bold",
+        color="#000000",
+        bbox={
+            "boxstyle": "round,pad=0.22,rounding_size=0.45",
+            "facecolor": pill_color,
+            "edgecolor": "#666666",
+            "linewidth": 0.5,
+        },
+        clip_on=False,
+    )
+    sub_text = (
+        f"{model_name}\ndis={dist:.6f}" if dist is not None else model_name
+    )
+    ax.text(
+        0.5,
+        -0.21,
+        sub_text,
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        fontsize=8.5,
+        color="#000000",
+        clip_on=False,
+    )
+
+
 def render_meshes_grid(
     rows_data: list[dict[str, Any]], output_path: str, cell_size: float = 2.2
 ) -> None:
@@ -52,11 +113,12 @@ def render_meshes_grid(
     max_matches = max(len(r["matches"]) for r in rows_data)
     number_of_collumns = max(max_matches, 1) + 1
 
+    row_height = cell_size * 1.24 if number_of_rows > 1 else cell_size
     fig, axes = plt.subplots(
         nrows=number_of_rows,
         ncols=number_of_collumns,
-        figsize=(number_of_collumns * cell_size, number_of_rows * cell_size),
-        gridspec_kw={"wspace": 0.4, "hspace": 0.04},
+        figsize=(number_of_collumns * cell_size, number_of_rows * row_height),
+        gridspec_kw={"wspace": 0.4, "hspace": 0.38},
     )
 
     # Ensure 2D array of axes even if single row or single column
@@ -80,6 +142,18 @@ def render_meshes_grid(
                 "Query shape", fontsize=11, fontweight="bold", pad=8
             )
 
+        row_label = row_entry.get("row_label")
+        if row_label:
+            query_ax.set_ylabel(
+                str(row_label),
+                fontsize=11,
+                fontweight="bold",
+                labelpad=10,
+            )
+
+        query_cls, query_name = _extract_class_and_name(query_mesh_file)
+        _add_cell_caption(query_ax, query_cls, query_name)
+
         for spine in query_ax.spines.values():
             spine.set_color("black")
             spine.set_linewidth(1.0)
@@ -100,13 +174,12 @@ def render_meshes_grid(
             if match_index < len(matches):
                 match_file, dist = matches[match_index]
                 match_img = render_mesh_thumbnail(match_file)
+                match_cls, match_name = _extract_class_and_name(match_file)
 
                 match_ax.imshow(match_img)
                 match_ax.set_xticks([])
                 match_ax.set_yticks([])
-                match_ax.set_xlabel(
-                    f"dis={dist:.6f}", fontsize=8.5, labelpad=4
-                )
+                _add_cell_caption(match_ax, match_cls, match_name, dist)
 
                 for spine in match_ax.spines.values():
                     spine.set_color("black")

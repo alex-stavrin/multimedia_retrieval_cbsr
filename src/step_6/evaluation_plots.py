@@ -4,10 +4,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def _save_plot(
+    output_path: str | Path,
+    label: str,
+    save_pdf: bool = False,
+) -> None:
+    """Save the active matplotlib figure to output_path and optionally a sibling PDF."""
+    out_file = Path(output_path)
+    out_file.parent.mkdir(parents=True, exist_ok=True)
+    plt.savefig(out_file)
+    print(f"Saved {label} to: {out_file.resolve()}")
+    if save_pdf and out_file.suffix.lower() != ".pdf":
+        pdf_file = out_file.with_suffix(".pdf")
+        plt.savefig(pdf_file)
+        print(f"Saved {label} (PDF) to: {pdf_file.resolve()}")
+    plt.close()
+
+
 def plot_roc_curves(
     evaluated_methods: list[dict],
     output_path: str | Path,
     title: str = "ROC Curves (Sensitivity vs Specificity)",
+    save_pdf: bool = False,
 ) -> None:
     """Plots one or more ROC curves on the same figure (Slides 22-26)."""
     plt.figure(figsize=(9, 7), dpi=300)
@@ -50,17 +68,14 @@ def plot_roc_curves(
     plt.grid(True, linestyle=":", alpha=0.6)
     plt.tight_layout()
 
-    out_file = Path(output_path)
-    out_file.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(out_file)
-    plt.close()
-    print(f"Saved ROC plot to: {out_file.resolve()}")
+    _save_plot(output_path, "ROC plot", save_pdf=save_pdf)
 
 
 def plot_metrics_comparison(
     all_stats: list[dict],
     output_path: str | Path,
     title: str = "Comparison of Retrieval Methods Across Metrics",
+    save_pdf: bool = False,
 ) -> None:
     """Plots a grouped bar chart comparing all methods across key retrieval metrics."""
     metrics_to_plot = [
@@ -131,17 +146,14 @@ def plot_metrics_comparison(
     plt.grid(axis="y", linestyle=":", alpha=0.6)
     plt.tight_layout()
 
-    out_file = Path(output_path)
-    out_file.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(out_file)
-    plt.close()
-    print(f"Saved metrics comparison plot to: {out_file.resolve()}")
+    _save_plot(output_path, "metrics comparison plot", save_pdf=save_pdf)
 
 
 def plot_time_comparison(
     all_stats: list[dict],
     output_path: str | Path,
     title: str = "Mean Retrieval Time per Query Across Methods",
+    save_pdf: bool = False,
 ) -> None:
     """Plots a bar chart comparing mean per-query retrieval time (ms) across methods."""
     methods = [
@@ -188,8 +200,4 @@ def plot_time_comparison(
         plt.ylim([0, max(mean_query_ms) * 1.18])  # type: ignore
     plt.tight_layout()
 
-    out_file = Path(output_path)
-    out_file.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(out_file)
-    plt.close()
-    print(f"Saved time comparison plot to: {out_file.resolve()}")
+    _save_plot(output_path, "time comparison plot", save_pdf=save_pdf)
