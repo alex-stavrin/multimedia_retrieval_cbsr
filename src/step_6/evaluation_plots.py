@@ -27,7 +27,6 @@ def plot_roc_curves(
     title: str = "ROC Curves (Sensitivity vs Specificity)",
     save_pdf: bool = False,
 ) -> None:
-    """Plots one or more ROC curves on the same figure (Slides 22-26)."""
     plt.figure(figsize=(9, 7), dpi=300)
 
     plt.plot(
@@ -157,12 +156,9 @@ def plot_time_comparison(
 ) -> None:
     """Plots a bar chart comparing mean per-query retrieval time (ms) across methods."""
     methods = [
-        stat.get("method", f"Method {idx + 1}")
-        for idx, stat in enumerate(all_stats)
+        stat.get("method", f"Method {idx + 1}") for idx, stat in enumerate(all_stats)
     ]
-    mean_query_ms = [
-        float(stat.get("mean_query_time_ms", 0.0)) for stat in all_stats
-    ]
+    mean_query_ms = [float(stat.get("mean_query_time_ms", 0.0)) for stat in all_stats]
 
     x = np.arange(len(methods))
     colors = ["#1f77b4", "#d62728", "#2ca02c", "#ff7f0e", "#9467bd", "#8c564b"]

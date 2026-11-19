@@ -235,7 +235,6 @@ class ROCEvaluator:
             },
         }
 
-    # Plotting helper aliases (delegated to evaluation_plots)
     plot_roc_curves = staticmethod(plot_roc_curves)
     plot_metrics_comparison = staticmethod(plot_metrics_comparison)
     plot_time_comparison = staticmethod(plot_time_comparison)

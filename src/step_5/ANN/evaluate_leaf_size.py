@@ -14,7 +14,6 @@ from tqdm import tqdm
 from src.step_5.ANN.spatial_search_engine import SpatialSearchEngine
 from src.step_6.retrieval_evalulator import RetrievalEvaluator
 
-
 DEFAULT_LEAF_SIZES = [1, 2, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512]
 DEFAULT_WORKERS = max(1, min(8, (os.cpu_count() or 4) // 2))
 
@@ -38,8 +37,7 @@ def _init_worker(
         histogram_csv=histogram_csv,
     )
     _WORKER_TREES = {
-        ls: KDTree(_WORKER_ENGINE.feature_matrix, leafsize=ls)
-        for ls in leaf_sizes
+        ls: KDTree(_WORKER_ENGINE.feature_matrix, leafsize=ls) for ls in leaf_sizes
     }
     # Warmup worker process
     for sid in _WORKER_ENGINE.shape_ids[:50]:
@@ -166,10 +164,12 @@ def benchmark_knn_leaf_size(
         stats = eval_res["total_stats"]
 
         overlaps = [
-            len(set(baseline_results[sid]) & set(results[sid]))
-            / len(baseline_results[sid])
-            if baseline_results[sid]
-            else 1.0
+            (
+                len(set(baseline_results[sid]) & set(results[sid]))
+                / len(baseline_results[sid])
+                if baseline_results[sid]
+                else 1.0
+            )
             for sid in shape_ids
         ]
 
@@ -212,12 +212,13 @@ def plot_leaf_size_results(
     saved_plots: dict[str, Path] = {}
 
     if elbow_ls not in knn_df["leaf_size"].values:
-        elbow_ls = int(knn_df.loc[(knn_df["leaf_size"] - elbow_ls).abs().idxmin(), "leaf_size"])
+        elbow_ls = int(
+            knn_df.loc[(knn_df["leaf_size"] - elbow_ls).abs().idxmin(), "leaf_size"]
+        )
     elbow_time = float(
         knn_df.loc[knn_df["leaf_size"] == elbow_ls, "mean_query_ms"].iloc[0]
     )
 
-    # Single-panel Log2 X-axis Retrieval Time plot (without construction time or max-leaf dot)
     fig, ax = plt.subplots(figsize=(7.5, 5.2), dpi=300)
     ax.plot(
         knn_df["leaf_size"],

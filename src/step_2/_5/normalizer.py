@@ -7,9 +7,6 @@ import vedo
 
 from src.types.mesh_types import Box
 
-# A recomputed quantity counts as correct if it is within this distance of its
-# target. Far above the ~1e-7 rounding from single-precision/text storage,
-# far below any real normalization error.
 TOLERANCE = 1e-6
 
 
@@ -33,14 +30,7 @@ def center(mesh: vedo.Mesh) -> np.ndarray:
 
 def scale_to_unit_cube(mesh: vedo.Mesh) -> float:
     """Uniformly scale the mesh, about the world origin, so its current
-    axis-aligned bounding box's largest dimension becomes exactly 1.
-
-    This must run AFTER any rotation/alignment step (e.g. Step 3.1's PCA
-    alignment), not before: the bounding box computed here depends on the
-    mesh's current orientation, so scaling before alignment would give two
-    instances of the same shape -- differing only by their original
-    rotation -- different scale factors. Mutates `mesh` and returns the
-    scale factor applied."""
+    axis-aligned bounding box's largest dimension becomes exactly 1."""
     bounds = mesh.bounds()
     extents = (bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4])
     max_extent = max(extents)

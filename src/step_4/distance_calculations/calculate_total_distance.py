@@ -29,6 +29,7 @@ IDENTIFIER_COLUMN = "file_path"
 
 DistanceFunction = Callable[..., dict[str, float]]
 
+
 @dataclass(frozen=True)
 class DistanceConfig:
     function: DistanceFunction
@@ -51,18 +52,14 @@ DISTANCE_CONFIG_EMD = {
     "euclidean": DistanceConfig(
         euclidean_distance, ELEMENTAL_DESCRIPTORS, histogram=False
     ),
-    "emd": DistanceConfig(
-        earth_movers_distance, HISTOGRAM_DESCRIPTORS, histogram=True
-    ),
+    "emd": DistanceConfig(earth_movers_distance, HISTOGRAM_DESCRIPTORS, histogram=True),
 }
 
 DISTANCE_CONFIG_COSINE = {
     "euclidean": DistanceConfig(
         euclidean_distance, ELEMENTAL_DESCRIPTORS, histogram=False
     ),
-    "cosine": DistanceConfig(
-        cosine_distance, HISTOGRAM_DESCRIPTORS, histogram=True
-    ),
+    "cosine": DistanceConfig(cosine_distance, HISTOGRAM_DESCRIPTORS, histogram=True),
 }
 
 
@@ -144,9 +141,7 @@ class ShapeDistanceCalculator:
         feature_databases = {
             path: df
             for path, df in self.databases.items()
-            if not {"distance_function", "descriptor", "weight"}.issubset(
-                df.columns
-            )
+            if not {"distance_function", "descriptor", "weight"}.issubset(df.columns)
         }
         if not feature_databases:
             raise ValueError("No descriptor databases were supplied.")
@@ -172,15 +167,11 @@ class ShapeDistanceCalculator:
                                 (path, df, histogram_columns, True)
                             )
                     elif scalar_present:
-                        source_candidates.append(
-                            (path, df, [descriptor], False)
-                        )
+                        source_candidates.append((path, df, [descriptor], False))
                     elif histogram_columns:
                         # Infer histogram input from its numbered bin columns
                         # when the family is not stored as a scalar column.
-                        source_candidates.append(
-                            (path, df, histogram_columns, True)
-                        )
+                        source_candidates.append((path, df, histogram_columns, True))
 
                 if not source_candidates:
                     raise ValueError(
@@ -209,18 +200,14 @@ class ShapeDistanceCalculator:
                     columns,
                     is_histogram,
                 )
-                self._descriptor_source_paths[(function_name, descriptor)] = (
-                    path
-                )
+                self._descriptor_source_paths[(function_name, descriptor)] = path
                 if is_histogram and self.hist_df is None:
                     self.hist_df = source_df
                 if not is_histogram and self.simple_df is None:
                     self.simple_df = source_df
 
         if not self._descriptor_sources:
-            raise ValueError(
-                "The active distance configuration has no descriptors."
-            )
+            raise ValueError("The active distance configuration has no descriptors.")
 
         if self.simple_df is None:
             # Preserve a common candidate index even for histogram-only
@@ -232,9 +219,7 @@ class ShapeDistanceCalculator:
         self.weights: dict[tuple[str, str], float] = {}
         if self.weights_df is not None:
             self.weights = {
-                (str(r["distance_function"]), str(r["descriptor"])): float(
-                    r["weight"]
-                )
+                (str(r["distance_function"]), str(r["descriptor"])): float(r["weight"])
                 for _, r in self.weights_df.iterrows()
             }
         self.distance_scales: dict[tuple[str, str], float] = {}
@@ -252,9 +237,6 @@ class ShapeDistanceCalculator:
                     )
                 self.distance_scales[key] = float(scale)
 
-        # A distance-function change should not require editing the config
-        # and weights CSV in lockstep. Reuse a descriptor weight only when
-        # the CSV has exactly one unambiguous weight for that descriptor.
         for function_name, config in self.distance_config.items():
             for descriptor in config.descriptors:
                 key = (function_name, descriptor)
@@ -330,9 +312,7 @@ class ShapeDistanceCalculator:
                 scale = 0.0
                 offset = float(np.mean(y))
             else:
-                scale = float(
-                    np.mean((x - x.mean()) * (y - y.mean())) / variance
-                )
+                scale = float(np.mean((x - x.mean()) * (y - y.mean())) / variance)
                 offset = float(y.mean() - scale * x.mean())
 
             if not np.allclose(
@@ -436,9 +416,7 @@ class ShapeDistanceCalculator:
             if candidate_cdfs is None:
                 candidate_sums = candidates.sum(axis=1, keepdims=True)
                 candidate_sums[candidate_sums == 0] = 1.0
-                candidate_cdfs = np.cumsum(candidates / candidate_sums, axis=1)[
-                    :, :-1
-                ]
+                candidate_cdfs = np.cumsum(candidates / candidate_sums, axis=1)[:, :-1]
                 cached["candidate_cdfs"] = candidate_cdfs
             query_sum = query_vector.sum()
             if query_sum == 0:
@@ -462,9 +440,7 @@ class ShapeDistanceCalculator:
                     f"Cosine distance is undefined for descriptor "
                     f"'{descriptor}' with a zero vector."
                 )
-            similarities = (
-                candidates @ query_vector / (candidate_norms * query_norm)
-            )
+            similarities = candidates @ query_vector / (candidate_norms * query_norm)
             values = 1.0 - np.clip(similarities, -1.0, 1.0)
             return dict(zip(self.shape_identifiers, values.astype(float)))
 
@@ -538,8 +514,7 @@ class ShapeDistanceCalculator:
             )
 
         raise ValueError(
-            f"Query '{query}' was not found in the supplied descriptor "
-            "databases."
+            f"Query '{query}' was not found in the supplied descriptor " "databases."
         )
 
     def _detect_normalize_by_sum(self) -> bool:
@@ -593,9 +568,7 @@ class ShapeDistanceCalculator:
             if (
                 not is_histogram
                 and len(columns) == 1
-                and self._is_processed_stem(
-                    self._descriptor_source_paths[key].stem
-                )
+                and self._is_processed_stem(self._descriptor_source_paths[key].stem)
             )
         }
         missing_transforms = processed_scalars - self._query_transforms.keys()
@@ -617,9 +590,7 @@ class ShapeDistanceCalculator:
         )
         for descriptor, (scale, offset) in self._query_transforms.items():
             if descriptor in scalar_values:
-                scalar_values[descriptor] = (
-                    scale * scalar_values[descriptor] + offset
-                )
+                scalar_values[descriptor] = scale * scalar_values[descriptor] + offset
         return scalar_values, histogram_values
 
     def calculate_total_distance_from_mesh(
@@ -628,13 +599,8 @@ class ShapeDistanceCalculator:
     ) -> dict[str, float]:
         """
         Run the whole pipeline on the query mesh and compute total weighted
-        distances against the precomputed database in < 1 second.
+        distances against the precomputed database.
         """
-        # If the query is one of the indexed database meshes, use its saved
-        # descriptor row as the query vector. Re-extracting it from the raw
-        # mesh would apply repair/resampling/normalization that was not used
-        # to build the database descriptors, so even a self-match could be
-        # non-zero.
         if isinstance(mesh_or_path, (str, Path)):
             try:
                 query_key = self._resolve_query_key(str(mesh_or_path))
@@ -644,13 +610,11 @@ class ShapeDistanceCalculator:
                 self.last_query = str(mesh_or_path)
                 self.last_preprocessed_mesh = None
                 self.all_distances = self.calculate_all_distances(query_key)
-                self.total_distances = self._sum_weighted_distances(
-                    self.all_distances
-                )
+                self.total_distances = self._sum_weighted_distances(self.all_distances)
                 return self.total_distances
 
-        elem_descriptors, hist_descriptors = (
-            self.process_mesh_and_extract_descriptors(mesh_or_path)
+        elem_descriptors, hist_descriptors = self.process_mesh_and_extract_descriptors(
+            mesh_or_path
         )
 
         query_identifier = "__query_mesh__"
@@ -765,16 +729,14 @@ class ShapeDistanceCalculator:
                 source_df, _, is_histogram = self._descriptor_sources[
                     (function_name, descriptor)
                 ]
-                columns = self._descriptor_sources[
-                    (function_name, descriptor)
-                ][1]
+                columns = self._descriptor_sources[(function_name, descriptor)][1]
                 cache_key = (id(source_df), tuple(columns))
                 cached = self._candidate_cache.get(cache_key)
                 if cached is None:
                     indexed = source_df.set_index(self.identifier_column)
-                    candidates = indexed.loc[
-                        self.shape_identifiers, columns
-                    ].to_numpy(dtype=float)
+                    candidates = indexed.loc[self.shape_identifiers, columns].to_numpy(
+                        dtype=float
+                    )
                     cached = {"candidates": candidates}
                     self._candidate_cache[cache_key] = cached
                 else:
@@ -783,9 +745,9 @@ class ShapeDistanceCalculator:
                 if query_pos is not None:
                     query_features = candidates[query_pos]
                 else:
-                    qf = source_df.set_index(
-                        self.identifier_column
-                    ).loc[query_key, columns]
+                    qf = source_df.set_index(self.identifier_column).loc[
+                        query_key, columns
+                    ]
                     if isinstance(qf, pd.Series):
                         query_features = qf.to_numpy(dtype=float)
                     else:
@@ -912,9 +874,7 @@ class ShapeDistanceCalculator:
             if not total_distances:
                 # Mesh queries populate descriptor distances but return the
                 # weighted totals without retaining them on the instance.
-                total_distances = self._sum_weighted_distances(
-                    self.all_distances
-                )
+                total_distances = self._sum_weighted_distances(self.all_distances)
 
             results = self._format_results(
                 query=query or self.last_query or "",
@@ -996,8 +956,7 @@ def main():
     parser.add_argument(
         "--visualise",
         action="store_true",
-        help="Visualises the distances between shapes in interactive"
-        "3D renderer",
+        help="Visualises the distances between shapes in interactive" "3D renderer",
     )
     parser.add_argument(
         "-o",
@@ -1009,7 +968,7 @@ def main():
         "--max_top_results_printing",
         type=int,
         default=10,
-        help="The final result printing in CLI"
+        help="The final result printing in CLI",
     )
 
     args = parser.parse_args()
@@ -1024,7 +983,7 @@ def main():
         args.query, args.shapes, run_pipeline=True
     )
     print(f"Total distances calculated. Top {args.max_top_results_printing}:")
-    for k, v in list(total_distances.items())[:args.max_top_results_printing]:
+    for k, v in list(total_distances.items())[: args.max_top_results_printing]:
         print(f"  {k}: {v:.4f}")
 
     if args.output:
@@ -1036,23 +995,16 @@ def main():
         if len(shapes) == 1 and Path(shapes[0]).is_dir():
             mesh_root = Path(shapes[0])
             shapes = [
-                str(mesh_root / shape)
-                for shape in list(total_distances.keys())[:10]
+                str(mesh_root / shape) for shape in list(total_distances.keys())[:10]
             ]
         else:
-            # Distance keys are usually database-relative identifiers such as
-            # ``Car/m1496.obj`` rather than paths relative to the working
-            # directory. When the query is a mesh file, its class directory's
-            # parent is the likely database root; use it to resolve those keys.
             query_path = Path(args.query)
             candidate_roots: list[Path] = []
             if query_path.is_file():
                 candidate_roots.append(query_path.parent.parent)
             candidate_roots.extend(
                 [
-                    Path(
-                        "3d_models_final/3d_models_steps/3_models_fully_normalized"
-                    ),
+                    Path("3d_models_final/3d_models_steps/3_models_fully_normalized"),
                     Path("3d_models"),
                 ]
             )
@@ -1068,9 +1020,7 @@ def main():
                         break
                 else:
                     resolved_shapes.append(
-                        str(candidate_roots[0] / shape)
-                        if candidate_roots
-                        else shape
+                        str(candidate_roots[0] / shape) if candidate_roots else shape
                     )
             shapes = resolved_shapes
         visualize_mesh_distances(
@@ -1083,9 +1033,7 @@ def main():
                 else (
                     "Euclidean"
                     if args.config.startswith("l2")
-                    else (
-                        "Cosine" if args.config.startswith("cosine") else "EMD"
-                    )
+                    else ("Cosine" if args.config.startswith("cosine") else "EMD")
                 )
             ),
         )

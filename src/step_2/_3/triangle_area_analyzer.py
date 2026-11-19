@@ -151,9 +151,7 @@ def _compare_single_mesh_pair(
     shape_class = parts[0] if len(parts) > 1 else "Unknown"
 
     needed_vertex_sub = before_stats.n_vertices < MIN_VERTEX_COUNT
-    needed_area_sub = (
-        before_stats.top_1pct_area_share > MAX_TOP_1PCT_AREA_SHARE
-    )
+    needed_area_sub = before_stats.top_1pct_area_share > MAX_TOP_1PCT_AREA_SHARE
     needed_decimation = before_stats.n_vertices > MAX_VERTEX_COUNT
 
     # Determine whether the mesh underwent subdivision during resampling:
@@ -272,9 +270,7 @@ def analyze_triangle_areas(
             writer = csv.DictWriter(f, fieldnames=list(df.columns))
             writer.writeheader()
             writer.writerows(rows)
-        print(
-            f"[TriangleAreaAnalyzer] Saved {len(df)} mesh comparisons to {csv_path}"
-        )
+        print(f"[TriangleAreaAnalyzer] Saved {len(df)} mesh comparisons to {csv_path}")
 
     return df
 
@@ -352,7 +348,6 @@ def plot_triangle_area_histograms(
         fig.savefig(plot_path, dpi=150, bbox_inches="tight")
         print(f"[TriangleAreaAnalyzer] Saved histogram plot to {plot_path}")
 
-        # Also save a PDF version alongside PNG (or vice versa) for report inclusion
         alt_suffix = ".pdf" if plot_path.suffix.lower() != ".pdf" else ".png"
         alt_path = plot_path.with_suffix(alt_suffix)
         fig.savefig(alt_path, dpi=150, bbox_inches="tight")
@@ -536,9 +531,7 @@ def main() -> None:
         )
     else:
         if args.before is None or args.after is None:
-            parser.error(
-                "--before and --after are required unless --from_csv is set."
-            )
+            parser.error("--before and --after are required unless --from_csv is set.")
         analyze_and_plot_triangle_areas(
             before_dir=args.before,
             after_dir=args.after,

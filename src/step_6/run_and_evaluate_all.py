@@ -67,11 +67,6 @@ def _try_load_existing(stats_file: Path, roc_file: Path) -> tuple[dict, dict] | 
 
 
 def compute_ranking_table(comparison_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Computes integer ranks (1 = best) per metric and average rank per row,
-    following Slide 31 of Module 7. Quality metrics rank higher=better;
-    timing metrics rank lower=better (faster = rank 1).
-    """
     rank_df = pd.DataFrame()
     rank_df["method"] = comparison_df["method"]
 
@@ -274,7 +269,6 @@ def run_and_evaluate_all(
     if not all_total_stats:
         raise RuntimeError("No retrieval methods were evaluated.")
 
-    # 4. Build Combined Comparison Table (Slide 30) & Ranking Table (Slide 31)
     comparison_df = pd.DataFrame(all_total_stats)
     ordered_cols = (
         ["method", "total_queries"]
@@ -294,7 +288,6 @@ def run_and_evaluate_all(
     with open(comparison_json, "w", encoding="utf-8") as f:
         json.dump(all_total_stats, f, indent=2)
 
-    # 5. Plot Combined ROC Curve (Slide 26), Metrics Bar Chart & Time Comparison
     roc_plot_path = comparison_dir / "all_methods_roc_comparison.png"
     plot_roc_curves(
         all_roc_results,
@@ -323,7 +316,6 @@ def run_and_evaluate_all(
     pd.set_option("display.max_columns", None)
     pd.set_option("display.width", 1000)
     print("\n" + "=" * 95)
-    print("COMBINED METRICS & TIME COMPARISON TABLE (Slide 30)")
     print("=" * 95)
     print(comparison_df.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
 
@@ -336,7 +328,6 @@ def run_and_evaluate_all(
         print(time_summary_df.to_string(index=False, float_format=lambda x: f"{x:.4f}"))
 
     print("\n" + "=" * 95)
-    print("SYSTEM RANKING TABLE (1 = Best, Slide 31)")
     print("=" * 95)
     print(ranking_df.to_string(index=False, float_format=lambda x: f"{x:.2f}"))
     print("=" * 95)

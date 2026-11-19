@@ -81,13 +81,6 @@ def flip_mesh(mesh: vedo.Mesh) -> np.ndarray:
 def full_normalize(mesh: vedo.Mesh) -> FullNormalizationReport:
     """Run the complete four-step normalization pipeline on `mesh`, in the
     order translate -> align -> flip -> scale. Mutates `mesh` in place.
-
-    Scaling must come last: it fits the CURRENT axis-aligned bounding box to
-    a unit cube, and that box only becomes orientation-independent once the
-    shape has already been rotated into its canonical (PCA-aligned) pose.
-    Scaling before alignment would give two instances of the same shape --
-    differing only in their original rotation -- two different scale
-    factors, which breaks the whole point of normalizing.
     """
     barycenter_before = mesh.center_of_mass()
     bounding_box_before = Box(*mesh.bounds())
@@ -206,8 +199,7 @@ def summarize_reports(reports: list[FullNormalizationReport]) -> None:
     """Recompute, for every shape, the value each normalization step is
     supposed to fix and print how close it landed to its target: barycenter
     at the origin (translation), largest bounding-box dimension equal to 1
-    (scaling), and variance ordered x >= y >= z (alignment). This is
-    automated whole-database evidence rather than a visual spot check."""
+    (scaling), and variance ordered x >= y >= z (alignment)."""
     if not reports:
         print("No shapes were normalized.")
         return
@@ -226,10 +218,6 @@ def summarize_reports(reports: list[FullNormalizationReport]) -> None:
         ]
     )
 
-    # A tolerance of 1e-12 is too strict for vedo's float32 vertex storage:
-    # shapes with near-degenerate eigenvalues (e.g. a table whose width is
-    # almost equal to its depth) can show orderings "off" by ~1e-7, which is
-    # rounding noise, not a normalization error.
     variances = np.array([r.variance_after for r in reports])
     correctly_ordered = np.sum(
         (variances[:, 0] >= variances[:, 1] - 1e-5)

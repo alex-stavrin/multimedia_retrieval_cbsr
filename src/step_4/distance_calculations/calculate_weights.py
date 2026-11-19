@@ -103,9 +103,7 @@ def _build_statistics_frame(
                 "distance_function": function_name,
                 "descriptor": descriptor,
                 "count": values.count,
-                "pairwise_mean": (
-                    values.mean if values.count else float("nan")
-                ),
+                "pairwise_mean": (values.mean if values.count else float("nan")),
                 "std": values.sample_std,
             }
         )
@@ -142,7 +140,7 @@ def calculate_distance_scales(
     """Scale histogram-distance spread to the median scalar-distance spread.
 
     Scalar descriptors already use standardized values, so their distance
-    scales remain one. This calculation does not read or modify weights.
+    scales remain one.
     """
     if stats.empty:
         raise ValueError("No descriptor statistics were calculated.")
@@ -155,15 +153,12 @@ def calculate_distance_scales(
 
     is_histogram = pd.Series(
         [
-            (str(row.distance_function), str(row.descriptor))
-            in histogram_pairs
+            (str(row.distance_function), str(row.descriptor)) in histogram_pairs
             for row in stats.itertuples(index=False)
         ],
         index=stats.index,
     )
-    scalar_stds = pd.to_numeric(
-        stats.loc[~is_histogram, "std"], errors="coerce"
-    )
+    scalar_stds = pd.to_numeric(stats.loc[~is_histogram, "std"], errors="coerce")
     scalar_stds = scalar_stds[np.isfinite(scalar_stds) & (scalar_stds > 0)]
     if scalar_stds.empty:
         raise ValueError(
@@ -182,9 +177,7 @@ def calculate_distance_scales(
                 "invalid standard deviation."
             )
         if histogram_std > 0:
-            scales.at[index, "distance_scale"] = reference_std / float(
-                histogram_std
-            )
+            scales.at[index, "distance_scale"] = reference_std / float(histogram_std)
 
     return scales
 

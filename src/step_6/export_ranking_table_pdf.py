@@ -25,7 +25,6 @@ MACRO_METRIC_LABELS: dict[str, str] = {
     "macro_auroc": "AUROC",
 }
 
-# Palette (single green used for all winners)
 HEADER_BG = "#1E293B"
 HEADER_FG = "#FFFFFF"
 SECTION_BG = "#E2E8F0"
@@ -54,12 +53,13 @@ def build_table_rows(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """Build macro-only metric rows and summary rows sorted left-to-right by average rank."""
     macro_cols = [
-        c for c in METRIC_COLUMNS if c.startswith("macro_") and c in comparison_df.columns
+        c
+        for c in METRIC_COLUMNS
+        if c.startswith("macro_") and c in comparison_df.columns
     ]
     if not macro_cols:
         raise ValueError("No macro_* metric columns found in comparison CSV.")
 
-    # Compute ranks strictly across the displayed macro quality metrics.
     macro_df = comparison_df[["method"] + macro_cols].copy()
     ranking_df = compute_ranking_table(macro_df)
 

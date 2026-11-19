@@ -104,9 +104,7 @@ def compare_ranges(
         column for column in raw_df.columns if column in processed_df.columns
     ]
     if not common_columns:
-        raise ValueError(
-            "The CSV files have no shared numeric descriptor columns."
-        )
+        raise ValueError("The CSV files have no shared numeric descriptor columns.")
 
     rows = []
     for column in common_columns:
@@ -129,9 +127,7 @@ def compare_ranges(
         )
 
     if not rows:
-        raise ValueError(
-            "No shared descriptors contain usable numeric values."
-        )
+        raise ValueError("No shared descriptors contain usable numeric values.")
 
     return pd.DataFrame(rows)
 
@@ -204,13 +200,10 @@ def plot_ranges(
         raw_padding = (raw_max - raw_min) * RANGE_PADDING_FRACTION
         if raw_padding == 0:
             raw_padding = (
-                abs(raw_min) * ZERO_RANGE_PADDING_FRACTION
-                or ZERO_RANGE_MIN_PADDING
+                abs(raw_min) * ZERO_RANGE_PADDING_FRACTION or ZERO_RANGE_MIN_PADDING
             )
 
-        processed_padding = (
-            processed_max - processed_min
-        ) * RANGE_PADDING_FRACTION
+        processed_padding = (processed_max - processed_min) * RANGE_PADDING_FRACTION
         if processed_padding == 0:
             processed_padding = (
                 abs(processed_min) * ZERO_RANGE_PADDING_FRACTION
@@ -235,7 +228,6 @@ def plot_ranges(
             ha="right",
         )
 
-        # Grid appearance is inherited from rcParams.
         raw_ax.grid(axis="x")
         processed_ax.grid(axis="x")
 
@@ -279,17 +271,11 @@ def plot_descriptor_histograms(
 
     for label, df in (("raw", raw_df), ("processed", processed_df)):
         if descriptor not in df.columns:
-            raise ValueError(
-                f"Descriptor '{descriptor}' not found in {label} CSV."
-            )
+            raise ValueError(f"Descriptor '{descriptor}' not found in {label} CSV.")
 
-    raw_values = pd.to_numeric(
-        raw_df[descriptor], errors="coerce"
-    ).dropna()
+    raw_values = pd.to_numeric(raw_df[descriptor], errors="coerce").dropna()
 
-    processed_values = pd.to_numeric(
-        processed_df[descriptor], errors="coerce"
-    ).dropna()
+    processed_values = pd.to_numeric(processed_df[descriptor], errors="coerce").dropna()
 
     if raw_values.empty or processed_values.empty:
         raise ValueError(
@@ -299,14 +285,10 @@ def plot_descriptor_histograms(
 
     # Calculate the 5th and 95th percentiles independently.
     raw_lower, raw_upper = raw_values.quantile([0.05, 0.95])
-    processed_lower, processed_upper = processed_values.quantile(
-        [0.05, 0.95]
-    )
+    processed_lower, processed_upper = processed_values.quantile([0.05, 0.95])
 
     # Retain only observations within the percentile ranges.
-    raw_plot_values = raw_values[
-        raw_values.between(raw_lower, raw_upper)
-    ]
+    raw_plot_values = raw_values[raw_values.between(raw_lower, raw_upper)]
 
     processed_plot_values = processed_values[
         processed_values.between(processed_lower, processed_upper)
@@ -316,20 +298,12 @@ def plot_descriptor_histograms(
         print(f"\nDescriptor: {descriptor}")
         print("Raw:")
         print(raw_values.describe())
-        print(
-            f"Displayed range: [{raw_lower:.4f}, {raw_upper:.4f}]"
-        )
-        print(
-            f"Displayed observations: {len(raw_plot_values)} "
-            f"/ {len(raw_values)}"
-        )
+        print(f"Displayed range: [{raw_lower:.4f}, {raw_upper:.4f}]")
+        print(f"Displayed observations: {len(raw_plot_values)} " f"/ {len(raw_values)}")
 
         print("\nProcessed:")
         print(processed_values.describe())
-        print(
-            f"Displayed range: "
-            f"[{processed_lower:.4f}, {processed_upper:.4f}]"
-        )
+        print(f"Displayed range: " f"[{processed_lower:.4f}, {processed_upper:.4f}]")
         print(
             f"Displayed observations: {len(processed_plot_values)} "
             f"/ {len(processed_values)}"
@@ -375,8 +349,7 @@ def plot_descriptor_histograms(
     processed_ax.legend()
 
     fig.suptitle(
-        f"Distribution of {descriptor}: Raw vs. Processed "
-        "(5th–95th percentile)"
+        f"Distribution of {descriptor}: Raw vs. Processed " "(5th–95th percentile)"
     )
     fig.tight_layout()
 
@@ -393,7 +366,6 @@ def plot_descriptor_histograms(
         plt.show()
 
     return fig
-
 
 
 def main() -> None:
@@ -434,10 +406,7 @@ def main() -> None:
         "--bins",
         type=int,
         default=DEFAULT_HISTOGRAM_BINS,
-        help=(
-            f"Number of histogram bins "
-            f"(default: {DEFAULT_HISTOGRAM_BINS})."
-        ),
+        help=(f"Number of histogram bins " f"(default: {DEFAULT_HISTOGRAM_BINS})."),
     )
 
     args = parser.parse_args()

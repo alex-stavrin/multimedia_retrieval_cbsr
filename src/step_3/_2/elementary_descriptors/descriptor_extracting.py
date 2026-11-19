@@ -127,7 +127,6 @@ def __oriented_bounding_box(
 
     points = np.asarray(shape.points)
 
-    # Use the PCA instance consistently.
     center = pca.center
     axes = pca.eigenvectors
 

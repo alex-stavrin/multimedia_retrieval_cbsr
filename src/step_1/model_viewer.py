@@ -41,7 +41,7 @@ class ModelViewer(QMainWindow):
         window_title: str = "Multimedia Retrieval CBSR",
         window_size: tuple[int, int] = (1000, 1000),
         background_color: str = "#FFFFFF",
-        meshes: list[Mesh] = [],  # wake up
+        meshes: list[Mesh] = [],
         models_delta: numpy.array = numpy.zeros(3),  # type: ignore
     ):
 
