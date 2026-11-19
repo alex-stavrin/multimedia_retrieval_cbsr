@@ -29,6 +29,7 @@ def run_and_evaluate_weighted(
     k: int = 6,
     exclude_self: bool = True,
     eval_roc: bool = True,
+    save_pdf: bool = False,
 ) -> dict:
     total_start = time.perf_counter()
     out_path = Path(output_dir)
@@ -107,6 +108,7 @@ def run_and_evaluate_weighted(
             [roc_res],
             out_path / f"weighted_{config}_k{k}_roc.png",
             title=f"ROC Curve - Weighted ({config.upper()})",
+            save_pdf=save_pdf,
         )
 
     eval_results["total_stats"]["total_time_s"] = float(
@@ -193,6 +195,12 @@ def main() -> None:
         default=True,
         help="Compute full ROC curve, AUROC and plot (default: True).",
     )
+    parser.add_argument(
+        "-pdf",
+        "--pdf",
+        action="store_true",
+        help="Also export the ROC curve plot as a PDF.",
+    )
 
     args = parser.parse_args()
 
@@ -205,6 +213,7 @@ def main() -> None:
         k=args.k,
         exclude_self=not args.include_self,
         eval_roc=args.eval_roc,
+        save_pdf=args.pdf,
     )
 
 

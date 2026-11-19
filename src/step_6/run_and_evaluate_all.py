@@ -149,6 +149,12 @@ def run_and_evaluate_all(
         if loaded is not None:
             print(f"[REUSE] Loaded existing kNN evaluation from {knn_dir}")
             stats, roc = loaded
+            if save_pdf and not (knn_dir / f"knn_k{knn_k}_roc.pdf").is_file():
+                plot_roc_curves(
+                    [roc],
+                    knn_dir / f"knn_k{knn_k}_roc.pdf",
+                    title=f"ROC Curve - kNN (p={knn_p}, eps={knn_eps})",
+                )
         else:
             knn_eval = run_and_evaluate_knn(
                 elementary_csv=elementary_csv,
@@ -159,6 +165,7 @@ def run_and_evaluate_all(
                 eps=knn_eps,
                 exclude_self=exclude_self,
                 eval_roc=True,
+                save_pdf=save_pdf,
             )
             stats = knn_eval["total_stats"]
             roc = knn_eval["roc"]
@@ -176,6 +183,12 @@ def run_and_evaluate_all(
         if loaded is not None:
             print(f"[REUSE] Loaded existing rNN evaluation from {rnn_dir}")
             stats, roc = loaded
+            if save_pdf and not (rnn_dir / f"rnn_r{rnn_radius}_roc.pdf").is_file():
+                plot_roc_curves(
+                    [roc],
+                    rnn_dir / f"rnn_r{rnn_radius}_roc.pdf",
+                    title=f"ROC Curve - rNN (p={rnn_p}, eps={rnn_eps})",
+                )
         else:
             rnn_eval = run_and_evaluate_rnn(
                 elementary_csv=elementary_csv,
@@ -186,6 +199,7 @@ def run_and_evaluate_all(
                 eps=rnn_eps,
                 exclude_self=exclude_self,
                 eval_roc=True,
+                save_pdf=save_pdf,
             )
             stats = rnn_eval["total_stats"]
             roc = rnn_eval["roc"]
@@ -228,6 +242,17 @@ def run_and_evaluate_all(
                         f"[REUSE] Loaded existing Weighted ({cfg}) evaluation from {weighted_dir}"
                     )
                     stats, roc = loaded
+                    if (
+                        save_pdf
+                        and not (
+                            weighted_dir / f"weighted_{cfg}_k{weighted_k}_roc.pdf"
+                        ).is_file()
+                    ):
+                        plot_roc_curves(
+                            [roc],
+                            weighted_dir / f"weighted_{cfg}_k{weighted_k}_roc.pdf",
+                            title=f"ROC Curve - Weighted ({cfg.upper()})",
+                        )
                 else:
                     w_eval = run_and_evaluate_weighted(
                         elementary_csv=elementary_csv,
@@ -238,6 +263,7 @@ def run_and_evaluate_all(
                         k=weighted_k,
                         exclude_self=exclude_self,
                         eval_roc=True,
+                        save_pdf=save_pdf,
                     )
                     stats = w_eval["total_stats"]
                     roc = w_eval["roc"]
@@ -274,7 +300,7 @@ def run_and_evaluate_all(
         all_roc_results,
         output_path=roc_plot_path,
         title="ROC Curves Comparison - All Retrieval Methods",
-        save_pdf=save_pdf,
+        save_pdf=True,
     )
 
     metrics_plot_path = comparison_dir / "all_methods_metrics_comparison.png"
@@ -321,6 +347,7 @@ def run_and_evaluate_all(
         "ranking_table": ranking_df,
         "roc_results": all_roc_results,
         "roc_plot": roc_plot_path,
+        "roc_plot_pdf": roc_plot_path.with_suffix(".pdf"),
         "metrics_plot": metrics_plot_path,
         "time_plot": time_plot_path,
         "time_plot_pdf": time_plot_path.with_suffix(".pdf"),
@@ -428,7 +455,7 @@ def main() -> None:
         "-pdf",
         "--pdf",
         action="store_true",
-        help="Also export ROC and metrics comparison plots as PDFs (the time comparison plot is always exported as both PNG and PDF).",
+        help="Also export individual ROC plots and the metrics comparison plot as PDFs (the combined ROC and time comparison plots are always exported as both PNG and PDF).",
     )
 
     args = parser.parse_args()
