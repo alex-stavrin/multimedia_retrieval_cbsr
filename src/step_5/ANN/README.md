@@ -1,34 +1,34 @@
-# ANN (Approximate Nearest Neighbors)
+# knn_search.py
 
-## knn_search.py
-This file makes the ANN data structure and does a knn query on query shapes. You can run it: 
-```python -m src.step_5.ANN.knn_search -q {querie_shapes} -k {number_of_neighbors_to_return} --elementary_csv {path_to_elementary_desciptors_csv} --histogram_csv {path_to_histogram_descriptors_csv} --model_dir {3d_database_directory} -o {name_of_output_file}```
+```knn_search.py``` uses the ```SpatialSearchEngine``` class from ```spatial_search_engine.py``` to build the KD-Tree index over the database descriptors and run a k-nearest-neighbor (`kNN`) search for one or more query shapes, rendering the retrieved shapes and their distances into an output image.
 
-### Example
+You can run it from the root directory with:  
+```python -m src.step_5.ANN.knn_search -q ./3d_models/Chess/D01049.obj -k 6 --elementary_csv ./3d_models_final/analysis/4_descriptors/simple_descriptors_normalized.csv --histogram_csv ./3d_models_final/analysis/4_descriptors/histogram_descriptors.csv --model_dir ./3d_models_final/3d_models_steps/3_models_fully_normalized -o result_knn.png```  
+-q / --queries = One or more query `.obj` file paths or database shape identifiers.  
+-k = Number of nearest neighbors to return per query (default is 6).  
+--eps = Approximation factor for the KD-Tree search (`0.0` is exact search; default is `0.0`).  
+--p = Minkowski distance norm order (`2.0` is Euclidean distance; default is `2.0`).  
+--elementary_csv = Path to the normalized elementary descriptors CSV file.  
+--histogram_csv = Path to the histogram descriptors CSV file.  
+--model_dir = Path to the 3D models directory used to render thumbnails (default is `3d_models`).  
+-o / --output = Output file path for the rendered results grid image (default is `knn_result_table.png`).
 
-```python -m src.step_5.ANN.knn_search -q .\3d_models\Chess\D01049.obj -k 6 --elementary_csv ./3d_models_final/analysis/4_descriptors/simple_descriptors_normalized.csv  --histogram_csv ./3d_models_final/analysis/4_descriptors/histogram_descriptors.csv --model_dir ./3d_models_final/3d_models_steps/3_models_fully_normalized -o result_knn.png```
+# rnn_search.py
 
+```rnn_search.py``` uses the ```SpatialSearchEngine``` class from ```spatial_search_engine.py``` to build the KD-Tree index over the database descriptors and run a range nearest-neighbor (`rNN`) search within a given distance radius `r` for one or more query shapes, rendering the retrieved matches into an output image.
 
-## rnn_search.py
+You can run it from the root directory with:  
+```python -m src.step_5.ANN.rnn_search -q ./3d_models/Chess/D01049.obj -r 0.85 --max_matches 6 --elementary_csv ./3d_models_final/analysis/4_descriptors/simple_descriptors_normalized.csv --histogram_csv ./3d_models_final/analysis/4_descriptors/histogram_descriptors.csv --model_dir ./3d_models_final/3d_models_steps/3_models_fully_normalized -o result_rnn.png```  
+-q / --queries = One or more query `.obj` file paths or database shape identifiers.  
+-r / --radius = Search radius threshold in the balanced feature space.  
+--max_matches = Maximum number of retrieved matches to display per query row (default is 6).  
+--eps = Approximation factor for the KD-Tree search (`0.0` is exact search; default is `0.0`).  
+--p = Minkowski distance norm order (`2.0` is Euclidean distance; default is `2.0`).  
+--elementary_csv = Path to the normalized elementary descriptors CSV file.  
+--histogram_csv = Path to the histogram descriptors CSV file.  
+--model_dir = Path to the 3D models directory used to render thumbnails.  
+-o / --output = Output file path for the rendered results grid image (default is `rnn_table.png`).
 
-This file makes the ANN data structure and does a rnn query on query shapes. You can run it:
-```python -m src.step_5.ANN.rnn_search -q {querie_shapes} -r {radius_for_rnn} --max_matches {max_matches} --elementary_csv {csv_with_elementary_descriptors} --histogram_csv {csv_with_histogram_descriptors} --model_dir {database_directory} -o {name_of_output_image}```
+# spatial_search_engine.py
 
-
-### Example
-
-```python -m src.step_5.ANN.rnn_search -q .\3d_models\Chess\D01049.obj -r 500 --max_matches 6 --elementary_csv .\3d_models_final\analysis\4_descriptors\simple_descriptors_normalized.csv --histogram_csv .\3d_models_final\analysis\4_descriptors\histogram_descriptors.csv --model_dir .\3d_models_final\3d_models_steps\3_models_fully_normalized\ -o result_rnn.png```
-
-
-## evaluate_leaf_size.py
-
-Benchmarks KNN retrieval speed and KD-Tree construction time across different KD-Tree `leaf_size` values and saves CSV tables and graphs (`knn_leaf_size_retrieval_time.png`, `knn_leaf_size_detailed_analysis.png`).
-
-```python -m src.step_5.ANN.evaluate_leaf_size --elementary_csv {elementary_csv} --histogram_csv {histogram_csv} -o {output_dir} -k {k}```
-
-
-## compare_methods_table.py
-
-Generates a 3-row comparison table (Step 4 Custom Weighted Distance, Step 5 kNN, and Step 5 rNN) for each query shape and exports the tables as PDFs (`result_comparison_chess_D01049.pdf`, `result_comparison_door_D01005.pdf`, `result_comparison_human_D00013.pdf`, `result_comparison_human_m356.pdf`).
-
-```python -m src.step_5.ANN.compare_methods_table```
+```spatial_search_engine.py``` has the ```SpatialSearchEngine``` class that loads and merges the elementary and histogram descriptor CSVs, balances the variance across feature groups, constructs the `scipy.spatial.KDTree` index, and handles `query_knn` and `query_range` (`rNN`) queries (including on-the-fly preprocessing and descriptor extraction for out-of-database query meshes).

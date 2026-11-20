@@ -1,15 +1,10 @@
-# Reduced database
-The python file for this is ```reduced_database.py```  
+# reduced_database.py
 
-It copies a small, class-balanced part of the database (4 shapes per class, 276
-shapes in total) so the other steps can be tested quickly. The choice is random
-but uses a fixed seed, so everyone who runs it on the same ```3d_models``` folder
-gets exactly the same shapes and nobody has to share the files.
+```reduced_database.py``` copies a small, class-balanced subset of the 3D shape database (by default 4 shapes per class, 276 shapes in total) using a fixed random seed so that pipeline steps can be tested quickly and reproducibly.
 
-## How to run
-You run it from project root directory. Example:
-```python -m src.step_2.reduced_database -i ./3d_models -o ./3d_models_reduced```
-
-This would compute and write analysis of the *folders* 3d_models/Bus/,
-3d_models/AquaticAnimals and the single *.obj file* ./3d_models/Bed/D00031.obj
-to the single *output file* ./analysis_output/output.csv.
+You can run it from the root directory with:  
+```python -m src.step_2.reduced_database -i ./3d_models -o ./3d_models_reduced -n 4 --seed 42```  
+-i / --input = Path to the full 3D shape database root folder.  
+-o / --output = Path to the output directory where the reduced database will be written.  
+-n / --shapes-per-class = Maximum number of shapes to sample per class (default is 4).  
+--seed = Random seed for reproducible shape selection (default is 42).

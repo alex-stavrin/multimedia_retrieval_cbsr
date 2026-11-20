@@ -1,32 +1,18 @@
-# 3.2
+# descriptor_analyzer.py
 
-## Descriptor Extracting
-File is `descriptor_extracting.py`
+```descriptor_analyzer.py``` uses the descriptor functions from ```descriptor_extracting.py``` to compute the 6 elementary 3D shape descriptors (`surface_area`, `compactness`, `rectangularity`, `diameter`, `convexity`, and `eccentricity`, plus `was_closed`) for every `.obj` mesh in a database folder and writes them to a CSV file.
 
-### How to run
-You run it from project root directory. Example:
-`python -m src.step_2._1.shapes_analyzer -i ./3d_models/Bed/D00031.obj ./3d_models/Bus/ ./3d_models/AquaticAnimals/ -s True -o ./analysis_output/output.csv -v`
+You can run it from the root directory with:  
+```python -m src.step_3._2.elementary_descriptors.descriptor_analyzer -i ./3d_models_full_normalized -o ./analysis_output/descriptors/simple_descriptors.csv -w 6```  
+-i / --input = Root directory containing the `.obj` meshes to analyze.  
+-o / --output = Output CSV path where the calculated descriptors will be saved (default is `shape_descriptors.csv`).  
+-w / --workers = Number of parallel worker processes to use (default is all CPU cores).
 
-This would compute and write analysis of the _folders_ 3d*models/Bus/,
-3d_models/AquaticAnimals and the single *.obj file* ./3d_models/Bed/D00031.obj
-to the single \_output file* ./analysis_output/output.csv.
+# descriptor_extracting.py
 
+```descriptor_extracting.py``` contains the functions that calculate the 6 elementary shape descriptors (`calculate_surface_area`, `calculate_compactness`, `calculate_rectangularity`, `calculate_diameter`, `calculate_convexity`, `calculate_eccentricity`) for a 3D mesh, and can be run directly to inspect a single `.obj` file or visualize its PCA oriented bounding box using ```ModelViewer```.
 
-
-## Descriptor Plotter
-The Python file for this is `plot_shape_features.py`. It loads a feature CSV and plots the distributions of shape descriptors across the database. It can generate histograms for each feature or boxplots grouped by class, using the first folder in each mesh's file_path as its class.
-
-### How to run
-Run it from the project root directory using `python -m src.step_2._repairment.plot_shape_features -i ./shape_features.csv`. The `-i/--input` argument specifies the input CSV. By default, the plots are displayed interactively. Use `-o/--output` to save the figure to a file, and `--bins` to set the number of bins for histograms (default: 30).
-
-The optional `--by_class` flag generates boxplots grouped by class, while `--closed_only` restricts the analysis to meshes marked as closed in the CSV. To compare descriptors for specific meshes, use `--compare ./class_a/model1.obj ./class_b/model2.obj`, providing at least two OBJ files, but can be virtually any. This mode ignores the other plot options and compares the selected meshes using their descriptors from the CSV.
-
-
-
-## Descriptor Analyzer
-The Python file for this is `descriptor_analyzer.py`. It calculates 3D shape descriptors for every OBJ mesh in a database and saves the results to a CSV file. The descriptors include surface area, compactness, rectangularity, diameter, convexity, eccentricity, and whether each mesh is closed. The script also records processing errors in the output files.
-
-### How to run
-Run it from the project root directory using `python -m src.step_3._2.elementary_descriptors.descriptor_analyzer -i ./3d_models/ -o ./shape_descriptors.csv`. The `-i`/`--input` argument specifies the root directory containing OBJ meshes, while `-o`/`--output` specifies the output CSV path. The output argument is optional and defaults to `shape_descriptors.csv`. The script searches recursively for OBJ files and preserves their relative paths in the CSV. The input meshes are not modified.
-
-The script generates three output files: the main descriptor CSV, a warnings CSV with the suffix `_warnings.csv`, and a summary text file with the suffix `_conclusion.txt`. The main CSV contains the calculated descriptors for each mesh, with any processing errors recorded in the `reason` column. The warnings CSV records warnings associated with each mesh, while the summary file reports the total number of meshes, successful calculations, errors, and captured warnings.
+You can run it from the root directory with:  
+```python -m src.step_3._2.elementary_descriptors.descriptor_extracting -i ./3d_models_full_normalized/Bed/D00031.obj -v```  
+-i / --input = Path to the `.obj` file to compute elementary descriptors for.  
+-v / --visualize = If present, opens ```ModelViewer``` to visualize the mesh and its PCA oriented bounding box.

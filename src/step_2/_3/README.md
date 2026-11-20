@@ -1,17 +1,12 @@
-# 2.3
-The python file for resampling is ```resampling.py```  
+# resampling.py
 
-You can run it:  
+```resampling.py``` resamples 3D meshes in the database so that every shape has between 5,000 and 10,000 vertices (targeting 7,500 vertices) and an even triangle area distribution, using quadric decimation for high-vertex meshes and adaptive edge/linear/centroid subdivision for low-vertex meshes.
+
+You can run it from the root directory with:  
 ```python -m src.step_2._3.resampling -i ./3d_models -o ./resampled_models -pdl -psl -pos```  
-
-- i = defines the 3d models folder
-- o = defines the output folder where we will put our resampled models
-- pdl = enable debugging messages for decimating (reducing the vertices count)
-- psl = enable debugging messages for subdivision (increasing the vertices count)
-- pos = enable debugging messages for outliers and their stats
-
-## Triangle Area Distribution Analyzer
-The python file for analyzing triangle area evenness before and after resampling is ```triangle_area_analyzer.py```.
-
-You can run it:
-```python -m src.step_2._3.triangle_area_analyzer -b ./3d_models_final/3d_models_steps/1_models_reparation -a ./3d_models_final/3d_models_steps/2_models_resampled -o ./3d_models_final/analysis/2_models_resampled/triangle_area_distribution.csv```
+-i / --input = Input folder or `.obj` file containing the 3D meshes to resample.  
+-o / --output = Output folder where the resampled 3D meshes will be saved.  
+-pdl / --print_decimate_logs = Enable console logging for decimated meshes (reducing vertex count).  
+-psl / --print_subdivision_logs = Enable console logging for subdivided meshes (increasing vertex count).  
+-pos / --print_outliers_stats = Enable console logging for meshes that were already within the target range.  
+-pfl / --print_failed_logs = Print failed subdivision and decimation logs (enabled by default; disable with `--no_print_failed_logs`).
