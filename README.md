@@ -43,8 +43,8 @@ You can run the whole pipelin with this command :
 
 ### Results of the whole pipeline
 
-After running the whole pipeline (with the above command) the resulting final normalized database should be at : ```./3d_models_final/3d_models_steps/3_models_fully_normalized```. This database should be used for querying, when testing.  
+All results are inside the folder ```./3d_models_final``` (unless you changed the argument). The resulting final normalized database should be at : ```./3d_models_final/3d_models_steps/3_models_fully_normalized```. This database should be used for querying, when testing.  
 
 Also the final features for elementary features are at ```./3d_models_final/analysis/4_descriptors/simple_descriptors_normalized.csv``` and for histogram features are at ```./3d_models_final/analysis/4_descriptors/histogram_descriptors.csv```  
 
-Any other data needed for testing should be in ```./3d_models_final``` or ```./analysis_output```.
+Any other data needed for testing should be in ```./3d_models_final``` or ```./analysis_output```.  
